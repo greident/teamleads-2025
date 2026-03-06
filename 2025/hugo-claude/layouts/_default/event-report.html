@@ -1,0 +1,202 @@
+{{ define "main" }}
+
+<!-- Hero Section -->
+{{ partial "components/page-hero.html" (dict "title" "Встреча сообщества" "subtitle" "5 марта 2026" "emoji" "💬" "gradient" "ai") }}
+
+<section class="relative py-16 px-4">
+  <div class="container mx-auto max-w-4xl">
+
+    <!-- Back link -->
+    <a href="/events" class="inline-flex items-center gap-2 text-slate-400 hover:text-telegram-blue transition-colors mb-10">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span>Все события</span>
+    </a>
+
+    <!-- Main Topic -->
+    <div class="bento-card p-8 mb-10 border-l-4 border-telegram-blue">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-4">Основная тема</h2>
+      <p class="text-lg text-slate-300">
+        Как продавать блокчейн-решение для защиты от двойного факторинга (double invoice cashing) реальному бизнесу, который изначально не заинтересован в блокчейне.
+      </p>
+    </div>
+
+    <!-- Participants -->
+    <div class="bento-card p-8 mb-10">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-6 flex items-center gap-3">
+        <span class="text-3xl">👥</span> Участники
+      </h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Денис</div>
+          <div class="text-slate-400 text-sm">Автор идеи блокчейн-решения для факторинга</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Андрей</div>
+          <div class="text-slate-400 text-sm">Организатор встречи, инженерный менеджер</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Стас</div>
+          <div class="text-slate-400 text-sm">Microsoft (Эстония), лидер Project KZ</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Олег</div>
+          <div class="text-slate-400 text-sm">Участник</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg md:col-span-2">
+          <div class="text-starlight font-bold">Рома</div>
+          <div class="text-slate-400 text-sm">Поднял тему карьерного роста и эффективности процессов</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discussion Topics -->
+    <h2 class="text-3xl font-heading font-bold text-starlight mb-8">
+      Подтемы и их <span class="text-gradient-ai">суть</span>
+    </h2>
+
+    <div class="space-y-6 mb-10">
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">1.</span> Блокчейн vs. централизованное решение
+        </h3>
+        <p class="text-slate-300">
+          Денис предложил использовать блокчейн и zero-knowledge proof для защиты от двойного обналичивания инвойсов. Андрей поставил под сомнение необходимость блокчейна — ту же задачу можно решить централизованной базой данных с межотраслевым соглашением. Денис возражал, что блокчейн убирает vendor lock-in и не требует доверия к центральному оператору.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">2.</span> Как продавать технологию бизнесу
+        </h3>
+        <p class="text-slate-300">
+          Главный вывод дискуссии: бизнесу не нужен блокчейн как таковой, ему нужно решение конкретной проблемы. Слова «блокчейн» и «zero-knowledge proof» отпугивают и вызывают недоверие. Нужно приходить с конкретным предложением: «я сэкономлю вам X% на проверке инвойсов», а технические детали раскрывать только по запросу.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">3.</span> Проблема перехода на криптовалюту (USDT)
+        </h3>
+        <p class="text-slate-300">
+          Денис настаивал, что для работы системы все транзакции должны проходить в криптовалюте на блокчейне. Андрей и Стас категорически не согласились — нельзя требовать от бизнеса полного отказа от фиата. Нужно предлагать параллельную систему: часть транзакций в крипте с более выгодными условиями, часть остается как есть. Органический рост вместо революции.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">4.</span> Учет интересов всех участников системы
+        </h3>
+        <p class="text-slate-300">
+          Стас подчеркнул, что Денис думает только о своей технологии, но не учитывает интересы всех сторон: покупателей долгов, продавцов долгов, конечных клиентов. Если для клиентов вырастет эффективная комиссия (например, из-за стоимости обнала крипты), система не взлетит.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">5.</span> Карьерный рост и эффективность процессов
+        </h3>
+        <p class="text-slate-300">
+          Рома описал типичную проблему: компания на 200 человек, процессы неэффективны, бюрократия, отчеты в никуда, документация разбросана. Руководство не хочет менять процессы, пока есть ежегодный рост. Стас дал три ключевых мысли о карьерном росте.
+        </p>
+      </div>
+    </div>
+
+    <!-- Opinions Table -->
+    <div class="bento-card p-8 mb-10 overflow-x-auto">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-6">Различные мнения</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-700">
+            <th class="text-left py-3 pr-4 text-slate-400 font-normal">Вопрос</th>
+            <th class="text-left py-3 pr-4 text-telegram-blue font-bold">Денис</th>
+            <th class="text-left py-3 pr-4 text-management-orange-start font-bold">Андрей</th>
+            <th class="text-left py-3 text-ai-purple-start font-bold">Стас</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-300">
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">Нужен ли блокчейн?</td>
+            <td class="py-3 pr-4">Да, убирает vendor lock-in</td>
+            <td class="py-3 pr-4">Нет, межотраслевое соглашение решает задачу</td>
+            <td class="py-3">Технология вторична, важно решение проблемы</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">Все транзакции в крипте?</td>
+            <td class="py-3 pr-4">Да, иначе система не работает</td>
+            <td class="py-3 pr-4">Нет, начинать с части транзакций</td>
+            <td class="py-3">Нет, нельзя ломать существующий бизнес</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">Параноидальное недоверие оправдано?</td>
+            <td class="py-3 pr-4">Да, зачем рисковать</td>
+            <td class="py-3 pr-4">Нет, люди доверяют друг другу</td>
+            <td class="py-3">Бизнесу нужно решение, а не идеология</td>
+          </tr>
+          <tr>
+            <td class="py-3 pr-4 text-starlight">Роль комплаенса</td>
+            <td class="py-3 pr-4">Решается прозрачностью блокчейна</td>
+            <td class="py-3 pr-4">Нужно учитывать стоимость рисков</td>
+            <td class="py-3">Если не позволяет обнал — бизнесу не нужна</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Takeaways -->
+    <h2 class="text-3xl font-heading font-bold text-starlight mb-8">
+      Основные <span class="text-gradient-management">выводы</span>
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+      <div class="bento-card p-6 border-l-4 border-telegram-blue">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Продажа блокчейн-решения</h3>
+        <p class="text-slate-400 text-sm">
+          Убрать слова «блокчейн» и «zero-knowledge proof» из презентации. Продавать решение конкретной бизнес-проблемы, а не технологию.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-management-orange-start">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Стратегия выхода на рынок</h3>
+        <p class="text-slate-400 text-sm">
+          Не пытаться заменить всю систему сразу. Начинать с малого: предложить более выгодные условия для транзакций в крипте, оставив старую систему работать параллельно.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-ai-purple-start">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Бизнес-модель</h3>
+        <p class="text-slate-400 text-sm">
+          Денис занимается не продажей технологии, а построением стартапа. Нужно идти к существующим факторинговым компаниям и помогать решать их текущие проблемы.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-yellow-400">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Карьерный рост</h3>
+        <p class="text-slate-400 text-sm">
+          Растут не самые умные, а те, кому доверяют. Руководитель может тормозить рост хорошего специалиста. Нужно четко понять, чего именно ты хочешь.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-green-400 md:col-span-2">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Эффективность процессов</h3>
+        <p class="text-slate-400 text-sm">
+          Проблема неэффективности типична для компаний от 70-100 человек. Неэффективность — это часто плата за масштаб. Тему решили вынести в отдельную встречу.
+        </p>
+      </div>
+    </div>
+
+    <!-- Back link bottom -->
+    <div class="text-center">
+      <a href="/events" class="inline-flex items-center gap-2 px-8 py-4 bento-card hover:border-telegram-blue/50 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span class="text-lg text-starlight">Все события</span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{{ end }}
