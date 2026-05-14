@@ -4,6 +4,57 @@
    Colors: Sky Blue (#00AFCA), Gold (#FEC50C)
    =========================================== */
 
+/* Self-hosted fonts */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/Inter-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/Inter-Medium.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/Inter-Bold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('/fonts/Inter-ExtraBold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+}
+
 /* CSS Variables */
 :root {
     /* Kazakhstan-inspired colors (subtle) */
@@ -202,6 +253,23 @@ img {
     color: var(--white);
     border-radius: var(--radius-md);
     font-size: 1.25rem;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.nav-link {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    transition: color var(--transition-base);
+}
+
+.nav-link:hover {
+    color: var(--primary-dark);
 }
 
 .nav-cta {
@@ -469,6 +537,132 @@ img {
 
     .year-review-arrow {
         font-size: 1.5rem;
+    }
+}
+
+/* ===========================================
+   EVENTS SECTION
+   =========================================== */
+.events {
+    padding: var(--space-4xl) 0;
+    background: var(--gray-50);
+}
+
+.events-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.event-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xl);
+    padding: var(--space-xl) var(--space-2xl);
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.event-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.event-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+    padding: var(--space-sm) var(--space-md);
+    background: linear-gradient(135deg, var(--kz-sky) 0%, var(--kz-sky-dark) 100%);
+    border-radius: var(--radius-lg);
+    color: var(--white);
+    flex-shrink: 0;
+}
+
+.event-day {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.event-month {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+}
+
+.event-info {
+    flex: 1;
+}
+
+.event-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.event-desc {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin-bottom: var(--space-md);
+    line-height: 1.5;
+}
+
+.event-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.event-tag {
+    padding: 2px var(--space-sm);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: var(--radius-full);
+}
+
+.event-arrow {
+    font-size: 1.5rem;
+    color: var(--gray-300);
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+    margin-top: var(--space-xs);
+}
+
+.event-card:hover .event-arrow {
+    color: var(--primary);
+    transform: translateX(6px);
+}
+
+@media (max-width: 768px) {
+    .event-card {
+        padding: var(--space-lg);
+        gap: var(--space-md);
+    }
+
+    .event-date {
+        min-width: 48px;
+        padding: var(--space-xs) var(--space-sm);
+    }
+
+    .event-day {
+        font-size: 1.25rem;
+    }
+
+    .event-arrow {
+        display: none;
     }
 }
 
@@ -799,6 +993,10 @@ img {
     }
 
     .nav-logo .logo-text {
+        display: none;
+    }
+
+    .nav-link {
         display: none;
     }
 

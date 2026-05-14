@@ -1,0 +1,255 @@
+{{ define "main" }}
+
+<!-- Hero Section -->
+{{ partial "components/page-hero.html" (dict "title" "Встреча сообщества" "subtitle" "14 мая 2026" "emoji" "💬" "gradient" "ai") }}
+
+<section class="relative py-16 px-4">
+  <div class="container mx-auto max-w-4xl">
+
+    <!-- Back link -->
+    <a href="/events" class="inline-flex items-center gap-2 text-slate-400 hover:text-telegram-blue transition-colors mb-10">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span>Все события</span>
+    </a>
+
+    <!-- Main Topic -->
+    <div class="bento-card p-8 mb-10 border-l-4 border-telegram-blue">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-4">Основная тема</h2>
+      <p class="text-lg text-slate-300">
+        Контроль качества кода: линтеры, статический анализ, автоматизация CI-проверок и организационные аспекты внедрения инженерных практик в команды.
+      </p>
+    </div>
+
+    <!-- Participants -->
+    <div class="bento-card p-8 mb-10">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-6 flex items-center gap-3">
+        <span class="text-3xl">👥</span> Участники
+      </h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Андрей</div>
+          <div class="text-slate-400 text-sm">Инженерный менеджер (Франция), опыт внедрения стандартов в крупных организациях</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Артур</div>
+          <div class="text-slate-400 text-sm">Участник (Казахстан), активный дебатер по архитектурным вопросам</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Василий</div>
+          <div class="text-slate-400 text-sm">Сторонник явного проброса параметров и контроля через компилятор</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Жоха</div>
+          <div class="text-slate-400 text-sm">Инициатор темы линтеров, опыт с auto-docs и AI-пентестингом</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Денис</div>
+          <div class="text-slate-400 text-sm">Участник</div>
+        </div>
+        <div class="p-4 bg-deep-space/50 rounded-lg">
+          <div class="text-starlight font-bold">Ян, Паша, Аза, Луар</div>
+          <div class="text-slate-400 text-sm">Участники</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discussion Topics -->
+    <h2 class="text-3xl font-heading font-bold text-starlight mb-8">
+      Подтемы и их <span class="text-gradient-ai">суть</span>
+    </h2>
+
+    <div class="space-y-6 mb-10">
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">1.</span> Линтеры и статический анализ: где запускать
+        </h3>
+        <p class="text-slate-300">
+          Обсуждали три уровня запуска линтеров: IDE, pre-commit hook, CI build. Стас считает, что IDE должна быть настроена на максимум, а commit hooks он не любит. Другие участники возражали, что pre-commit hook дает мгновенную обратную связь, а не заставляет ждать 10 минут CI-билда. Консенсус: линтеры на CI обязательны в любом случае, потому что commit hook легко обойти, а после мержа все должно проверяться независимо.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">2.</span> Внедрение инженерных стандартов в команды
+        </h3>
+        <p class="text-slate-300">
+          Два подхода: постепенный (для маленьких команд с доверием) и директивный (для крупных организаций). Андрей рассказал, что в компании с 140 разработчиками любые мягкие подходы проваливались — работало только директивное «с завтрашнего дня мерж-реквесты не пройдут без линтеров». Стас обратил внимание, что новые процессы — это отдельные проекты, и нельзя навесить на команду четыре новых практики одновременно.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">3.</span> Теория разбитых окон и конформизм
+        </h3>
+        <p class="text-slate-300">
+          Если в проекте вся кодовая база структурирована и покрыта Swagger-документацией, новые разработчики автоматически следуют этим стандартам — они копируют соседний код. Стас назвал это конформизмом: люди подстраиваются под окружение. Важно убрать психологический барьер — показать примеры на большом объеме кода, чтобы стандарт «победил количеством».
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">4.</span> JWT-токены и глобальный контекст vs явный проброс параметров
+        </h3>
+        <p class="text-slate-300">
+          Самая жаркая дискуссия встречи. Артур защищал подход с глобальным контекстным объектом (сервис сессии, инъекция через DI), из которого можно достать user ID в любом слое. Василий и Стас категорически против: глобальный объект неконтролируем, скрывает зависимости, ломает тестируемость. Явный проброс параметров дает контроль через компилятор — при добавлении нового параметра все точки использования «рассыпаются» ошибками компиляции, и разработчик видит все затронутые места.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">5.</span> Безопасность и аудит уязвимостей
+        </h3>
+        <p class="text-slate-300">
+          Обсуждали npm audit, NuGet CVE-сканирование и корпоративные репозитории артефактов. При сканировании одного проекта нашли тысячу пакетов с уязвимостями. Стас подчеркнул, что уязвимости — это баги, и сообщество должно решать их через PR и форки, а не просто выпиливать зависимости. Жоха рассказал кейс, где локальная LLM с MCP-доступами провела пентест значительно эффективнее (на 80% больше находок), чем нанятая команда пентестеров.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">6.</span> Декомпозиция и абстракции
+        </h3>
+        <p class="text-slate-300">
+          SonarQube хорошо воспитывает декомпозицию за счет ограничений на сложность и длину методов. Но проблема в том, что разработчики декомпозируют, чтобы удовлетворить инструмент, а не логически. Стас отметил, что нет современного списка, где паттерны проектирования железобетонно нужны в веб-приложениях — примеры в книгах устарели (эпоха десктопов). Участники согласились, что один метод в 100 строк часто лучше абстракции из 10 классов.
+        </p>
+      </div>
+
+      <div class="bento-card p-8">
+        <h3 class="font-heading font-bold text-xl text-starlight mb-3 flex items-center gap-2">
+          <span class="text-telegram-blue">7.</span> Автоматическая генерация документации
+        </h3>
+        <p class="text-slate-300">
+          Жоха рассказал про подход команды: локальная LLM с настроенными скиллами анализирует проект и генерирует Mermaid-диаграммы в MD-файлах, которые рендерятся в GitHub. Используют также Quarto для более красивых диаграмм. Стас возразил: цель документации — обучение, а автогенерация не дает обратной связи о том, где люди спотыкаются. Документация — это отдельный навык и процесс, а не разовая генерация.
+        </p>
+      </div>
+    </div>
+
+    <!-- Opinions Table -->
+    <div class="bento-card p-8 mb-10 overflow-x-auto">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-6">Различные мнения</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-700">
+            <th class="text-left py-3 pr-4 text-slate-400 font-normal">Вопрос</th>
+            <th class="text-left py-3 pr-4 text-telegram-blue font-bold">Стас</th>
+            <th class="text-left py-3 pr-4 text-management-orange-start font-bold">Андрей</th>
+            <th class="text-left py-3 pr-4 text-ai-purple-start font-bold">Артур</th>
+            <th class="text-left py-3 text-green-400 font-bold">Василий</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-300">
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">Где линтеры?</td>
+            <td class="py-3 pr-4">IDE на максимум, CI обязательно</td>
+            <td class="py-3 pr-4">CI обязательно, директивно</td>
+            <td class="py-3 pr-4">—</td>
+            <td class="py-3">—</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">Как внедрять стандарты?</td>
+            <td class="py-3 pr-4">Постепенно, через лидеров мнений</td>
+            <td class="py-3 pr-4">Директивно, «пластырь дернуть»</td>
+            <td class="py-3 pr-4">—</td>
+            <td class="py-3">—</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">Глобальный контекст?</td>
+            <td class="py-3 pr-4">Против, теряешь контроль</td>
+            <td class="py-3 pr-4">—</td>
+            <td class="py-3 pr-4">За, удобно и просто</td>
+            <td class="py-3">Против, нужен контроль компилятора</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-3 pr-4 text-starlight">JWT в бизнес-логике?</td>
+            <td class="py-3 pr-4">Десериализовать на входе, дальше user object</td>
+            <td class="py-3 pr-4">—</td>
+            <td class="py-3 pr-4">Достаем из контекста</td>
+            <td class="py-3">Явно пробрасывать параметры</td>
+          </tr>
+          <tr>
+            <td class="py-3 pr-4 text-starlight">Автодокументация?</td>
+            <td class="py-3 pr-4">Скептичен, цель — обучение</td>
+            <td class="py-3 pr-4">—</td>
+            <td class="py-3 pr-4">—</td>
+            <td class="py-3">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Takeaways -->
+    <h2 class="text-3xl font-heading font-bold text-starlight mb-8">
+      Основные <span class="text-gradient-management">выводы</span>
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+      <div class="bento-card p-6 border-l-4 border-telegram-blue">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Линтеры и CI</h3>
+        <p class="text-slate-400 text-sm">
+          Линтеры на CI — обязательный минимум. Pre-commit hooks полезны для быстрой обратной связи, но ненадежны как единственный гейт. IDE-настройки — личное дело разработчика, но на CI все должно быть строго.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-management-orange-start">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Внедрение стандартов</h3>
+        <p class="text-slate-400 text-sm">
+          В больших организациях эффективнее директивный подход. В малых командах работает постепенное внедрение через лидеров мнений. Каждый новый процесс — отдельный проект, нельзя навесить все сразу.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-ai-purple-start">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Явный проброс параметров</h3>
+        <p class="text-slate-400 text-sm">
+          Контроль важнее удобства. Явные параметры дают: детерминированный код, тестируемость без моков, контроль побочных эффектов через компилятор, видимость зависимостей при ревью.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-yellow-400">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">AI для пентестинга</h3>
+        <p class="text-slate-400 text-sm">
+          Локальная LLM с MCP-доступами к инфраструктуре показала результаты на 80% лучше нанятой команды пентестеров при значительно меньших затратах.
+        </p>
+      </div>
+
+      <div class="bento-card p-6 border-l-4 border-green-400 md:col-span-2">
+        <h3 class="font-heading font-bold text-lg text-starlight mb-3">Документация</h3>
+        <p class="text-slate-400 text-sm">
+          Документация — это навык и процесс, а не артефакт. Нужно писать туториалы по сценариям использования, проверять их на новых людях и итерировать. Автогенерация полезна для исследовательского анализа, но не заменяет осмысленную документацию.
+        </p>
+      </div>
+    </div>
+
+    <!-- Questions for next time -->
+    <div class="bento-card p-8 mb-10 border-l-4 border-slate-500">
+      <h2 class="font-heading font-bold text-2xl text-starlight mb-4">Вопросы для дальнейшего обсуждения</h2>
+      <ul class="space-y-3 text-slate-300">
+        <li class="flex items-start gap-3">
+          <span class="text-telegram-blue mt-1">&#8226;</span>
+          <span>Как управляться с редкими талантами (тема Стаса, не успели обсудить)</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="text-telegram-blue mt-1">&#8226;</span>
+          <span>Практический гайд по пентестингу с помощью LLM (тема Жохи)</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="text-telegram-blue mt-1">&#8226;</span>
+          <span>Diagrams-as-code: Mermaid, Quarto и подходы к визуализации архитектуры</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Back link bottom -->
+    <div class="text-center">
+      <a href="/events" class="inline-flex items-center gap-2 px-8 py-4 bento-card hover:border-telegram-blue/50 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span class="text-lg text-starlight">Все события</span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{{ end }}
