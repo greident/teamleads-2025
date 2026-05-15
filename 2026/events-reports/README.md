@@ -14,5 +14,5 @@ events-reports/
 ```
 
 Each folder should contain:
-- `report.md` — main event report
+- `report.md` – main event report
 - Supporting materials (photos, slides, data)
