@@ -1,0 +1,116 @@
+{{ define "main" }}
+<section class="report-hero">
+    <div class="container">
+        <a href="/#events" class="report-back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Все встречи
+        </a>
+        <h1 class="report-title">{{ .Title }}</h1>
+    </div>
+</section>
+
+<section class="report-content">
+    <div class="container report-container">
+
+        {{- $open := slice -}}
+        {{- $answered := slice -}}
+        {{- $events := where .Site.RegularPages "Section" "events" -}}
+
+        {{- range $events -}}
+            {{- $event := . -}}
+            {{- range .Params.nextQuestions -}}
+                {{- $item := dict "question" .question "event" $event "answeredIn" .answeredIn -}}
+                {{- if .answeredIn -}}
+                    {{- $answered = $answered | append $item -}}
+                {{- else -}}
+                    {{- $open = $open | append $item -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+
+        <div class="questions-section">
+            <h2>Открытые вопросы <span class="questions-count">{{ len $open }}</span></h2>
+            <p class="questions-subtitle">Темы, предложенные участниками на прошлых встречах</p>
+
+            {{- $groupedEvents := slice -}}
+            {{- $seenEvents := slice -}}
+            {{- range $open -}}
+                {{- $slug := .event.File.ContentBaseName -}}
+                {{- if not (in $seenEvents $slug) -}}
+                    {{- $seenEvents = $seenEvents | append $slug -}}
+                    {{- $groupedEvents = $groupedEvents | append .event -}}
+                {{- end -}}
+            {{- end -}}
+
+            {{ range $groupedEvents }}
+            {{- $thisEvent := . -}}
+            <div class="questions-group">
+                <a href="{{ .RelPermalink }}" class="questions-group-header">
+                    <span class="questions-group-date">{{ .Date.Format "02.01.2006" }}</span>
+                    <span class="questions-group-title">{{ .Title }}</span>
+                    <span class="questions-group-arrow">→</span>
+                </a>
+                <div class="questions-list">
+                    {{ range $open }}
+                    {{ if eq .event.File.ContentBaseName $thisEvent.File.ContentBaseName }}
+                    <div class="question-card">
+                        <div class="question-text">{{ .question }}</div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+        </div>
+
+        {{ if $answered }}
+        <div class="questions-section questions-answered">
+            <h2>Обсудили <span class="questions-count">{{ len $answered }}</span></h2>
+            <div class="questions-list">
+                {{ range $answered }}
+                <div class="question-card question-done">
+                    <div class="question-text">{{ .question }}</div>
+                    <div class="question-meta">
+                        <a href="{{ .event.RelPermalink }}" class="question-source">{{ .event.Date.Format "02.01.2006" }}</a>
+                        <span class="question-arrow">→</span>
+                        {{ with site.GetPage (printf "/events/%s" .answeredIn) }}
+                        <a href="{{ .RelPermalink }}" class="question-answer">{{ .Date.Format "02.01.2006" }}</a>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+        {{ end }}
+
+        <div class="report-bottom-nav">
+            <a href="/#events" class="btn btn-secondary">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Все встречи
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">◇</span>
+                <span>тимлид не кодит</span>
+            </div>
+            <p class="footer-tagline">Сообщество технических лидеров Казахстана</p>
+            <div class="footer-links">
+                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>
+                <a href="/#events">Встречи</a>
+                <a href="https://2025.teamleads.kz" target="_blank" rel="noopener">Итоги 2025</a>
+            </div>
+            <p class="footer-copyright">© {{ now.Year }} Тимлид не кодит</p>
+        </div>
+    </div>
+</footer>
+{{ end }}

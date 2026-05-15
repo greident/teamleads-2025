@@ -1,0 +1,54 @@
+{{- $bg := resources.Get "images/og-bg.png" -}}
+{{- $fontBold := resources.Get "fonts/Inter-Bold.ttf" -}}
+{{- $fontRegular := resources.Get "fonts/Inter-Regular.ttf" -}}
+
+{{- $bg = $bg | images.Filter (images.Text "@teamleads_kz" (dict
+  "color" "#00AFCA"
+  "size" 40
+  "font" $fontBold
+  "x" 80
+  "y" 60
+)) -}}
+
+{{- $bg = $bg | images.Filter (images.Text "тимлид не кодит" (dict
+  "color" "#1F2937"
+  "size" 52
+  "font" $fontBold
+  "x" 80
+  "y" 200
+)) -}}
+
+{{- $bg = $bg | images.Filter (images.Text "Сообщество технических" (dict
+  "color" "#4B5563"
+  "size" 32
+  "font" $fontRegular
+  "x" 80
+  "y" 290
+)) -}}
+
+{{- $bg = $bg | images.Filter (images.Text "лидеров Казахстана" (dict
+  "color" "#4B5563"
+  "size" 32
+  "font" $fontRegular
+  "x" 80
+  "y" 340
+)) -}}
+
+{{- $bg = $bg | images.Filter (images.Text "Архитектура. Люди. Процессы." (dict
+  "color" "#9CA3AF"
+  "size" 24
+  "font" $fontRegular
+  "x" 80
+  "y" 420
+)) -}}
+
+{{- $bg = $bg | images.Filter (images.Text "400+ участников  ·  50+ тем  ·  регулярные встречи" (dict
+  "color" "#9CA3AF"
+  "size" 22
+  "font" $fontRegular
+  "x" 80
+  "y" 570
+)) -}}
+
+{{- $og := $bg.Content | resources.FromString "og/default.png" -}}
+{{- return $og -}}

@@ -16,7 +16,40 @@
 
 <section class="report-content">
     <div class="container report-container">
+
+        {{ with .Params.participants }}
+        <div class="report-participants">
+            <h2>Участники</h2>
+            <div class="participants-grid">
+                {{ range . }}
+                <div class="participant">
+                    <strong>{{ .name }}</strong>
+                    {{ with .role }}<span>{{ . }}</span>{{ end }}
+                </div>
+                {{ end }}
+            </div>
+        </div>
+        {{ end }}
+
         {{ .Content }}
+
+        {{ with .Params.nextQuestions }}
+        <div class="report-next">
+            <h2>Вопросы для дальнейшего обсуждения</h2>
+            <ul>
+                {{ range . }}
+                <li>
+                    {{ .question }}
+                    {{ with .answeredIn }}
+                        {{ with site.GetPage (printf "/events/%s" .) }}
+                            – <a href="{{ .RelPermalink }}">обсудили {{ .Date.Format "02.01.2006" }}</a>
+                        {{ end }}
+                    {{ end }}
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+        {{ end }}
 
         <div class="report-bottom-nav">
             <a href="/#events" class="btn btn-secondary">
