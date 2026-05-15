@@ -1,0 +1,57 @@
+{{- $bg := resources.Get "images/og-bg.png" -}}
+{{- $fontBold := resources.Get "fonts/Inter-Bold.ttf" -}}
+{{- $fontRegular := resources.Get "fonts/Inter-Regular.ttf" -}}
+
+{{/* Header: @teamleads_kz */}}
+{{- $bg = $bg | images.Filter (images.Text "@teamleads_kz" (dict
+  "color" "#00AFCA"
+  "size" 40
+  "font" $fontBold
+  "x" 80
+  "y" 60
+)) -}}
+
+{{/* Date */}}
+{{- $dateStr := .Date.Format "02.01.2006" -}}
+{{- $bg = $bg | images.Filter (images.Text $dateStr (dict
+  "color" "#6B7280"
+  "size" 28
+  "font" $fontRegular
+  "x" 80
+  "y" 120
+)) -}}
+
+{{/* Extract topic headers from content HTML */}}
+{{- $raw := .RawContent -}}
+{{- $topics := findRE `<span class="topic-num">\d+\.</span>\s*([^<]+)</h3>` $raw -}}
+{{- $y := 200 -}}
+{{- range $i, $match := $topics -}}
+  {{- if lt $i 7 -}}
+    {{- $clean := replaceRE `<span class="topic-num">\d+\.</span>\s*` "" $match -}}
+    {{- $clean = replaceRE `</h3>` "" $clean -}}
+    {{- $clean = $clean | truncate 60 -}}
+    {{- $prefix := printf "%d." (add $i 1) -}}
+    {{- $line := printf "%s %s" $prefix $clean -}}
+    {{- $bg = $bg | images.Filter (images.Text $line (dict
+      "color" "#1F2937"
+      "size" 26
+      "font" $fontRegular
+      "x" 80
+      "y" $y
+    )) -}}
+    {{- $y = add $y 48 -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* Footer: diamond + name */}}
+{{- $bg = $bg | images.Filter (images.Text "тимлид не кодит" (dict
+  "color" "#9CA3AF"
+  "size" 22
+  "font" $fontRegular
+  "x" 80
+  "y" 570
+)) -}}
+
+{{- $path := printf "og/%s.png" .File.ContentBaseName -}}
+{{- $og := $bg.Content | resources.FromString $path -}}
+{{- return $og -}}

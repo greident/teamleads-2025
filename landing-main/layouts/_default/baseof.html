@@ -27,7 +27,13 @@
     <meta property="og:url" content="{{ .Permalink }}">
     <meta property="og:site_name" content="{{ .Site.Title }}">
     <meta property="og:locale" content="ru_RU">
-    <meta property="og:image" content="{{ .Site.BaseURL }}images/og-image.png">
+    {{- $ogImage := "" -}}
+    {{- if and .File (eq .Section "events") .IsPage -}}
+      {{- $ogImage = (partial "og-image.html" .).Permalink -}}
+    {{- else -}}
+      {{- $ogImage = printf "%simages/og-image.png" .Site.BaseURL -}}
+    {{- end -}}
+    <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -35,7 +41,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ .Title }}">
     <meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
-    <meta name="twitter:image" content="{{ .Site.BaseURL }}images/og-image.png">
+    <meta name="twitter:image" content="{{ $ogImage }}">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
