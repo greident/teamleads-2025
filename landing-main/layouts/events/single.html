@@ -1,0 +1,49 @@
+{{ define "main" }}
+<section class="report-hero">
+    <div class="container">
+        <a href="/#events" class="report-back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Все встречи
+        </a>
+        <h1 class="report-title">{{ .Title }}</h1>
+        <div class="report-main-topic">
+            <strong>Основная тема:</strong> {{ .Params.mainTopic }}
+        </div>
+    </div>
+</section>
+
+<section class="report-content">
+    <div class="container report-container">
+        {{ .Content }}
+
+        <div class="report-bottom-nav">
+            <a href="/#events" class="btn btn-secondary">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Все встречи
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">◇</span>
+                <span>тимлид не кодит</span>
+            </div>
+            <p class="footer-tagline">Сообщество технических лидеров Казахстана</p>
+            <div class="footer-links">
+                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>
+                <a href="/#events">Встречи</a>
+                <a href="https://2025.teamleads.kz" target="_blank" rel="noopener">Итоги 2025</a>
+            </div>
+            <p class="footer-copyright">© {{ now.Year }} Тимлид не кодит</p>
+        </div>
+    </div>
+</footer>
+{{ end }}
