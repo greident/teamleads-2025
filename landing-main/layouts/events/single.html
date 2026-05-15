@@ -80,3 +80,38 @@
     </div>
 </footer>
 {{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "{{ .Title }}",
+    "description": "{{ .Description }}",
+    "startDate": "{{ .Date.Format "2006-01-02" }}",
+    "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "location": {
+        "@type": "VirtualLocation",
+        "url": "{{ .Site.Params.telegram }}"
+    },
+    "organizer": {
+        "@type": "Organization",
+        "name": "Тимлид не кодит",
+        "url": "{{ .Site.BaseURL }}"
+    },
+    "url": "{{ .Permalink }}",
+    "inLanguage": "ru"
+    {{- with .Params.participants }},
+    "attendee": [
+        {{- range $i, $p := . }}{{ if $i }},{{ end }}
+        {
+            "@type": "Person",
+            "name": "{{ $p.name }}"
+        }
+        {{- end }}
+    ]
+    {{- end }}
+}
+</script>
+{{ end }}
