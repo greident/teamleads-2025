@@ -4,6 +4,7 @@
       "a",
       "body",
       "circle",
+      "code",
       "div",
       "footer",
       "h1",
@@ -17,6 +18,7 @@
       "meta",
       "nav",
       "noscript",
+      "ol",
       "p",
       "path",
       "script",
@@ -131,6 +133,11 @@
       "section-header",
       "section-tag",
       "section-title",
+      "showcase-empty",
+      "showcase-grid",
+      "showcase-hero",
+      "showcase-instructions",
+      "showcase-list",
       "stat",
       "stat-divider",
       "stat-label",
@@ -161,7 +168,8 @@
       "about",
       "events",
       "join",
-      "topics"
+      "topics",
+      "как-добавить-свой-проект"
     ]
   }
 }

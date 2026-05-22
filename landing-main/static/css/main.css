@@ -1576,3 +1576,218 @@ img {
         flex-basis: 100%;
     }
 }
+
+/* ===========================================
+   SHOWCASE SECTION
+   =========================================== */
+
+.showcase-highlight {
+    padding: var(--space-4xl) 0;
+    background: var(--white);
+}
+
+.showcase-hero {
+    padding: var(--space-3xl) 0 var(--space-xl);
+    background: linear-gradient(180deg, var(--white) 0%, var(--primary-light) 100%);
+}
+
+.showcase-list {
+    padding: var(--space-2xl) 0 var(--space-4xl);
+    background: var(--gray-50);
+    min-height: 40vh;
+}
+
+.showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+}
+
+.showcase-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-xl);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.showcase-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.showcase-card-body {
+    margin-bottom: var(--space-lg);
+}
+
+.showcase-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.showcase-card-desc {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    line-height: 1.5;
+    margin-bottom: var(--space-sm);
+}
+
+.showcase-card-author {
+    font-size: 0.8125rem;
+    color: var(--primary-dark);
+    font-weight: 500;
+}
+
+.showcase-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.showcase-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.showcase-card:hover .event-arrow {
+    color: var(--primary);
+    transform: translateX(6px);
+}
+
+.showcase-pr-link {
+    color: var(--primary-dark);
+    font-weight: 600;
+    border-bottom: 1px solid var(--primary);
+    transition: border-color var(--transition-base);
+}
+
+.showcase-pr-link:hover {
+    border-color: transparent;
+}
+
+.showcase-instructions {
+    max-width: 600px;
+    margin: var(--space-xl) auto 0;
+    padding: var(--space-xl);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    font-size: 0.9375rem;
+    color: var(--gray-700);
+    line-height: 1.7;
+}
+
+.showcase-instructions h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-md);
+}
+
+.showcase-instructions ol {
+    padding-left: var(--space-xl);
+    margin-bottom: var(--space-md);
+}
+
+.showcase-instructions li {
+    margin-bottom: var(--space-xs);
+}
+
+.showcase-instructions a {
+    color: var(--primary-dark);
+    font-weight: 500;
+    border-bottom: 1px solid var(--primary);
+    transition: border-color var(--transition-base);
+}
+
+.showcase-instructions a:hover {
+    border-color: transparent;
+}
+
+.showcase-empty {
+    text-align: center;
+    padding: var(--space-4xl) 0;
+    color: var(--gray-500);
+    font-size: 1.125rem;
+}
+
+.showcase-empty a {
+    color: var(--primary-dark);
+    font-weight: 600;
+    border-bottom: 1px solid var(--primary);
+}
+
+/* Showcase single page */
+.showcase-author {
+    font-size: 1.125rem;
+    color: var(--primary-dark);
+    font-weight: 500;
+    margin-top: var(--space-sm);
+}
+
+.showcase-single {
+    padding: var(--space-2xl) 0 var(--space-4xl);
+}
+
+.showcase-single-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.showcase-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.showcase-social {
+    display: flex;
+    gap: var(--space-md);
+    margin-left: auto;
+}
+
+.showcase-social-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    transition: color var(--transition-base);
+}
+
+.showcase-social-link:hover {
+    color: var(--primary-dark);
+}
+
+.showcase-single-body {
+    max-width: 720px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--gray-700);
+}
+
+.showcase-single-body p {
+    margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+    .showcase-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .showcase-social {
+        margin-left: 0;
+        width: 100%;
+    }
+}

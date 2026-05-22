@@ -10,6 +10,7 @@
         </div>
         <div class="nav-links">
             <a href="#events" class="nav-link">Встречи</a>
+            <a href="/showcase/" class="nav-link">Проекты</a>
             <a href="#about" class="nav-link">О нас</a>
             <a href="{{ .Site.Params.telegram }}" class="nav-cta" target="_blank" rel="noopener">
                 Присоединиться
@@ -198,6 +199,32 @@
         </div>
     </div>
 </section>
+
+<!-- Showcase Highlight -->
+{{- $showcasePages := where (where .Site.RegularPages "Section" "showcase") "Params.draft" "ne" true -}}
+{{- if gt (len $showcasePages) 0 }}
+<section class="showcase-highlight" id="showcase">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Витрина проектов</span>
+            <h2 class="section-title">Что делают участники</h2>
+            <p class="section-desc">
+                Проекты, продукты и инструменты от участников сообщества.
+            </p>
+        </div>
+
+        <div class="showcase-grid">
+            {{- range first 6 (sort $showcasePages "Date" "desc") -}}
+            {{- partial "showcase-card.html" . -}}
+            {{- end }}
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/showcase/" class="btn btn-secondary">Все проекты →</a>
+        </div>
+    </div>
+</section>
+{{- end }}
 
 <!-- CTA Section -->
 <section class="cta" id="join">

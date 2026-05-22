@@ -30,6 +30,8 @@
     {{- $ogImage := "" -}}
     {{- if and .File (eq .Section "events") .IsPage -}}
       {{- $ogImage = (partial "og-image.html" .).Permalink -}}
+    {{- else if and .File (eq .Section "showcase") .IsPage -}}
+      {{- $ogImage = (partial "og-showcase.html" .).Permalink -}}
     {{- else -}}
       {{- $ogImage = (partial "og-default.html" .).Permalink -}}
     {{- end -}}
