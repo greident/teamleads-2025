@@ -78,168 +78,30 @@
             <a href="/questions/" class="btn btn-secondary" style="margin-top: var(--space-md);">Что обсудить дальше?</a>
         </div>
 
+        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
         <div class="events-grid">
-            <a href="/events/meetup-2026-05-14/" class="event-card">
+            {{- range where .Site.RegularPages "Section" "events" -}}
+            {{- if .Params.cardTitle -}}
+            <a href="{{ .RelPermalink }}" class="event-card">
                 <div class="event-date">
-                    <span class="event-day">14</span>
-                    <span class="event-month">мая</span>
+                    <span class="event-day">{{ .Date.Day }}</span>
+                    <span class="event-month">{{ index $months (printf "%d" .Date.Month) }}</span>
                 </div>
                 <div class="event-info">
-                    <h3 class="event-title">Качество кода и инженерные практики</h3>
-                    <p class="event-desc">Линтеры на CI, JWT vs явные параметры, AI-пентестинг с LLM, внедрение стандартов в команды</p>
+                    <h3 class="event-title">{{ .Params.cardTitle }}</h3>
+                    <p class="event-desc">{{ .Params.cardDesc }}</p>
+                    {{- with .Params.tags }}
                     <div class="event-tags">
-                        <span class="event-tag">линтеры</span>
-                        <span class="event-tag">CI/CD</span>
-                        <span class="event-tag">JWT</span>
-                        <span class="event-tag">AI-пентестинг</span>
+                        {{- range . }}
+                        <span class="event-tag">{{ . }}</span>
+                        {{- end }}
                     </div>
+                    {{- end }}
                 </div>
                 <div class="event-arrow">→</div>
             </a>
-
-            <a href="/events/meetup-2026-05-07/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">7</span>
-                    <span class="event-month">мая</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Джуниоры, онбординг и Open Source в Казахстане</h3>
-                    <p class="event-desc">Проблемы джунов, роль тимлида, борьба с навязанными решениями, публичная вики по госинтеграциям</p>
-                    <div class="event-tags">
-                        <span class="event-tag">джуниоры</span>
-                        <span class="event-tag">онбординг</span>
-                        <span class="event-tag">Open Source</span>
-                        <span class="event-tag">тимлид</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-04-30/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">30</span>
-                    <span class="event-month">апреля</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Микросервисы, культура незнания и AI-агенты</h3>
-                    <p class="event-desc">Микросервисы vs монолит, культура сокрытия некомпетентности, AI-разработка и ревью, долгосрочная архитектура</p>
-                    <div class="event-tags">
-                        <span class="event-tag">микросервисы</span>
-                        <span class="event-tag">культура</span>
-                        <span class="event-tag">AI-агенты</span>
-                        <span class="event-tag">архитектура</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-04-23/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">23</span>
-                    <span class="event-month">апреля</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Бюрократия как инструмент управления в IT</h3>
-                    <p class="event-desc">ISO и CMMI, критика Scrum, реабилитация диаграмм Ганта, change management, документация и заменяемость</p>
-                    <div class="event-tags">
-                        <span class="event-tag">бюрократия</span>
-                        <span class="event-tag">процессы</span>
-                        <span class="event-tag">Scrum</span>
-                        <span class="event-tag">документация</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-04-12/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">12</span>
-                    <span class="event-month">апреля</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Увольнения в IT: формальные аспекты и политические игры</h3>
-                    <p class="event-desc">PIP и испытательный срок, эмоциональная сторона увольнения, политические игры, обучение тимлидов, аналитика</p>
-                    <div class="event-tags">
-                        <span class="event-tag">увольнения</span>
-                        <span class="event-tag">PIP</span>
-                        <span class="event-tag">политика</span>
-                        <span class="event-tag">управление</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-03-26/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">26</span>
-                    <span class="event-month">марта</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Нормирование труда в IT</h3>
-                    <p class="event-desc">Метрики продуктивности, миф о «творческой профессии», декомпозиция задач, PanDev, предсказуемость vs эффективность</p>
-                    <div class="event-tags">
-                        <span class="event-tag">нормирование</span>
-                        <span class="event-tag">метрики</span>
-                        <span class="event-tag">декомпозиция</span>
-                        <span class="event-tag">процессы</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-03-19/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">19</span>
-                    <span class="event-month">марта</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Продажа технологий и эволюция разработчика</h3>
-                    <p class="event-desc">Продажа технологий внутри компаний, рефакторинг как бизнес-решение, разработчик → продукт, AI в разработке</p>
-                    <div class="event-tags">
-                        <span class="event-tag">продажи</span>
-                        <span class="event-tag">рефакторинг</span>
-                        <span class="event-tag">продукт</span>
-                        <span class="event-tag">AI</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-03-12/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">12</span>
-                    <span class="event-month">марта</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Эстимация, микроменеджмент и карьерные стратегии</h3>
-                    <p class="event-desc">Часы vs Story Points vs No Estimate, микроменеджмент и инновационность, токсичность, рынок труда</p>
-                    <div class="event-tags">
-                        <span class="event-tag">эстимация</span>
-                        <span class="event-tag">микроменеджмент</span>
-                        <span class="event-tag">карьера</span>
-                        <span class="event-tag">рынок труда</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-
-            <a href="/events/meetup-2026-03-05/" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">5</span>
-                    <span class="event-month">марта</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">Блокчейн, продажа технологий и карьерный рост</h3>
-                    <p class="event-desc">Как продавать блокчейн бизнесу, стратегия выхода на рынок, карьерный рост выше тимлида</p>
-                    <div class="event-tags">
-                        <span class="event-tag">блокчейн</span>
-                        <span class="event-tag">факторинг</span>
-                        <span class="event-tag">карьера</span>
-                        <span class="event-tag">процессы</span>
-                    </div>
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
+            {{- end -}}
+            {{- end }}
         </div>
     </div>
 </section>

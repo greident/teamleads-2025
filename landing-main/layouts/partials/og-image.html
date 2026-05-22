@@ -29,7 +29,7 @@
   {{- if lt $i 7 -}}
     {{- $clean := replaceRE `<span class="topic-num">\d+\.</span>\s*` "" $match -}}
     {{- $clean = replaceRE `</h3>` "" $clean -}}
-    {{- $clean = $clean | truncate 60 -}}
+    {{- $clean = $clean | plainify | truncate 60 -}}
     {{- $prefix := printf "%d." (add $i 1) -}}
     {{- $line := printf "%s %s" $prefix $clean -}}
     {{- $bg = $bg | images.Filter (images.Text $line (dict
