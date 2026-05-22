@@ -1,0 +1,53 @@
+{{- $bg := resources.Get "images/og-bg.png" -}}
+{{- $fontBold := resources.Get "fonts/Inter-Bold.ttf" -}}
+{{- $fontRegular := resources.Get "fonts/Inter-Regular.ttf" -}}
+
+{{- $bg = $bg | images.Filter (images.Text "Витрина проектов" (dict
+  "color" "#00AFCA"
+  "size" 32
+  "font" $fontBold
+  "x" 80
+  "y" 60
+)) -}}
+
+{{- $title := .Title | truncate 50 -}}
+{{- $bg = $bg | images.Filter (images.Text $title (dict
+  "color" "#1F2937"
+  "size" 52
+  "font" $fontBold
+  "x" 80
+  "y" 180
+)) -}}
+
+{{- with .Params.description -}}
+{{- $desc := . | truncate 70 -}}
+{{- $bg = $bg | images.Filter (images.Text $desc (dict
+  "color" "#4B5563"
+  "size" 28
+  "font" $fontRegular
+  "x" 80
+  "y" 280
+)) -}}
+{{- end -}}
+
+{{- with .Params.author -}}
+{{- $bg = $bg | images.Filter (images.Text . (dict
+  "color" "#008BA3"
+  "size" 28
+  "font" $fontRegular
+  "x" 80
+  "y" 380
+)) -}}
+{{- end -}}
+
+{{- $bg = $bg | images.Filter (images.Text "тимлид не кодит" (dict
+  "color" "#9CA3AF"
+  "size" 22
+  "font" $fontRegular
+  "x" 80
+  "y" 570
+)) -}}
+
+{{- $path := printf "og/showcase-%s.png" .File.ContentBaseName -}}
+{{- $og := $bg.Content | resources.FromString $path -}}
+{{- return $og -}}

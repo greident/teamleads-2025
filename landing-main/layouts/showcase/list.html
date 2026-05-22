@@ -1,0 +1,73 @@
+{{ define "main" }}
+<section class="showcase-hero">
+    <div class="container">
+        <a href="/" class="report-back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Главная
+        </a>
+        <span class="section-tag">Витрина проектов</span>
+        <h1 class="section-title">Что делают участники сообщества</h1>
+        <p class="section-desc">
+            Проекты, продукты и инструменты от тимлидов и технических лидеров Казахстана.
+        </p>
+        {{- with .Content }}
+        <div class="showcase-instructions">
+            {{ . }}
+        </div>
+        {{- end }}
+    </div>
+</section>
+
+<section class="showcase-list">
+    <div class="container">
+        <div class="showcase-grid">
+            {{- range where .Pages "Params.draft" "ne" true -}}
+            {{- partial "showcase-card.html" . -}}
+            {{- end }}
+        </div>
+
+        {{- if eq (len (where .Pages "Params.draft" "ne" true)) 0 }}
+        <div class="showcase-empty">
+            <p>Пока здесь пусто. Станьте первым – <a href="https://github.com/belyaevsa/teamleads-2025" target="_blank" rel="noopener">добавьте свой проект</a>.</p>
+        </div>
+        {{- end }}
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">◇</span>
+                <span>тимлид не кодит</span>
+            </div>
+            <p class="footer-tagline">Сообщество технических лидеров Казахстана</p>
+            <div class="footer-links">
+                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>
+                <a href="/#events">Встречи</a>
+                <a href="https://2025.teamleads.kz" target="_blank" rel="noopener">Итоги 2025</a>
+            </div>
+            <p class="footer-copyright">© {{ now.Year }} Тимлид не кодит</p>
+        </div>
+    </div>
+</footer>
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Витрина проектов – Тимлид не кодит",
+    "description": "Проекты участников сообщества тимлидов Казахстана",
+    "url": "{{ .Permalink }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}

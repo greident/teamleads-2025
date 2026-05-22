@@ -1,0 +1,104 @@
+{{ define "main" }}
+<section class="showcase-hero">
+    <div class="container">
+        <a href="/showcase/" class="report-back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Все проекты
+        </a>
+        <h1 class="report-title">{{ .Title }}</h1>
+        <p class="showcase-author">{{ .Params.author }}</p>
+    </div>
+</section>
+
+<section class="showcase-single">
+    <div class="container report-container">
+        <div class="showcase-single-meta">
+            {{- with .Params.projectUrl }}
+            <a href="{{ . }}" class="btn btn-primary" target="_blank" rel="noopener">
+                Открыть проект →
+            </a>
+            {{- end }}
+
+            {{- with .Params.tags }}
+            <div class="showcase-tags">
+                {{- range . }}
+                <span class="event-tag">{{ . }}</span>
+                {{- end }}
+            </div>
+            {{- end }}
+
+            {{- with .Params.social }}
+            <div class="showcase-social">
+                {{- with .telegram }}
+                <a href="{{ . }}" target="_blank" rel="noopener" class="showcase-social-link">Telegram</a>
+                {{- end }}
+                {{- with .github }}
+                <a href="{{ . }}" target="_blank" rel="noopener" class="showcase-social-link">GitHub</a>
+                {{- end }}
+                {{- with .linkedin }}
+                <a href="{{ . }}" target="_blank" rel="noopener" class="showcase-social-link">LinkedIn</a>
+                {{- end }}
+                {{- with .twitter }}
+                <a href="{{ . }}" target="_blank" rel="noopener" class="showcase-social-link">Twitter</a>
+                {{- end }}
+            </div>
+            {{- end }}
+        </div>
+
+        <div class="showcase-single-body">
+            {{ .Content }}
+        </div>
+
+        <div class="report-bottom-nav">
+            <a href="/showcase/" class="btn btn-secondary">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Все проекты
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">◇</span>
+                <span>тимлид не кодит</span>
+            </div>
+            <p class="footer-tagline">Сообщество технических лидеров Казахстана</p>
+            <div class="footer-links">
+                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>
+                <a href="/#events">Встречи</a>
+                <a href="https://2025.teamleads.kz" target="_blank" rel="noopener">Итоги 2025</a>
+            </div>
+            <p class="footer-copyright">© {{ now.Year }} Тимлид не кодит</p>
+        </div>
+    </div>
+</footer>
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "{{ .Title }}",
+    "description": "{{ .Params.description }}",
+    "url": "{{ with .Params.projectUrl }}{{ . }}{{ else }}{{ .Permalink }}{{ end }}",
+    "author": {
+        "@type": "Person",
+        "name": "{{ .Params.author }}"
+    },
+    "datePublished": "{{ .Date.Format "2006-01-02" }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}

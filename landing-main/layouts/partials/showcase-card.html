@@ -1,0 +1,17 @@
+<a href="{{ .RelPermalink }}" class="showcase-card">
+    <div class="showcase-card-body">
+        <h3 class="showcase-card-title">{{ .Title }}</h3>
+        <p class="showcase-card-desc">{{ .Params.description }}</p>
+        <span class="showcase-card-author">{{ .Params.author }}</span>
+    </div>
+    <div class="showcase-card-footer">
+        {{- with .Params.tags }}
+        <div class="showcase-card-tags">
+            {{- range . }}
+            <span class="event-tag">{{ . }}</span>
+            {{- end }}
+        </div>
+        {{- end }}
+        <span class="event-arrow">→</span>
+    </div>
+</a>
