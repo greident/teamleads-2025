@@ -10,6 +10,7 @@
         </div>
         <div class="nav-links">
             <a href="#events" class="nav-link">Встречи</a>
+            <a href="/insights/" class="nav-link">Инсайты</a>
             <a href="/showcase/" class="nav-link">Проекты</a>
             <a href="#about" class="nav-link">О нас</a>
             <a href="{{ .Site.Params.telegram }}" class="nav-cta" target="_blank" rel="noopener">
@@ -221,6 +222,47 @@
 
         <div style="text-align: center; margin-top: var(--space-xl);">
             <a href="/showcase/" class="btn btn-secondary">Все проекты →</a>
+        </div>
+    </div>
+</section>
+{{- end }}
+
+<!-- Insights Highlight -->
+{{- $insightPages := where (where .Site.RegularPages "Section" "insights") "Params.draft" "ne" true -}}
+{{- if gt (len $insightPages) 0 }}
+<section class="insights-highlight" id="insights">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Инсайты из чата</span>
+            <h2 class="section-title">Знания, которые не тонут</h2>
+            <p class="section-desc">
+                Ключевые идеи из обсуждений в Telegram – структурировано и доступно для поиска.
+            </p>
+        </div>
+
+        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+        <div class="insights-grid">
+            {{- range first 3 (sort $insightPages "Date" "desc") }}
+            <a href="{{ .RelPermalink }}" class="insight-card">
+                <div class="insight-card-header">
+                    <span class="insight-period">{{ .Params.period }}</span>
+                    <span class="insight-date">
+                        {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}
+                    </span>
+                </div>
+                <h3 class="insight-card-title">{{ .Title }}</h3>
+                <p class="insight-card-desc">{{ .Description }}</p>
+                <div class="insight-card-meta">
+                    <span class="insight-stat">{{ .Params.messagesCount }} сообщений</span>
+                    <span class="insight-stat">{{ .Params.topicsCount }} тем</span>
+                    <span class="event-arrow">→</span>
+                </div>
+            </a>
+            {{- end }}
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/insights/" class="btn btn-secondary">Все инсайты →</a>
         </div>
     </div>
 </section>

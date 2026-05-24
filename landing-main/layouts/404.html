@@ -1,0 +1,31 @@
+{{ define "main" }}
+<section style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--gray-50);">
+    <div class="container" style="text-align: center; padding: var(--space-4xl) var(--space-lg);">
+
+        <div style="margin-bottom: var(--space-2xl);">
+            <span style="display: inline-block; font-size: 4rem; color: var(--kz-sky); opacity: 0.25; transform: rotate(45deg);">◇</span>
+        </div>
+
+        <span class="section-tag" style="margin-bottom: var(--space-md); display: inline-block;">404</span>
+
+        <h1 class="section-title" style="margin-bottom: var(--space-md);">
+            Страница не найдена
+        </h1>
+
+        <p class="section-desc" style="max-width: 480px; margin: 0 auto var(--space-2xl);">
+            Похоже, эта страница переехала или её не существует.
+            Попробуйте вернуться на главную – или загляните к нам в Telegram.
+        </p>
+
+        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+            <a href="/" class="btn btn-primary">
+                На главную
+            </a>
+            <a href="{{ .Site.Params.telegram }}" class="btn btn-secondary" target="_blank" rel="noopener">
+                Telegram-группа
+            </a>
+        </div>
+
+    </div>
+</section>
+{{ end }}

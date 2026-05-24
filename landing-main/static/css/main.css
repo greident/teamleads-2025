@@ -1813,6 +1813,211 @@ img {
 
 
 /* ============================================
+   Insights Section
+   ============================================ */
+
+.insights-hero {
+    padding: var(--space-3xl) 0 var(--space-xl);
+    background: linear-gradient(180deg, var(--white) 0%, var(--primary-light) 100%);
+}
+
+.insights-list {
+    padding: var(--space-2xl) 0 var(--space-4xl);
+    background: var(--gray-50);
+    min-height: 40vh;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-lg);
+}
+
+.insight-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-xl);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+}
+
+.insight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.insight-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.insight-period {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-dark);
+    background: var(--primary-light);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+}
+
+.insight-date {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+}
+
+.insight-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-sm);
+    line-height: 1.4;
+}
+
+.insight-card-desc {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
+    flex-grow: 1;
+}
+
+.insight-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.insight-card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--gray-100);
+}
+
+.insight-stat {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+    font-weight: 500;
+}
+
+.insight-card-meta .event-arrow {
+    margin-left: auto;
+}
+
+.insight-card:hover .event-arrow {
+    color: var(--primary);
+    transform: translateX(6px);
+}
+
+.insights-empty {
+    text-align: center;
+    padding: var(--space-4xl) 0;
+    color: var(--gray-500);
+    font-size: 1.125rem;
+}
+
+.insights-empty a {
+    color: var(--primary-dark);
+    font-weight: 600;
+    border-bottom: 1px solid var(--primary);
+}
+
+.insight-discuss {
+    text-align: center;
+    margin: var(--space-3xl) 0 var(--space-xl);
+    padding: var(--space-2xl);
+    background: var(--primary-light);
+    border-radius: var(--radius-xl);
+}
+
+.insight-discuss p {
+    font-size: 1.125rem;
+    color: var(--gray-700);
+    margin-bottom: var(--space-lg);
+    font-weight: 500;
+}
+
+/* Insights highlight on homepage */
+.insights-highlight {
+    padding: var(--space-4xl) 0;
+    background: var(--gray-50);
+}
+
+.insights-highlight .insights-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* Insight single page – topic blocks reuse report styles */
+.insight-topic {
+    margin-bottom: var(--space-2xl);
+    padding: var(--space-xl);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.insight-topic h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-sm);
+}
+
+.insight-topic p {
+    font-size: 0.9375rem;
+    color: var(--gray-600);
+    line-height: 1.7;
+    margin-bottom: var(--space-sm);
+}
+
+.insight-topic blockquote {
+    margin: var(--space-md) 0;
+    padding: var(--space-sm) var(--space-lg);
+    border-left: 3px solid var(--primary);
+    background: var(--primary-light);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-style: italic;
+    color: var(--gray-600);
+}
+
+.insight-topic .msg-link {
+    font-size: 0.8125rem;
+    color: var(--primary-dark);
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--transition-base);
+}
+
+.insight-topic .msg-link:hover {
+    border-bottom-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .insight-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+}
+
+/* ============================================
    Edit on GitHub — contribute block
    ============================================ */
 

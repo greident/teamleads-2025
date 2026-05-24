@@ -9,3 +9,4 @@ node_modules
 /landing-main/resources/
 /landing-main/public/
 landing-main/public/
+.claude/commands/extract-insights.md
