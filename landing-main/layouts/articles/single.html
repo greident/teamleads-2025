@@ -41,6 +41,20 @@
         {{- end }}
         {{- end }}
 
+        {{- with .Params.relatedInsights }}
+        <div class="related-articles" style="margin-top: var(--space-lg);">
+            <h2>Связанные инсайты</h2>
+            {{- range . }}
+            {{- with site.GetPage (printf "/insights/%s" .) }}
+            <a href="{{ .RelPermalink }}" class="related-article-link">
+                <strong>{{ .Title }}</strong>
+                <span>{{ .Params.period }} · {{ .Params.messagesCount }} сообщений · {{ .Params.topicsCount }} тем</span>
+            </a>
+            {{- end }}
+            {{- end }}
+        </div>
+        {{- end }}
+
         <div class="insight-discuss">
             <p>Хотите обсудить эту тему с практикующими тимлидами?</p>
             <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">

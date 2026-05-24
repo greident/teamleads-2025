@@ -99,6 +99,20 @@
         </div>
         {{ end }}
 
+        {{- $insightSlug := .File.ContentBaseName -}}
+        {{- $relatedArticles := where (where .Site.RegularPages "Section" "articles") "Params.relatedInsights" "intersect" (slice $insightSlug) -}}
+        {{- if gt (len $relatedArticles) 0 }}
+        <div class="related-articles">
+            <h2>Статьи по теме</h2>
+            {{- range $relatedArticles }}
+            <a href="{{ .RelPermalink }}" class="related-article-link">
+                <strong>{{ .Title }}</strong>
+                <span>{{ .Description }}</span>
+            </a>
+            {{- end }}
+        </div>
+        {{- end }}
+
         <div class="insight-discuss">
             <p>Хотите продолжить обсуждение?</p>
             <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
