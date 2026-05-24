@@ -3,7 +3,7 @@ languageCode = "ru"
 title = "Тимлид не кодит – Сообщество тимлидов Казахстана"
 # theme = ""  # Using custom layouts, no external theme
 
-disableKinds = ["taxonomy", "term", "RSS"]
+disableKinds = ["taxonomy", "term"]
 
 [params]
   description = "Крупнейшее сообщество тимлидов и технических лидеров Казахстана. Архитектура. Люди. Процессы разработки."

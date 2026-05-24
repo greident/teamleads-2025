@@ -18,12 +18,18 @@
     <link rel="canonical" href="{{ .Permalink }}">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Тимлид не кодит">
-    <meta name="keywords" content="тимлид, тимлид казахстан, teamlead, team lead, техлид, технический лидер, engineering manager, сообщество тимлидов, IT менеджмент, управление командой разработки, лидерство в IT, архитектура ПО, найм разработчиков, agile, scrum master, CTO, руководитель разработки, казахстан IT, teamleads kz, карьера тимлида, как стать тимлидом, управление командой">
+    <meta name="keywords" content="тимлид, тимлид казахстан, teamlead, team lead, техлид, технический лидер, engineering manager, сообщество тимлидов, IT менеджмент, управление командой разработки, лидерство в IT, архитектура ПО, найм разработчиков, agile, scrum master, CTO, руководитель разработки, казахстан IT, teamleads kz, карьера тимлида, как стать тимлидом, управление командой{{ with .Params.tags }}, {{ delimit . ", " }}{{ end }}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ .Title }}">
     <meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ if and .IsPage (or (eq .Section "insights") (eq .Section "events")) }}article{{ else }}website{{ end }}">
+    {{- if and .IsPage (eq .Section "insights") }}
+    <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+    {{- with .Params.tags }}{{- range . }}
+    <meta property="article:tag" content="{{ . }}">
+    {{- end }}{{- end }}
+    {{- end -}}
     <meta property="og:url" content="{{ .Permalink }}">
     <meta property="og:site_name" content="{{ .Site.Title }}">
     <meta property="og:locale" content="ru_RU">
@@ -32,18 +38,22 @@
       {{- $ogImage = (partial "og-image.html" .).Permalink -}}
     {{- else if and .File (eq .Section "showcase") .IsPage -}}
       {{- $ogImage = (partial "og-showcase.html" .).Permalink -}}
+    {{- else if and .File (eq .Section "insights") .IsPage -}}
+      {{- $ogImage = (partial "og-insights.html" .).Permalink -}}
     {{- else -}}
       {{- $ogImage = (partial "og-default.html" .).Permalink -}}
     {{- end -}}
     <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Title }}{{ end }}">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ .Title }}">
     <meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
+    <meta name="twitter:site" content="{{ .Site.Params.telegramHandle }}">
 
     <!-- Structured Data -->
     {{- if .IsHome }}
@@ -101,6 +111,19 @@
                 "name": "{{ .Title }}",
                 "item": "{{ .Permalink }}"
             }
+            {{- else if and (eq .Section "insights") .IsPage }},
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Инсайты из чата",
+                "item": "{{ .Site.BaseURL }}insights/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "{{ .Title }}",
+                "item": "{{ .Permalink }}"
+            }
             {{- else }},
             {
                 "@type": "ListItem",
@@ -114,6 +137,10 @@
     </script>
     {{- end }}
     {{- block "structured-data" . }}{{ end }}
+
+    <!-- RSS & Sitemap -->
+    <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "index.xml" | absURL }}">
+    <link rel="sitemap" type="application/xml" href="{{ "sitemap.xml" | absURL }}">
 
     <!-- Fonts (self-hosted) -->
     <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
