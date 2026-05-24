@@ -1810,3 +1810,62 @@ img {
         width: 100%;
     }
 }
+
+
+/* ============================================
+   Edit on GitHub — contribute block
+   ============================================ */
+
+.report-contribute {
+    margin: 3rem 0 1.5rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+}
+
+.report-contribute p {
+    margin: 0 0 0.875rem;
+    color: var(--gray-400);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.edit-on-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg);
+
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    color: var(--gray-500);
+
+    background-color: transparent;
+    border: 1px solid var(--gray-300);
+    transition: all var(--transition-base);
+}
+
+.edit-on-github:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400)
+}
+
+.edit-on-github svg {
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+}
+
+@media (max-width: 640px) {
+    .report-contribute {
+        margin-top: 2rem;
+        padding: 1.25rem 0.5rem;
+    }
+
+    .edit-on-github {
+        padding: 0.625rem 1rem;
+    }
+}

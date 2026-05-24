@@ -2,6 +2,7 @@
   "htmlElements": {
     "tags": [
       "a",
+      "aside",
       "body",
       "circle",
       "code",
@@ -52,6 +53,7 @@
       "cta-ornament-1",
       "cta-ornament-2",
       "cta-title",
+      "edit-on-github",
       "event-arrow",
       "event-card",
       "event-date",
@@ -121,6 +123,7 @@
       "report-bottom-nav",
       "report-container",
       "report-content",
+      "report-contribute",
       "report-hero",
       "report-main-topic",
       "report-next",
