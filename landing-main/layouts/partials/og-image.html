@@ -2,7 +2,7 @@
 {{- $fontBold := resources.Get "fonts/Inter-Bold.ttf" -}}
 {{- $fontRegular := resources.Get "fonts/Inter-Regular.ttf" -}}
 
-{{/* Header: @teamleads_kz */}}
+{{/* Header */}}
 {{- $bg = $bg | images.Filter (images.Text "@teamleads_kz" (dict
   "color" "#00AFCA"
   "size" 40
@@ -11,39 +11,115 @@
   "y" 60
 )) -}}
 
-{{/* Date */}}
-{{- $dateStr := .Date.Format "02.01.2006" -}}
-{{- $bg = $bg | images.Filter (images.Text $dateStr (dict
+{{/* Badge line – section-specific */}}
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+{{- $badge := "" -}}
+{{- if eq .Section "events" -}}
+  {{- $badge = .Date.Format "02.01.2006" -}}
+{{- else if eq .Section "insights" -}}
+  {{- $badge = printf "Инсайты · %s · %d сообщений" (.Params.period | default "") (.Params.messagesCount | default 0) -}}
+{{- else if eq .Section "articles" -}}
+  {{- $readTime := .Params.readingTime | default 10 -}}
+  {{- $badge = printf "Статья · %d %s %d · %d мин чтения" .Date.Day (index $months (printf "%d" .Date.Month)) .Date.Year $readTime -}}
+{{- end -}}
+{{- $bg = $bg | images.Filter (images.Text $badge (dict
   "color" "#6B7280"
-  "size" 28
+  "size" 24
   "font" $fontRegular
   "x" 80
   "y" 120
 )) -}}
 
-{{/* Extract topic headers from content HTML */}}
-{{- $raw := .RawContent -}}
-{{- $topics := findRE `<span class="topic-num">\d+\.</span>\s*([^<]+)</h3>` $raw -}}
+{{/* Body */}}
 {{- $y := 200 -}}
-{{- range $i, $match := $topics -}}
-  {{- if lt $i 7 -}}
-    {{- $clean := replaceRE `<span class="topic-num">\d+\.</span>\s*` "" $match -}}
-    {{- $clean = replaceRE `</h3>` "" $clean -}}
-    {{- $clean = $clean | plainify | truncate 60 -}}
-    {{- $prefix := printf "%d." (add $i 1) -}}
-    {{- $line := printf "%s %s" $prefix $clean -}}
-    {{- $bg = $bg | images.Filter (images.Text $line (dict
-      "color" "#1F2937"
-      "size" 26
+
+{{- if eq .Section "events" -}}
+  {{/* Topic list from content HTML */}}
+  {{- $raw := .RawContent -}}
+  {{- $topics := findRE `<span class="topic-num">\d+\.</span>\s*([^<]+)</h3>` $raw -}}
+  {{- range $i, $match := $topics -}}
+    {{- if lt $i 7 -}}
+      {{- $clean := replaceRE `<span class="topic-num">\d+\.</span>\s*` "" $match -}}
+      {{- $clean = replaceRE `</h3>` "" $clean -}}
+      {{- $clean = $clean | plainify | truncate 60 -}}
+      {{- $line := printf "%d. %s" (add $i 1) $clean -}}
+      {{- $bg = $bg | images.Filter (images.Text $line (dict
+        "color" "#1F2937"
+        "size" 26
+        "font" $fontRegular
+        "x" 80
+        "y" $y
+      )) -}}
+      {{- $y = add $y 48 -}}
+    {{- end -}}
+  {{- end -}}
+
+{{- else if eq .Section "insights" -}}
+  {{/* Topic list from YAML frontmatter */}}
+  {{- with .Params.topics -}}
+    {{- range $i, $topic := . -}}
+      {{- if lt $i 7 -}}
+        {{- $line := printf "%d. %s" (add $i 1) ($topic.title | truncate 55) -}}
+        {{- $bg = $bg | images.Filter (images.Text $line (dict
+          "color" "#1F2937"
+          "size" 26
+          "font" $fontRegular
+          "x" 80
+          "y" $y
+        )) -}}
+        {{- $y = add $y 48 -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+{{- else if eq .Section "articles" -}}
+  {{/* Title – word-wrap into lines; len counts bytes, Cyrillic = 2 bytes/char */}}
+  {{- $words := split .Title " " -}}
+  {{- $lines := slice -}}
+  {{- $current := "" -}}
+  {{- range $words -}}
+    {{- $candidate := printf "%s %s" $current . -}}
+    {{- if and (gt (len $current) 0) (gt (len $candidate) 75) -}}
+      {{- $lines = $lines | append $current -}}
+      {{- $current = . -}}
+    {{- else -}}
+      {{- if eq (len $current) 0 -}}
+        {{- $current = . -}}
+      {{- else -}}
+        {{- $current = $candidate -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if gt (len $current) 0 -}}
+    {{- $lines = $lines | append $current -}}
+  {{- end -}}
+  {{- range $i, $line := $lines -}}
+    {{- if lt $i 4 -}}
+      {{- $bg = $bg | images.Filter (images.Text $line (dict
+        "color" "#1F2937"
+        "size" 46
+        "font" $fontBold
+        "x" 80
+        "y" $y
+      )) -}}
+      {{- $y = add $y 62 -}}
+    {{- end -}}
+  {{- end -}}
+  {{/* Tags */}}
+  {{- with .Params.tags -}}
+    {{- $tagLine := delimit . "  ·  " -}}
+    {{- $bg = $bg | images.Filter (images.Text $tagLine (dict
+      "color" "#00AFCA"
+      "size" 24
       "font" $fontRegular
       "x" 80
-      "y" $y
+      "y" (add $y 20)
     )) -}}
-    {{- $y = add $y 48 -}}
   {{- end -}}
+
 {{- end -}}
 
-{{/* Footer: diamond + name */}}
+{{/* Footer */}}
 {{- $bg = $bg | images.Filter (images.Text "тимлид не кодит" (dict
   "color" "#9CA3AF"
   "size" 22

@@ -34,12 +34,10 @@
     <meta property="og:site_name" content="{{ .Site.Title }}">
     <meta property="og:locale" content="ru_RU">
     {{- $ogImage := "" -}}
-    {{- if and .File (eq .Section "events") .IsPage -}}
+    {{- if and .File (or (eq .Section "events") (eq .Section "insights") (eq .Section "articles")) .IsPage -}}
       {{- $ogImage = (partial "og-image.html" .).Permalink -}}
     {{- else if and .File (eq .Section "showcase") .IsPage -}}
       {{- $ogImage = (partial "og-showcase.html" .).Permalink -}}
-    {{- else if and .File (eq .Section "insights") .IsPage -}}
-      {{- $ogImage = (partial "og-insights.html" .).Permalink -}}
     {{- else -}}
       {{- $ogImage = (partial "og-default.html" .).Permalink -}}
     {{- end -}}
