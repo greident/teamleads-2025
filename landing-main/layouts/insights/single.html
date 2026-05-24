@@ -39,14 +39,39 @@
                 <blockquote>{{ . }}</blockquote>
                 {{ end }}
                 {{ with $topic.links }}
+                {{ $videos := slice }}
+                {{ $regular := slice }}
+                {{ range . }}
+                    {{ $ytID := "" }}
+                    {{ if findRE `youtube\.com/watch\?v=` .url }}
+                        {{ $ytID = replaceRE `.*[?&]v=([^&]+).*` "$1" .url }}
+                    {{ else if findRE `youtu\.be/` .url }}
+                        {{ $ytID = replaceRE `.*youtu\.be/([^?]+).*` "$1" .url }}
+                    {{ end }}
+                    {{ if $ytID }}
+                        {{ $videos = $videos | append (dict "title" .title "ytID" $ytID) }}
+                    {{ else }}
+                        {{ $regular = $regular | append . }}
+                    {{ end }}
+                {{ end }}
+                {{ range $videos }}
+                <div class="topic-video">
+                    <div class="video-wrapper">
+                        <iframe src="https://www.youtube-nocookie.com/embed/{{ .ytID }}" title="{{ .title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <span class="video-caption">{{ .title }}</span>
+                </div>
+                {{ end }}
+                {{ if $regular }}
                 <div class="topic-links">
                     <span class="topic-links-label">Ссылки из обсуждения:</span>
                     <ul>
-                    {{ range . }}
+                    {{ range $regular }}
                         <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .title }}</a></li>
                     {{ end }}
                     </ul>
                 </div>
+                {{ end }}
                 {{ end }}
                 <a href="https://t.me/teamleads_kz/{{ with $topic.messageId }}{{ . }}{{ end }}" class="msg-link" target="_blank" rel="noopener">Читать в чате →</a>
             </div>
