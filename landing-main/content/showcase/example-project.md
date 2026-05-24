@@ -2,14 +2,14 @@
 title: "TeamTracker"
 description: "Дашборд для тимлидов – метрики команды, 1-on-1 и ретро в одном месте"
 projectUrl: "https://example.com/teamtracker"
-author: "Аскар Нурланов"
-date: 2026-05-22
+author: "Аскар разработчик"
+date: 2026-05-22 #Дата публикации, по умолчанию - текущая дата
 tags:
   - SaaS
   - Инструмент
 social:
-  telegram: "https://t.me/askar_dev"
-  github: "https://github.com/askar-example"
+  telegram: "https://t.me/some-awesome-developer"
+  github: "https://github.com/good-to-know-example"
 draft: true
 ---
 
