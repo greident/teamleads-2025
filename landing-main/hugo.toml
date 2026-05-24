@@ -14,6 +14,11 @@ disableKinds = ["taxonomy", "term", "RSS"]
   participantsCount = "490+"
   topicsCount = "50+"
 
+  # GitHub edit links — used by "Edit on GitHub" button on event pages
+  githubRepo = "belyaevsa/teamleads-2025"
+  githubBranch = "master"
+  githubContentPath = "landing-main/content"
+
   # Kazakhstan-inspired colors
   [params.colors]
     primary = "#00AFCA"
