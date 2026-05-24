@@ -10,6 +10,7 @@
         </div>
         <div class="nav-links">
             <a href="#events" class="nav-link">Встречи</a>
+            <a href="/articles/" class="nav-link">Статьи</a>
             <a href="/insights/" class="nav-link">Инсайты</a>
             <a href="/showcase/" class="nav-link">Проекты</a>
             <a href="#about" class="nav-link">О нас</a>
@@ -222,6 +223,54 @@
 
         <div style="text-align: center; margin-top: var(--space-xl);">
             <a href="/showcase/" class="btn btn-secondary">Все проекты →</a>
+        </div>
+    </div>
+</section>
+{{- end }}
+
+<!-- Articles Highlight -->
+{{- $articlePages := where (where .Site.RegularPages "Section" "articles") "Params.draft" "ne" true -}}
+{{- if gt (len $articlePages) 0 }}
+<section class="articles-highlight" id="articles">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Статьи</span>
+            <h2 class="section-title">Глубже, чем обсуждение</h2>
+            <p class="section-desc">
+                Экспертные материалы на основе дискуссий сообщества – структурированные для поиска и глубокого чтения.
+            </p>
+        </div>
+
+        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+        <div class="articles-grid">
+            {{- range first 3 (sort $articlePages "Date" "desc") }}
+            <a href="{{ .RelPermalink }}" class="article-card">
+                <div class="article-card-header">
+                    {{- with .Params.tags }}
+                    <div class="article-card-tags">
+                        {{- range first 2 . }}
+                        <span class="event-tag">{{ . }}</span>
+                        {{- end }}
+                    </div>
+                    {{- end }}
+                    <span class="insight-date">
+                        {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}
+                    </span>
+                </div>
+                <h3 class="insight-card-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
+                <p class="insight-card-desc">{{ with .Params.cardDesc }}{{ . }}{{ else }}{{ .Description }}{{ end }}</p>
+                <div class="insight-card-meta">
+                    {{- with .Params.readingTime }}
+                    <span class="insight-stat">{{ . }} мин чтения</span>
+                    {{- end }}
+                    <span class="event-arrow">→</span>
+                </div>
+            </a>
+            {{- end }}
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/articles/" class="btn btn-secondary">Все статьи →</a>
         </div>
     </div>
 </section>

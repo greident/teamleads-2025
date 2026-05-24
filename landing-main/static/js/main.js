@@ -101,4 +101,19 @@
         fadeObserver.observe(el);
     });
 
+    // Track Telegram link clicks via Yandex.Metrika
+    document.querySelectorAll('a[href*="t.me/"]').forEach(link => {
+        link.addEventListener('click', function () {
+            var label = this.closest('nav') ? 'nav'
+                : this.closest('.hero') ? 'hero'
+                : this.closest('.cta') ? 'cta'
+                : this.closest('.footer') ? 'footer'
+                : this.closest('.report-contribute') ? 'report'
+                : location.pathname;
+            if (typeof ym === 'function') {
+                ym(106055675, 'reachGoal', 'telegram_click', { placement: label });
+            }
+        });
+    });
+
 })();

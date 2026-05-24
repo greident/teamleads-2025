@@ -1,0 +1,115 @@
+{{ define "main" }}
+<section class="report-hero">
+    <div class="container">
+        <a href="/articles/" class="report-back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Все статьи
+        </a>
+        <h1 class="report-title">{{ .Title }}</h1>
+        <div class="article-meta">
+            {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+            <span class="article-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}</span>
+            {{- with .Params.readingTime }}
+            <span class="article-reading-time">· {{ . }} мин чтения</span>
+            {{- end }}
+        </div>
+        {{- with .Params.tags }}
+        <div class="article-tags">
+            {{- range . }}
+            <span class="event-tag">{{ . }}</span>
+            {{- end }}
+        </div>
+        {{- end }}
+    </div>
+</section>
+
+<section class="report-content">
+    <div class="container report-container">
+        <div class="article-body">
+            {{ .Content }}
+        </div>
+
+        {{- with .Params.sourceEvent }}
+        {{- with site.GetPage (printf "/events/%s" .) }}
+        <div class="article-source">
+            <h3>Первоисточник</h3>
+            <p>Эта статья основана на встрече сообщества. Полный отчёт со всеми мнениями участников:</p>
+            <a href="{{ .RelPermalink }}" class="btn btn-secondary">{{ .Title }} →</a>
+        </div>
+        {{- end }}
+        {{- end }}
+
+        <div class="insight-discuss">
+            <p>Хотите обсудить эту тему с практикующими тимлидами?</p>
+            <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
+                Обсудить в Telegram
+            </a>
+        </div>
+
+        <div class="report-bottom-nav">
+            {{ with .PrevInSection }}
+            <a href="{{ .RelPermalink }}" class="btn btn-secondary">← {{ .Title }}</a>
+            {{ end }}
+            <a href="/articles/" class="btn btn-secondary">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Все статьи
+            </a>
+            {{ with .NextInSection }}
+            <a href="{{ .RelPermalink }}" class="btn btn-secondary">{{ .Title }} →</a>
+            {{ end }}
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">◇</span>
+                <span>тимлид не кодит</span>
+            </div>
+            <p class="footer-tagline">Сообщество технических лидеров Казахстана</p>
+            <div class="footer-links">
+                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>
+                <a href="/#events">Встречи</a>
+                <a href="https://2025.teamleads.kz" target="_blank" rel="noopener">Итоги 2025</a>
+            </div>
+            <p class="footer-copyright">© {{ now.Year }} Тимлид не кодит</p>
+        </div>
+    </div>
+</footer>
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ .Title }}",
+    "description": "{{ .Description }}",
+    "datePublished": "{{ .Date.Format "2006-01-02" }}",
+    "dateModified": "{{ .Lastmod.Format "2006-01-02" }}",
+    "author": {
+        "@type": "Organization",
+        "name": "Тимлид не кодит",
+        "url": "{{ .Site.BaseURL }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Тимлид не кодит",
+        "url": "{{ .Site.BaseURL }}"
+    },
+    "url": "{{ .Permalink }}",
+    "inLanguage": "ru",
+    "keywords": "{{ delimit .Params.tags ", " }}",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ .Permalink }}"
+    }
+}
+</script>
+{{ end }}
