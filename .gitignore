@@ -11,3 +11,4 @@ node_modules
 landing-main/public/
 .claude/commands/extract-insights.md
 landing-main/hugo_stats.json
+.env

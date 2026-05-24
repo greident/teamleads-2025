@@ -151,6 +151,9 @@
     {{ block "head" . }}{{ end }}
 </head>
 <body>
+    {{- if not .IsHome }}
+    {{ partial "nav.html" . }}
+    {{- end }}
     {{ block "main" . }}{{ end }}
 
     {{- if and .File (not .IsHome) site.Params.githubRepo }}
