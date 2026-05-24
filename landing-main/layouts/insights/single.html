@@ -18,16 +18,35 @@
     <div class="container report-container">
 
         {{ with .Params.topics }}
+        <nav class="insight-toc">
+            <h2>Содержание</h2>
+            <ol>
+            {{ range $i, $topic := . }}
+                <li><a href="#topic-{{ add $i 1 }}">{{ $topic.title }}</a></li>
+            {{ end }}
+            </ol>
+        </nav>
+
         <div class="report-topics">
             <h2>Ключевые темы</h2>
             {{ range $i, $topic := . }}
-            <div class="insight-topic">
+            <div class="insight-topic" id="topic-{{ add $i 1 }}">
                 <h3><span class="topic-num">{{ add $i 1 }}.</span> {{ $topic.title }}</h3>
                 {{ range $topic.paragraphs }}
                 <p>{{ . }}</p>
                 {{ end }}
                 {{ range $topic.quotes }}
                 <blockquote>{{ . }}</blockquote>
+                {{ end }}
+                {{ with $topic.links }}
+                <div class="topic-links">
+                    <span class="topic-links-label">Ссылки из обсуждения:</span>
+                    <ul>
+                    {{ range . }}
+                        <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .title }}</a></li>
+                    {{ end }}
+                    </ul>
+                </div>
                 {{ end }}
                 <a href="https://t.me/teamleads_kz/{{ with $topic.messageId }}{{ . }}{{ end }}" class="msg-link" target="_blank" rel="noopener">Читать в чате →</a>
             </div>

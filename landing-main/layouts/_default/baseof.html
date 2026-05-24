@@ -147,7 +147,8 @@
     <link rel="preload" href="/fonts/Inter-Bold.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
+    {{ $css := resources.Get "css/main.css" | fingerprint }}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}">
 
     {{ block "head" . }}{{ end }}
 </head>
