@@ -10,3 +10,4 @@ node_modules
 /landing-main/public/
 landing-main/public/
 .claude/commands/extract-insights.md
+landing-main/hugo_stats.json
