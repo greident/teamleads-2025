@@ -1,0 +1,38 @@
+name: Deploy landing → teamleads.kz
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'landing-main/**'
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    env:
+      DEPLOY_ROOT: /opt/teamleads.kz
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Hugo site
+        working-directory: landing-main
+        run: hugo --minify
+
+      - name: Deploy
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          RELEASE_DIR="${DEPLOY_ROOT}/${SHORT_SHA}"
+
+          cp -r landing-main/public "$RELEASE_DIR"
+
+          ln -sfn "$RELEASE_DIR" "${DEPLOY_ROOT}/latest"
+
+          echo "Deployed $SHORT_SHA → ${DEPLOY_ROOT}/latest"
+
+      - name: Cleanup old releases (keep last 5)
+        run: |
+          cd "$DEPLOY_ROOT"
+          ls -dt */ | grep -v latest | tail -n +6 | xargs -r rm -rf
