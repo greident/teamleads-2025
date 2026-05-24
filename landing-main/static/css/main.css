@@ -157,6 +157,21 @@ img {
     padding: 0 var(--space-lg);
 }
 
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.page-header .report-back {
+    margin-bottom: 0;
+}
+
+.page-header .section-tag {
+    margin-bottom: 0;
+}
+
 /* ===========================================
    HERO SECTION
    =========================================== */
@@ -1062,6 +1077,10 @@ img {
 
     .topic-xl {
         font-size: 1.25rem;
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
