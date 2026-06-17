@@ -62,8 +62,9 @@
         statsObserver.observe(heroStats);
     }
 
-    // Parallax effect for gradient orbs
+    // Parallax effect for gradient orbs (desktop pointers only — no-op on touch)
     let ticking = false;
+    if (window.matchMedia('(pointer: fine)').matches)
     document.addEventListener('mousemove', (e) => {
         if (!ticking) {
             requestAnimationFrame(() => {
@@ -104,7 +105,8 @@
     // Track Telegram link clicks via Yandex.Metrika
     document.querySelectorAll('a[href*="t.me/"]').forEach(link => {
         link.addEventListener('click', function () {
-            var label = this.closest('nav') ? 'nav'
+            var label = this.closest('.bottom-nav') ? 'bottom-nav'
+                : this.closest('nav') ? 'nav'
                 : this.closest('.hero') ? 'hero'
                 : this.closest('.cta') ? 'cta'
                 : this.closest('.footer') ? 'footer'
@@ -115,5 +117,109 @@
             }
         });
     });
+
+    // Track add-to-calendar clicks
+    document.querySelectorAll('[data-cal]').forEach(el => {
+        el.addEventListener('click', function () {
+            if (typeof ym === 'function') {
+                ym(106055675, 'reachGoal', 'calendar_add', { type: this.dataset.cal });
+            }
+        });
+    });
+
+    // --- Next meetup: concrete date + live countdown -----------------------
+    (function nextMeetup() {
+        const card = document.querySelector('[data-iso-weekday]');
+        const out = document.querySelector('[data-next-meetup]');
+        if (!card || !out) return;
+        const isoWd = parseInt(card.dataset.isoWeekday, 10); // Mon=1 … Wed=3
+        const hour = parseInt(card.dataset.hour, 10);
+        const tz = card.dataset.tz;
+        const wdMap = { Sun: 7, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+        function tzOffsetMin(date) {
+            const p = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour12: false,
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                .formatToParts(date).reduce((a, x) => (a[x.type] = x.value, a), {});
+            const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+            return (asUTC - date.getTime()) / 60000; // minutes the tz is ahead of UTC
+        }
+        function nextInstant() {
+            const now = new Date();
+            for (let i = 0; i < 14; i++) {
+                const probe = new Date(now.getTime() + i * 86400000);
+                const p = new Intl.DateTimeFormat('en-CA', { timeZone: tz,
+                    year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' })
+                    .formatToParts(probe).reduce((a, x) => (a[x.type] = x.value, a), {});
+                if (wdMap[p.weekday] !== isoWd) continue;
+                const guess = new Date(Date.UTC(+p.year, +p.month - 1, +p.day, hour, 0, 0));
+                const inst = new Date(guess.getTime() - tzOffsetMin(guess) * 60000);
+                if (inst.getTime() > now.getTime()) return inst;
+            }
+            return null;
+        }
+        const inst = nextInstant();
+        if (!inst) return;
+        let dateStr = new Intl.DateTimeFormat('ru-RU', { timeZone: tz,
+            weekday: 'long', day: 'numeric', month: 'long' }).format(inst);
+        dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        const timeStr = new Intl.DateTimeFormat('ru-RU', { timeZone: tz,
+            hour: '2-digit', minute: '2-digit' }).format(inst);
+
+        function render() {
+            const diff = inst.getTime() - Date.now();
+            if (diff <= 0) { out.textContent = 'Идёт прямо сейчас — заходите в Telegram'; out.hidden = false; return; }
+            const d = Math.floor(diff / 86400000),
+                  h = Math.floor((diff % 86400000) / 3600000),
+                  m = Math.floor((diff % 3600000) / 60000);
+            const cd = d > 0 ? `через ${d} дн ${h} ч` : (h > 0 ? `через ${h} ч ${m} мин` : `через ${m} мин`);
+            out.textContent = `Ближайшая: ${dateStr}, ${timeStr} · ${cd}`;
+            out.hidden = false;
+        }
+        render();
+        setInterval(render, 60000);
+    })();
+
+    // --- Bottom nav: active section ----------------------------------------
+    (function bottomNav() {
+        const path = location.pathname;
+        document.querySelectorAll('.bottom-nav-item').forEach(a => {
+            const p = a.dataset.path;
+            const active = p === '/' ? (path === '/') : path.startsWith(p);
+            if (active) a.classList.add('is-active');
+        });
+    })();
+
+    // --- Reading progress bar ----------------------------------------------
+    (function readingProgress() {
+        const bar = document.querySelector('[data-reading-progress] span');
+        if (!bar) return;
+        const upd = () => {
+            const h = document.documentElement;
+            const max = h.scrollHeight - h.clientHeight;
+            bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+        };
+        window.addEventListener('scroll', upd, { passive: true });
+        window.addEventListener('resize', upd);
+        upd();
+    })();
+
+    // --- Back to top --------------------------------------------------------
+    (function backToTop() {
+        const btn = document.querySelector('[data-back-to-top]');
+        if (!btn) return;
+        const upd = () => btn.classList.toggle('is-visible', window.scrollY > 600);
+        window.addEventListener('scroll', upd, { passive: true });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        upd();
+    })();
+
+    // --- PWA service worker (network-first; never serves stale content) -----
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
 
 })();

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нет сети — Тимлид не кодит</title>
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            font-family: system-ui, -apple-system, sans-serif; background: #F8FAFC; color: #1F2937; text-align: center; padding: 24px; }
+        .box { max-width: 420px; }
+        .logo { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px;
+            background: linear-gradient(135deg, #00AFCA, #008BA3); color: #fff; border-radius: 14px; font-size: 28px; margin-bottom: 20px; }
+        h1 { font-size: 1.5rem; margin: 0 0 8px; }
+        p { color: #6B7280; line-height: 1.6; }
+        a { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #1F2937; color: #fff;
+            text-decoration: none; border-radius: 999px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="logo">◇</div>
+        <h1>Нет подключения к сети</h1>
+        <p>Похоже, вы офлайн. Проверьте соединение и попробуйте снова — материалы сообщества снова будут доступны.</p>
+        <a href="/" onclick="location.reload()">Обновить</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{{/* Mobile-only bottom navigation / action bar. Persistent nav + CTA in the
+     thumb zone; replaces the (previously hidden) top nav links on phones.
+     Hidden ≥768px via CSS. Active state set by JS from the current path. */}}
+<nav class="bottom-nav" aria-label="Навигация">
+    <a href="/#events" class="bottom-nav-item" data-path="/">
+        {{ partial "icons/users.html" }}
+        <span>Встречи</span>
+    </a>
+    <a href="/insights/" class="bottom-nav-item" data-path="/insights/">
+        {{ partial "icons/sun.html" }}
+        <span>Инсайты</span>
+    </a>
+    <a href="/articles/" class="bottom-nav-item" data-path="/articles/">
+        {{ partial "icons/layers.html" }}
+        <span>Статьи</span>
+    </a>
+    <a href="/questions/" class="bottom-nav-item" data-path="/questions/">
+        {{ partial "icons/activity.html" }}
+        <span>Темы</span>
+    </a>
+    <a href="{{ .Site.Params.telegram }}" class="bottom-nav-cta" target="_blank" rel="noopener">
+        {{ partial "icons/send.html" }}
+        <span>Telegram</span>
+    </a>
+</nav>

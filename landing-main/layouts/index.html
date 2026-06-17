@@ -47,6 +47,14 @@
         </div>
 
         {{ partial "hero-stats.html" . }}
+
+        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+        {{- $lastEvent := index (sort (where .Site.RegularPages "Section" "events") "Date" "desc") 0 -}}
+        {{- $lastInsight := index (sort (where .Site.RegularPages "Section" "insights") "Date" "desc") 0 -}}
+        <p class="hero-freshness">
+            <span class="hero-freshness-dot" aria-hidden="true"></span>
+            {{ with $lastEvent }}Последняя встреча {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}{{ end }}{{ with $lastInsight }} · свежий дайджест {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}{{ end }}
+        </p>
     </div>
 
     <div class="scroll-indicator">
@@ -54,6 +62,8 @@
         {{ partial "icons/arrow-down.html" }}
     </div>
 </section>
+
+{{ partial "next-meetup.html" . }}
 
 <!-- Year Review Banner -->
 <section class="year-review">
@@ -155,6 +165,37 @@
         </div>
     </div>
 </section>
+
+<!-- Voices Section -->
+{{- with .Site.Data.voices }}
+<section class="voices" id="voices">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Голоса сообщества</span>
+            <h2 class="section-title">Что говорят участники</h2>
+            <p class="section-desc">
+                Реальные реплики из обсуждений в чате – без редактуры, как есть.
+            </p>
+        </div>
+
+        <div class="voices-grid">
+            {{- range . }}
+            <figure class="voice-card">
+                <blockquote class="voice-text">{{ .text }}</blockquote>
+                <figcaption class="voice-meta">
+                    <span class="voice-author">{{ .author }}</span>
+                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
+                </figcaption>
+            </figure>
+            {{- end }}
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/insights/" class="btn btn-secondary">Больше из чата →</a>
+        </div>
+    </div>
+</section>
+{{- end }}
 
 <!-- Topics Section -->
 <section class="topics" id="topics">
@@ -358,8 +399,4 @@
         </div>
     </div>
 </footer>
-{{ end }}
-
-{{ define "scripts" }}
-<script src="{{ "js/main.js" | relURL }}"></script>
 {{ end }}

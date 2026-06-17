@@ -1,0 +1,33 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Тимлид не кодит//Meetup Schedule//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Тимлид не кодит — встречи
+X-WR-TIMEZONE:Asia/Almaty
+BEGIN:VTIMEZONE
+TZID:Asia/Almaty
+X-LIC-LOCATION:Asia/Almaty
+BEGIN:STANDARD
+DTSTART:19700101T000000
+TZOFFSETFROM:+0500
+TZOFFSETTO:+0500
+TZNAME:+05
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:weekly-meetup@teamleads.kz
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=Asia/Almaty:20260617T170000
+DTEND;TZID=Asia/Almaty:20260617T190000
+RRULE:FREQ=WEEKLY;BYDAY=WE
+SUMMARY:Встреча сообщества «Тимлид не кодит»
+DESCRIPTION:Еженедельная онлайн-встреча сообщества тимлидов и технических ли
+ деров Казахстана. Разбираем кейсы\, спорим об архитектуре\, обсуждаем найм\,
+  AI и карьеру. Подключайтесь в Telegram: https://t.me/teamleads_kz
+LOCATION:Онлайн · Telegram (@teamleads_kz)
+URL:https://t.me/teamleads_kz
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

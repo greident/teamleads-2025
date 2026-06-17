@@ -1,11 +1,25 @@
+{{/* Live community stats — computed from content so they never go stale.
+     participantsCount is the external Telegram member count (params, manual). */}}
+{{- $events := where .Site.RegularPages "Section" "events" -}}
+{{- $insights := sort (where .Site.RegularPages "Section" "insights") "Date" "desc" -}}
+{{- $meetups := len $events -}}
+{{- $weekMsgs := 0 -}}
+{{- with (index $insights 0) -}}
+  {{- $weekMsgs = mul (math.Floor (div (int .Params.messagesCount) 100.0)) 100 | int -}}
+{{- end -}}
 <div class="hero-stats">
     <div class="stat">
-        <span class="stat-number">{{ .Site.Params.participantsCount }}</span>
-        <span class="stat-label">активных участников</span>
+        <span class="stat-number" data-value="{{ .Site.Params.participantsCount }}" data-suffix="+">{{ .Site.Params.participantsCount }}+</span>
+        <span class="stat-label">участников</span>
     </div>
     <div class="stat-divider"></div>
     <div class="stat">
-        <span class="stat-number">{{ .Site.Params.topicsCount }}</span>
-        <span class="stat-label">тем для обсуждения</span>
+        <span class="stat-number" data-value="{{ $weekMsgs }}" data-suffix="+">{{ $weekMsgs }}+</span>
+        <span class="stat-label">сообщений в неделю</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+        <span class="stat-number" data-value="{{ $meetups }}">{{ $meetups }}</span>
+        <span class="stat-label">встреч проведено</span>
     </div>
 </div>

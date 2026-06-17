@@ -2,7 +2,10 @@
 <html lang="{{ .Site.LanguageCode }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Тимлид">
     <title>{{ .Title }}{{ if not .IsHome }} | {{ .Site.Title }}{{ end }}</title>
     <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
 
@@ -151,6 +154,9 @@
     {{ block "head" . }}{{ end }}
 </head>
 <body>
+    {{- if and .IsPage (in (slice "events" "insights" "articles" "showcase") .Section) }}
+    <div class="reading-progress" data-reading-progress aria-hidden="true"><span></span></div>
+    {{- end }}
     {{- if not .IsHome }}
     {{ partial "nav.html" . }}
     {{- end }}
@@ -172,7 +178,14 @@
     </aside>
     {{- end }}
 
+    <button class="back-to-top" data-back-to-top type="button" aria-label="Наверх">
+        {{ partial "icons/arrow-down.html" }}
+    </button>
+
+    {{ partial "bottom-nav.html" . }}
+
     {{ block "scripts" . }}{{ end }}
+    <script src="{{ "js/main.js" | relURL }}" defer></script>
 
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">

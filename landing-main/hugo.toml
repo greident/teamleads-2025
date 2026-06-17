@@ -10,14 +10,26 @@ disableKinds = ["taxonomy", "term"]
   telegram = "https://t.me/teamleads_kz"
   telegramHandle = "@teamleads_kz"
 
-  # Stats
-  participantsCount = "490+"
+  # Stats — participantsCount is the external Telegram member count (update manually);
+  # the other homepage stats are computed live from content and never go stale.
+  participantsCount = "510"
   topicsCount = "50+"
 
   # GitHub edit links — used by "Edit on GitHub" button on event pages
   githubRepo = "belyaevsa/teamleads-2025"
   githubBranch = "master"
   githubContentPath = "landing-main/content"
+
+  # Recurring meetup schedule — every Wednesday 17:00, Astana (UTC+5)
+  [params.meetup]
+    weekdayNominative = "среда"
+    weekdayAccusative = "среду"
+    time = "17:00"
+    tzLabel = "Астана, UTC+5"
+    tzId = "Asia/Almaty"
+    ics = "/teamleads-meetup.ics"
+    isoWeekday = 3   # Mon=1 … Wed=3 — used by JS to compute the next occurrence
+    hour = 17
 
   # Kazakhstan-inspired colors
   [params.colors]

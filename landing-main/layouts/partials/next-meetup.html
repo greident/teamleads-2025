@@ -1,0 +1,36 @@
+{{- $m := .Site.Params.meetup -}}
+{{- $gcal := printf "https://calendar.google.com/calendar/render?%s" (querify
+    "action" "TEMPLATE"
+    "text" "Встреча сообщества «Тимлид не кодит»"
+    "dates" "20260617T170000/20260617T190000"
+    "ctz" $m.tzId
+    "recur" "RRULE:FREQ=WEEKLY;BYDAY=WE"
+    "details" "Еженедельная онлайн-встреча сообщества тимлидов Казахстана. Подключайтесь в Telegram: https://t.me/teamleads_kz"
+    "location" "Онлайн · Telegram (@teamleads_kz)") -}}
+<section class="next-meetup" id="next-meetup" aria-label="Следующая встреча">
+    <div class="container">
+        <div class="next-meetup-card"
+             data-iso-weekday="{{ $m.isoWeekday }}"
+             data-hour="{{ $m.hour }}"
+             data-tz="{{ $m.tzId }}">
+            <div class="next-meetup-pulse" aria-hidden="true"><span></span></div>
+            <div class="next-meetup-body">
+                <span class="next-meetup-label">Следующая встреча</span>
+                <h3 class="next-meetup-when">
+                    Каждую {{ $m.weekdayAccusative }} в {{ $m.time }}
+                    <span class="next-meetup-tz">{{ $m.tzLabel }}</span>
+                </h3>
+                <p class="next-meetup-next" data-next-meetup hidden></p>
+            </div>
+            <div class="next-meetup-actions">
+                <a href="{{ $m.ics }}" class="btn btn-primary" download data-cal="ics">
+                    {{ partial "icons/clock.html" }}
+                    Добавить в календарь
+                </a>
+                <a href="{{ $gcal }}" class="btn btn-secondary" target="_blank" rel="noopener" data-cal="gcal">
+                    Google Календарь
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

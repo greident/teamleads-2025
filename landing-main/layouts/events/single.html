@@ -55,10 +55,11 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {{ $cols := .columns }}
                         {{ range .rows }}
                         <tr>
-                            <td><strong>{{ .question }}</strong></td>
-                            {{ range .values }}<td>{{ . }}</td>{{ end }}
+                            <td data-label="Вопрос"><strong>{{ .question }}</strong></td>
+                            {{ range $j, $v := .values }}<td data-label="{{ index $cols $j }}">{{ $v }}</td>{{ end }}
                         </tr>
                         {{ end }}
                     </tbody>
