@@ -39,6 +39,20 @@
             {{- $showToc := or .Params.participants .Params.topics .Params.opinions .Params.takeaways .Params.nextQuestions -}}
             {{- if $showToc }}
             <aside class="report-toc" aria-label="Содержание встречи" data-report-toc>
+                {{- with .Params.participants }}
+                <div class="report-toc-participants">
+                    <p class="report-toc-participants-label">Участники · {{ len . }}</p>
+                    <div class="report-toc-avatars">
+                        {{- range . }}
+                        {{- $parts := split .name " " -}}
+                        {{- $ini := upper (substr (index $parts 0) 0 1) -}}
+                        {{- if gt (len $parts) 1 -}}{{- $ini = printf "%s%s" $ini (upper (substr (index $parts 1) 0 1)) -}}{{- end -}}
+                        {{- $av := index $accentPalette (mod (len .name) (len $accentPalette)) -}}
+                        <span class="report-toc-avatar" style="--pa: {{ $av }}" title="{{ .name }}" aria-hidden="true">{{ $ini }}</span>
+                        {{- end }}
+                    </div>
+                </div>
+                {{- end }}
                 <p class="report-toc-title">Содержание</p>
                 <ol>
                     {{- with .Params.participants }}<li><a href="#participants">Участники</a></li>{{- end }}
