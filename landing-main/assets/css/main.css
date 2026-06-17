@@ -1555,6 +1555,89 @@ img {
     scroll-margin-top: 90px;
 }
 
+/* Tag cloud (taxonomy overview) */
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+.tag-chip:hover {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary);
+}
+
+.tag-count {
+    font-size: 0.75rem;
+    color: var(--gray-400);
+    font-weight: 600;
+}
+
+/* Make tag links inside cards/articles look like the chip label (no underline) */
+a.event-tag:hover {
+    text-decoration: none;
+    background: var(--primary);
+    color: var(--white);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: var(--space-2xl);
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 var(--space-sm);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    color: var(--gray-700);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+a.pagination-link:hover {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary);
+}
+
+.pagination-link.is-current {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+.pagination-link.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 /* Questions page */
 .questions-section {
     margin-bottom: var(--space-2xl);

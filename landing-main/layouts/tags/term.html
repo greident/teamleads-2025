@@ -1,0 +1,61 @@
+{{ define "main" }}
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+{{- $sectionLabels := dict "events" "Встреча" "insights" "Инсайт" "articles" "Статья" "showcase" "Проект" "fun" "Задачка" -}}
+<section class="insights-hero">
+    <div class="container">
+        <div class="page-header">
+            <a href="/tags/" class="report-back">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Все темы
+            </a>
+            <span class="section-tag">Тема</span>
+        </div>
+        <h1 class="section-title">{{ .Title }}</h1>
+        <p class="section-desc">{{ len .Pages }} материалов по теме в сообществе тимлидов Казахстана.</p>
+    </div>
+</section>
+
+<section class="insights-list">
+    <div class="container">
+        {{- if gt (len .Pages) 0 }}
+        <div class="articles-grid">
+            {{- range (.Paginate (sort .Pages "Date" "desc")).Pages }}
+            <a href="{{ .RelPermalink }}" class="article-card">
+                <div class="article-card-header">
+                    <span class="event-tag">{{ index $sectionLabels .Section | default .Section }}</span>
+                    <span class="insight-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}</span>
+                </div>
+                <h3 class="insight-card-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
+                <p class="insight-card-desc">{{ with .Description }}{{ . }}{{ else }}{{ .Params.cardDesc }}{{ end }}</p>
+                <div class="insight-card-meta"><span class="event-arrow">→</span></div>
+            </a>
+            {{- end }}
+        </div>
+        {{ partial "pagination.html" . }}
+        {{- else }}
+        <div class="insights-empty"><p>По этой теме пока нет материалов.</p></div>
+        {{- end }}
+    </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "{{ .Title }} – Тимлид не кодит",
+    "description": "Материалы по теме «{{ .Title }}» в сообществе тимлидов Казахстана",
+    "url": "{{ .Permalink }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}

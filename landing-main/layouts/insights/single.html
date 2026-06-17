@@ -11,6 +11,13 @@
         <div class="report-main-topic">
             <strong>Период:</strong> {{ .Params.period }} · {{ .Params.messagesCount }} сообщений · {{ .Params.topicsCount }} тем
         </div>
+        {{- with .Params.tags }}
+        <div class="article-tags">
+            {{- range . }}
+            <a class="event-tag" href="{{ printf "/tags/%s/" (. | urlize) | relURL }}">{{ . }}</a>
+            {{- end }}
+        </div>
+        {{- end }}
     </div>
 </section>
 
@@ -126,6 +133,7 @@
     "@type": "Article",
     "headline": "{{ .Title }}",
     "description": "{{ .Description }}",
+    "image": "{{ (partial "og-image.html" .).Permalink }}",
     "datePublished": "{{ .Date.Format "2006-01-02" }}",
     "dateModified": "{{ .Lastmod.Format "2006-01-02" }}",
     "author": {

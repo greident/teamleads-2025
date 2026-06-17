@@ -1,0 +1,48 @@
+{{ define "main" }}
+<section class="insights-hero">
+    <div class="container">
+        <div class="page-header">
+            <a href="/" class="report-back">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Главная
+            </a>
+            <span class="section-tag">Темы</span>
+        </div>
+        <h1 class="section-title">Все темы</h1>
+        <p class="section-desc">
+            Материалы сообщества по темам: архитектура, AI, найм, карьера, процессы и многое другое.
+        </p>
+    </div>
+</section>
+
+<section class="insights-list">
+    <div class="container">
+        <div class="tag-cloud">
+        {{- range .Data.Terms.ByCount }}
+            <a href="{{ printf "/tags/%s/" (.Name | urlize) | relURL }}" class="tag-chip">{{ .Name }}<span class="tag-count">{{ .Count }}</span></a>
+        {{- end }}
+        </div>
+    </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Темы – Тимлид не кодит",
+    "description": "Все темы и теги материалов сообщества тимлидов Казахстана",
+    "url": "{{ .Permalink }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}

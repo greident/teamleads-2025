@@ -1,7 +1,7 @@
 {{ define "main" }}
 <section class="report-hero">
     <div class="container">
-        <a href="/#fun" class="report-back">
+        <a href="/fun/" class="report-back">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -67,7 +67,7 @@
         {{- end }}
 
         <div class="report-bottom-nav">
-            <a href="/#fun" class="btn btn-secondary">
+            <a href="/fun/" class="btn btn-secondary">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
@@ -87,6 +87,7 @@
     "@type": "Event",
     "name": "{{ .Title }}",
     "description": "{{ .Description }}",
+    "image": "{{ (partial "og-default.html" .).Permalink }}",
     "startDate": "{{ .Date.Format "2006-01-02" }}",
     "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
     "eventStatus": "https://schema.org/EventScheduled",

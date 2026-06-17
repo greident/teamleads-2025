@@ -2,8 +2,11 @@ baseURL = "https://teamleads.kz/"
 languageCode = "ru"
 title = "Тимлид не кодит – Сообщество тимлидов Казахстана"
 # theme = ""  # Using custom layouts, no external theme
+[pagination]
+  pagerSize = 12
 
-disableKinds = ["taxonomy", "term"]
+[taxonomies]
+  tag = "tags"
 
 [params]
   description = "Крупнейшее сообщество тимлидов и технических лидеров Казахстана. Архитектура. Люди. Процессы разработки."

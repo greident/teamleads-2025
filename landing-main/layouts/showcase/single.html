@@ -24,7 +24,7 @@
             {{- with .Params.tags }}
             <div class="showcase-tags">
                 {{- range . }}
-                <span class="event-tag">{{ . }}</span>
+                <a class="event-tag" href="{{ printf "/tags/%s/" (. | urlize) | relURL }}">{{ . }}</a>
                 {{- end }}
             </div>
             {{- end }}

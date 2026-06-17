@@ -3,7 +3,7 @@
 {{- $accentPalette := slice "#00AFCA" "#FEC50C" "#8B5CF6" "#F59E0B" "#10B981" "#EF4444" -}}
 <section class="report-hero">
     <div class="container">
-        <a href="/#events" class="report-back">
+        <a href="/events/" class="report-back">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -22,7 +22,7 @@
         {{- with .Params.tags }}
         <div class="article-tags">
             {{- range . }}
-            <span class="event-tag">{{ . }}</span>
+            <a class="event-tag" href="{{ printf "/tags/%s/" (. | urlize) | relURL }}">{{ . }}</a>
             {{- end }}
         </div>
         {{- end }}
@@ -151,7 +151,7 @@
 
                 {{ partial "report/discuss.html" (dict "ctx" . "text" "Хотите обсудить эти темы с практикующими тимлидами?") }}
 
-                {{ partial "report/bottom-nav.html" (dict "ctx" . "allHref" "/#events" "allLabel" "Все встречи") }}
+                {{ partial "report/bottom-nav.html" (dict "ctx" . "allHref" "/events/" "allLabel" "Все встречи") }}
             </div>
         </div>
     </div>
@@ -167,7 +167,9 @@
     "@type": "Event",
     "name": "{{ .Title }}",
     "description": "{{ .Description }}",
-    "startDate": "{{ .Date.Format "2006-01-02" }}",
+    "image": "{{ (partial "og-image.html" .).Permalink }}",
+    "startDate": "{{ .Date.Format "2006-01-02" }}T17:00:00",
+    "endDate": "{{ .Date.Format "2006-01-02" }}T19:00:00",
     "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
     "eventStatus": "https://schema.org/EventScheduled",
     "location": {

@@ -18,7 +18,7 @@
         {{- with .Params.tags }}
         <div class="article-tags">
             {{- range . }}
-            <span class="event-tag">{{ . }}</span>
+            <a class="event-tag" href="{{ printf "/tags/%s/" (. | urlize) | relURL }}">{{ . }}</a>
             {{- end }}
         </div>
         {{- end }}
@@ -110,6 +110,7 @@
     "@type": "Article",
     "headline": "{{ .Title }}",
     "description": "{{ .Description }}",
+    "image": "{{ (partial "og-image.html" .).Permalink }}",
     "datePublished": "{{ .Date.Format "2006-01-02" }}",
     "dateModified": "{{ .Lastmod.Format "2006-01-02" }}",
     "author": {

@@ -25,10 +25,12 @@
 <section class="showcase-list">
     <div class="container">
         <div class="showcase-grid">
-            {{- range where .Pages "Params.draft" "ne" true -}}
+            {{- range (.Paginate (where .Pages "Params.draft" "ne" true)).Pages -}}
             {{- partial "showcase-card.html" . -}}
             {{- end }}
         </div>
+
+        {{ partial "pagination.html" . }}
 
         {{- if eq (len (where .Pages "Params.draft" "ne" true)) 0 }}
         <div class="showcase-empty">

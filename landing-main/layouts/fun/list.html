@@ -1,0 +1,61 @@
+{{ define "main" }}
+<section class="insights-hero">
+    <div class="container">
+        <div class="page-header">
+            <a href="/" class="report-back">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Главная
+            </a>
+            <span class="section-tag">Задачки</span>
+        </div>
+        <h1 class="section-title">Задачки от сообщества</h1>
+        <p class="section-desc">
+            Инженерные задачки и разборы от участников сообщества тимлидов Казахстана.
+        </p>
+    </div>
+</section>
+
+<section class="insights-list">
+    <div class="container">
+        {{- $pages := .Pages -}}
+        {{- if gt (len $pages) 0 }}
+        <div class="articles-grid">
+            {{- range (.Paginate (sort $pages "Date" "desc")).Pages }}
+            <a href="{{ .RelPermalink }}" class="article-card">
+                <div class="article-card-header">
+                    <span class="insight-date">{{ .Date.Format "02.01.2006" }}</span>
+                </div>
+                <h3 class="insight-card-title">{{ .Title }}</h3>
+                <p class="insight-card-desc">{{ .Description }}</p>
+                <div class="insight-card-meta"><span class="event-arrow">→</span></div>
+            </a>
+            {{- end }}
+        </div>
+        {{ partial "pagination.html" . }}
+        {{- else }}
+        <div class="insights-empty"><p>Задачек пока нет.</p></div>
+        {{- end }}
+    </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Задачки – Тимлид не кодит",
+    "description": "Инженерные задачки от сообщества тимлидов Казахстана",
+    "url": "{{ .Permalink }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}

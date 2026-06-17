@@ -19,9 +19,8 @@
 
     <!-- SEO -->
     <link rel="canonical" href="{{ .Permalink }}">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="{{ if eq .Kind "404" }}noindex, follow{{ else }}index, follow{{ end }}">
     <meta name="author" content="Тимлид не кодит">
-    <meta name="keywords" content="тимлид, тимлид казахстан, teamlead, team lead, техлид, технический лидер, engineering manager, сообщество тимлидов, IT менеджмент, управление командой разработки, лидерство в IT, архитектура ПО, найм разработчиков, agile, scrum master, CTO, руководитель разработки, казахстан IT, teamleads kz, карьера тимлида, как стать тимлидом, управление командой{{ with .Params.tags }}, {{ delimit . ", " }}{{ end }}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ .Title }}">
@@ -104,7 +103,7 @@
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Встречи",
-                "item": "{{ .Site.BaseURL }}#events"
+                "item": "{{ .Site.BaseURL }}events/"
             },
             {
                 "@type": "ListItem",
@@ -145,7 +144,7 @@
 
     <!-- Fonts (self-hosted) -->
     <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/Inter-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Inter-ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Styles -->
     {{ $css := resources.Get "css/main.css" | fingerprint }}

@@ -1,0 +1,77 @@
+{{ define "main" }}
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+<section class="insights-hero">
+    <div class="container">
+        <div class="page-header">
+            <a href="/" class="report-back">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Главная
+            </a>
+            <span class="section-tag">Встречи</span>
+        </div>
+        <h1 class="section-title">Встречи сообщества</h1>
+        <p class="section-desc">
+            Регулярные онлайн-встречи тимлидов Казахстана: реальные кейсы, споры об архитектуре, найм и процессы.
+            Полные отчёты с мнениями участников и выводами.
+        </p>
+    </div>
+</section>
+
+<section class="insights-list">
+    <div class="container">
+        {{- $pages := where .Pages "Params.cardTitle" "ne" nil -}}
+        {{- if gt (len $pages) 0 }}
+        <div class="events-grid">
+            {{- range (.Paginate (sort $pages "Date" "desc")).Pages }}
+            <a href="{{ .RelPermalink }}" class="event-card">
+                <div class="event-date">
+                    <span class="event-day">{{ .Date.Day }}</span>
+                    <span class="event-month">{{ index $months (printf "%d" .Date.Month) }}</span>
+                </div>
+                <div class="event-info">
+                    <h3 class="event-title">{{ .Params.cardTitle }}</h3>
+                    <p class="event-desc">{{ .Params.cardDesc }}</p>
+                    {{- with .Params.tags }}
+                    <div class="event-tags">
+                        {{- range . }}
+                        <span class="event-tag">{{ . }}</span>
+                        {{- end }}
+                    </div>
+                    {{- end }}
+                </div>
+                <div class="event-arrow">→</div>
+            </a>
+            {{- end }}
+        </div>
+        {{ partial "pagination.html" . }}
+        {{- else }}
+        <div class="insights-empty">
+            <p>Отчёты о встречах появятся здесь совсем скоро. А пока – присоединяйтесь к
+                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>.
+            </p>
+        </div>
+        {{- end }}
+    </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Встречи сообщества – Тимлид не кодит",
+    "description": "Онлайн-встречи и отчёты сообщества тимлидов Казахстана",
+    "url": "{{ .Permalink }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}
