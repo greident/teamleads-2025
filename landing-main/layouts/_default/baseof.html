@@ -21,6 +21,7 @@
     <link rel="canonical" href="{{ .Permalink }}">
     <meta name="robots" content="{{ if eq .Kind "404" }}noindex, follow{{ else }}index, follow{{ end }}">
     <meta name="author" content="Тимлид не кодит">
+    <link rel="me" href="{{ .Site.Params.telegram }}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ .Title }}">
@@ -53,7 +54,6 @@
     <meta name="twitter:title" content="{{ .Title }}">
     <meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
-    <meta name="twitter:site" content="{{ .Site.Params.telegramHandle }}">
 
     <!-- Structured Data -->
     {{- if .IsHome }}
@@ -140,6 +140,9 @@
 
     <!-- RSS & Sitemap -->
     <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "index.xml" | absURL }}">
+    {{- if eq .Kind "section" }}
+    <link rel="alternate" type="application/rss+xml" title="{{ .Title }} – {{ .Site.Title }}" href="{{ .RelPermalink }}index.xml">
+    {{- end }}
     <link rel="sitemap" type="application/xml" href="{{ "sitemap.xml" | absURL }}">
 
     <!-- Fonts (self-hosted) -->

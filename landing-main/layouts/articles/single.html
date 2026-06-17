@@ -74,27 +74,9 @@
         </div>
         {{- end }}
 
-        <div class="insight-discuss">
-            <p>Хотите обсудить эту тему с практикующими тимлидами?</p>
-            <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
-                Обсудить в Telegram
-            </a>
-        </div>
+        {{ partial "report/discuss.html" (dict "ctx" . "text" "Хотите обсудить эту тему с практикующими тимлидами?") }}
 
-        <div class="report-bottom-nav">
-            {{ with .PrevInSection }}
-            <a href="{{ .RelPermalink }}" class="btn btn-secondary">← {{ .Title }}</a>
-            {{ end }}
-            <a href="/articles/" class="btn btn-secondary">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Все статьи
-            </a>
-            {{ with .NextInSection }}
-            <a href="{{ .RelPermalink }}" class="btn btn-secondary">{{ .Title }} →</a>
-            {{ end }}
-        </div>
+        {{ partial "report/bottom-nav.html" (dict "ctx" . "allHref" "/articles/" "allLabel" "Все статьи") }}
             </div>
         </div>
     </div>

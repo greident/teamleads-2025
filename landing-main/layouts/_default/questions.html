@@ -98,3 +98,20 @@
 
 {{ partial "footer.html" . }}
 {{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Вопросы сообщества – Тимлид не кодит",
+    "description": "Открытые и обсуждённые темы митапов сообщества тимлидов Казахстана",
+    "url": "{{ .Permalink }}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ .Site.Title }}",
+        "url": "{{ .Site.BaseURL }}"
+    }
+}
+</script>
+{{ end }}
