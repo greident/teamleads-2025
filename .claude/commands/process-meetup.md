@@ -49,7 +49,7 @@ Create `2026/events-reports/meetup-YYYY-MM-DD/report.md` following the exact str
 
 ## Step 4: Create the Hugo content page
 
-Create `landing-main/content/events/meetup-YYYY-MM-DD.md` with:
+Create `landing-main/content/events/meetup-YYYY-MM-DD.md`. The file is **frontmatter only – no HTML, no Markdown body**. All content lives in structured YAML fields; the layout (`layouts/events/single.html`) renders them, and the OG image generator (`layouts/partials/og-image.html`) reads `topics` titles. Do not write a content body.
 
 ### Frontmatter (YAML)
 ```yaml
@@ -58,6 +58,9 @@ title: "Встреча сообщества – DD месяц YYYY"
 description: "Short SEO description with key topics, comma-separated"
 date: YYYY-MM-DD
 mainTopic: "Full sentence describing the main topic."
+cardTitle: "Short homepage card title"
+cardDesc: "Homepage card description, comma-separated topics"
+tags: ["tag1", "tag2", "tag3"]
 participants:
   - name: Name
     role: "Short role description"
@@ -65,17 +68,32 @@ participants:
 nextQuestions:
   - question: "Open question text"
   - question: "Another open question"
+# --- structured body content (rendered by the layout) ---
+topics:                     # «Подтемы и их суть» – numbered automatically (1., 2., ...)
+  - title: "Subtopic title"
+    body: "One factual paragraph describing the subtopic."
+  - title: "Second subtopic"
+    body: "..."
+opinions:                   # «Различные мнения» – the "Вопрос" column is implicit
+  columns: ["Андрей", "Василий", "Уалихан"]   # 3–5 participant names
+  rows:
+    - question: "Point of disagreement?"
+      values: ["Position A", "Position B", "–"]   # one value per column; use "–" if silent
+takeaways:                  # «Основные выводы»
+  - title: "Takeaway title"
+    body: "Conclusion paragraph."
+  - title: "Final takeaway"
+    body: "..."
+    wide: true              # optional – renders a full-width card (use on the last one)
 ---
 ```
 
-### Content body (HTML, not Markdown)
-
-Use the exact same HTML structure as the reference file:
-- `<div class="report-topics">` with `<div class="topic-block">` for each subtopic
-- `<div class="report-opinions">` with `<table class="opinions-table">` for differing views
-- `<div class="report-takeaways">` with `<div class="takeaways-grid">` for conclusions
-- Use `<span class="topic-num">N.</span>` inside `<h3>` for topic numbering (this is parsed by the OG image generator)
-- The last takeaway can use `class="takeaway takeaway-wide"` for a full-width card
+Rules for the structured fields:
+- `topics` are numbered automatically by the layout – do **not** prefix titles with `N.`
+- `opinions.values` must have exactly one entry per name in `opinions.columns`; use `"–"` when a participant didn't weigh in
+- Set `wide: true` on at most one takeaway (typically the last) for the full-width card
+- Use « » (guillemets) for quotes and – (en-dash) in all strings, same as elsewhere
+- After creating the file, run `hugo --quiet` in `landing-main/` to confirm it builds cleanly
 
 ## Step 5: Homepage and OG image (auto-generated)
 
@@ -95,7 +113,7 @@ Be conservative: only mark a question as answered if the meeting genuinely addre
 ## Formatting rules
 
 - Always use en-dashes (–) instead of em-dashes (—) in all content
-- Use « » (guillemets) for Russian quotation marks in HTML content
+- Use « » (guillemets) for Russian quotation marks in all content strings
 - Keep topic descriptions factual and neutral – report what was said, not your interpretation
 - Participant roles should be concise (3–6 words)
 - SEO description should be under 160 characters

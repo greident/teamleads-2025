@@ -31,6 +31,56 @@
         </div>
         {{ end }}
 
+        {{ with .Params.topics }}
+        <div class="report-topics">
+            <h2>Подтемы и их суть</h2>
+            {{ range $i, $t := . }}
+            <div class="topic-block">
+                <h3><span class="topic-num">{{ add $i 1 }}.</span> {{ $t.title }}</h3>
+                <p>{{ $t.body }}</p>
+            </div>
+            {{ end }}
+        </div>
+        {{ end }}
+
+        {{ with .Params.opinions }}
+        <div class="report-opinions">
+            <h2>Различные мнения</h2>
+            <div class="opinions-table-wrap">
+                <table class="opinions-table">
+                    <thead>
+                        <tr>
+                            <th>Вопрос</th>
+                            {{ range .columns }}<th>{{ . }}</th>{{ end }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range .rows }}
+                        <tr>
+                            <td><strong>{{ .question }}</strong></td>
+                            {{ range .values }}<td>{{ . }}</td>{{ end }}
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {{ end }}
+
+        {{ with .Params.takeaways }}
+        <div class="report-takeaways">
+            <h2>Основные выводы</h2>
+            <div class="takeaways-grid">
+                {{ range . }}
+                <div class="takeaway{{ if .wide }} takeaway-wide{{ end }}">
+                    <h3>{{ .title }}</h3>
+                    <p>{{ .body }}</p>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+        {{ end }}
+
         {{ .Content }}
 
         {{ with .Params.nextQuestions }}

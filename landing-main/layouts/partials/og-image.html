@@ -34,23 +34,20 @@
 {{- $y := 200 -}}
 
 {{- if eq .Section "events" -}}
-  {{/* Topic list from content HTML */}}
-  {{- $raw := .RawContent -}}
-  {{- $topics := findRE `<span class="topic-num">\d+\.</span>\s*([^<]+)</h3>` $raw -}}
-  {{- range $i, $match := $topics -}}
-    {{- if lt $i 7 -}}
-      {{- $clean := replaceRE `<span class="topic-num">\d+\.</span>\s*` "" $match -}}
-      {{- $clean = replaceRE `</h3>` "" $clean -}}
-      {{- $clean = $clean | plainify | truncate 60 -}}
-      {{- $line := printf "%d. %s" (add $i 1) $clean -}}
-      {{- $bg = $bg | images.Filter (images.Text $line (dict
-        "color" "#1F2937"
-        "size" 26
-        "font" $fontRegular
-        "x" 80
-        "y" $y
-      )) -}}
-      {{- $y = add $y 48 -}}
+  {{/* Topic list from YAML frontmatter */}}
+  {{- with .Params.topics -}}
+    {{- range $i, $t := . -}}
+      {{- if lt $i 7 -}}
+        {{- $line := printf "%d. %s" (add $i 1) ($t.title | plainify | truncate 60) -}}
+        {{- $bg = $bg | images.Filter (images.Text $line (dict
+          "color" "#1F2937"
+          "size" 26
+          "font" $fontRegular
+          "x" 80
+          "y" $y
+        )) -}}
+        {{- $y = add $y 48 -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
 
