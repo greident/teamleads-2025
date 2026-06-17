@@ -1183,7 +1183,7 @@ img {
 }
 
 .report-content {
-    padding: var(--space-xl) 0 var(--space-4xl);
+    padding: var(--space-sm) 0 var(--space-4xl);
 }
 
 .report-container {
@@ -1548,7 +1548,8 @@ img {
 .report-opinions,
 .report-takeaways,
 .report-next,
-.topic-block {
+.topic-block,
+.insight-topic {
     scroll-margin-top: 90px;
 }
 
