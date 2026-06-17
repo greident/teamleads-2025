@@ -26,7 +26,26 @@
 </section>
 
 <section class="report-content">
-    <div class="container report-container">
+    <div class="container">
+        <div class="report-layout">
+
+            {{- /* Flatten the heading tree to a list of top-level (h2) entries with IDs */ -}}
+            {{- $tops := slice -}}
+            {{- range .Fragments.Headings }}
+            {{- if .ID }}{{ $tops = $tops | append . }}{{ else }}{{ range .Headings }}{{ if .ID }}{{ $tops = $tops | append . }}{{ end }}{{ end }}{{ end }}
+            {{- end }}
+            {{- if $tops }}
+            <aside class="report-toc" aria-label="Содержание статьи" data-report-toc>
+                <p class="report-toc-title">Содержание</p>
+                <ol>
+                    {{- range $tops }}
+                    <li><a href="#{{ .ID }}">{{ .Title }}</a></li>
+                    {{- end }}
+                </ol>
+            </aside>
+            {{- end }}
+
+            <div class="report-container">
         <div class="article-body">
             {{ .Content }}
         </div>
@@ -75,6 +94,8 @@
             {{ with .NextInSection }}
             <a href="{{ .RelPermalink }}" class="btn btn-secondary">{{ .Title }} →</a>
             {{ end }}
+        </div>
+            </div>
         </div>
     </div>
 </section>

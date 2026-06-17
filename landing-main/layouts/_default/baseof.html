@@ -157,9 +157,7 @@
     {{- if and .IsPage (in (slice "events" "insights" "articles" "showcase") .Section) }}
     <div class="reading-progress" data-reading-progress aria-hidden="true"><span></span></div>
     {{- end }}
-    {{- if not .IsHome }}
     {{ partial "nav.html" . }}
-    {{- end }}
     {{ block "main" . }}{{ end }}
 
     {{- if and .File (not .IsHome) site.Params.githubRepo }}
