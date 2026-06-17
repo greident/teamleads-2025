@@ -1140,7 +1140,7 @@ img {
    EVENT REPORT PAGES
    =========================================== */
 .report-hero {
-    padding: var(--space-4xl) 0 var(--space-2xl);
+    padding: var(--space-4xl) 0 var(--space-lg);
     background: linear-gradient(180deg, var(--primary-light) 0%, var(--white) 100%);
 }
 
@@ -1183,7 +1183,7 @@ img {
 }
 
 .report-content {
-    padding: var(--space-3xl) 0 var(--space-4xl);
+    padding: var(--space-xl) 0 var(--space-4xl);
 }
 
 .report-container {
@@ -1426,7 +1426,7 @@ img {
 
 /* Sticky table of contents (#6) */
 .report-toc {
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-lg);
     padding: var(--space-lg);
     background: var(--gray-50);
     border: 1px solid var(--gray-100);
