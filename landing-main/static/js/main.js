@@ -191,6 +191,36 @@
         });
     })();
 
+    // --- Report TOC scrollspy ----------------------------------------------
+    (function reportScrollspy() {
+        const toc = document.querySelector('[data-report-toc]');
+        if (!toc) return;
+        const links = Array.from(toc.querySelectorAll('a[href^="#"]'));
+        const map = new Map();
+        links.forEach(a => {
+            const sec = document.getElementById(a.getAttribute('href').slice(1));
+            if (sec) map.set(sec, a);
+        });
+        if (!map.size) return;
+
+        let active = null;
+        const setActive = (a) => {
+            if (a === active) return;
+            if (active) active.parentElement.classList.remove('is-active');
+            if (a) a.parentElement.classList.add('is-active');
+            active = a;
+        };
+
+        const obs = new IntersectionObserver((entries) => {
+            const visible = entries
+                .filter(e => e.isIntersecting)
+                .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+            if (visible[0]) setActive(map.get(visible[0].target));
+        }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+        map.forEach((a, sec) => obs.observe(sec));
+    })();
+
     // --- Reading progress bar ----------------------------------------------
     (function readingProgress() {
         const bar = document.querySelector('[data-reading-progress] span');

@@ -1,4 +1,6 @@
 {{ define "main" }}
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+{{- $accentPalette := slice "#00AFCA" "#FEC50C" "#8B5CF6" "#F59E0B" "#10B981" "#EF4444" -}}
 <section class="report-hero">
     <div class="container">
         <a href="/#events" class="report-back">
@@ -8,6 +10,22 @@
             Все встречи
         </a>
         <h1 class="report-title">{{ .Title }}</h1>
+        <div class="article-meta">
+            {{ partial "icons/calendar.html" }}
+            <span class="article-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}</span>
+            {{- if not (.Date.Before (now.AddDate 0 0 -1)) }}
+            <a class="report-cal" href="{{ .Site.Params.meetup.ics }}" download data-cal="event">
+                · Добавить в календарь
+            </a>
+            {{- end }}
+        </div>
+        {{- with .Params.tags }}
+        <div class="article-tags">
+            {{- range . }}
+            <span class="event-tag">{{ . }}</span>
+            {{- end }}
+        </div>
+        {{- end }}
         <div class="report-main-topic">
             <strong>Основная тема:</strong> {{ .Params.mainTopic }}
         </div>
@@ -15,136 +33,172 @@
 </section>
 
 <section class="report-content">
-    <div class="container report-container">
+    <div class="container">
+        <div class="report-layout">
 
-        {{ with .Params.participants }}
-        <div class="report-participants">
-            <h2>Участники</h2>
-            <div class="participants-grid">
-                {{ range . }}
-                <div class="participant">
-                    <strong>{{ .name }}</strong>
-                    {{ with .role }}<span>{{ . }}</span>{{ end }}
-                </div>
-                {{ end }}
-            </div>
-        </div>
-        {{ end }}
-
-        {{ with .Params.topics }}
-        <div class="report-topics">
-            <h2>Подтемы и их суть</h2>
-            {{ range $i, $t := . }}
-            <div class="topic-block">
-                <h3><span class="topic-num">{{ add $i 1 }}.</span> {{ $t.title }}</h3>
-                <p>{{ $t.body }}</p>
-            </div>
-            {{ end }}
-        </div>
-        {{ end }}
-
-        {{ with .Params.opinions }}
-        <div class="report-opinions">
-            <h2>Различные мнения</h2>
-            <div class="opinions-table-wrap">
-                <table class="opinions-table">
-                    <thead>
-                        <tr>
-                            <th>Вопрос</th>
-                            {{ range .columns }}<th>{{ . }}</th>{{ end }}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{ $cols := .columns }}
-                        {{ range .rows }}
-                        <tr>
-                            <td data-label="Вопрос"><strong>{{ .question }}</strong></td>
-                            {{ range $j, $v := .values }}<td data-label="{{ index $cols $j }}">{{ $v }}</td>{{ end }}
-                        </tr>
-                        {{ end }}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {{ end }}
-
-        {{ with .Params.takeaways }}
-        <div class="report-takeaways">
-            <h2>Основные выводы</h2>
-            <div class="takeaways-grid">
-                {{ range . }}
-                <div class="takeaway{{ if .wide }} takeaway-wide{{ end }}">
-                    <h3>{{ .title }}</h3>
-                    <p>{{ .body }}</p>
-                </div>
-                {{ end }}
-            </div>
-        </div>
-        {{ end }}
-
-        {{ .Content }}
-
-        {{ with .Params.nextQuestions }}
-        <div class="report-next">
-            <h2>Вопросы для дальнейшего обсуждения</h2>
-            <ul>
-                {{ range . }}
-                <li>
-                    {{ .question }}
-                    {{ with .answeredIn }}
-                        {{ with site.GetPage (printf "/events/%s" .) }}
-                            – <a href="{{ .RelPermalink }}">обсудили {{ .Date.Format "02.01.2006" }}</a>
-                        {{ end }}
-                    {{ end }}
-                </li>
-                {{ end }}
-            </ul>
-        </div>
-        {{ end }}
-
-        {{- $eventSlug := .File.ContentBaseName -}}
-        {{- $relatedArticles := where (where .Site.RegularPages "Section" "articles") "Params.sourceEvent" $eventSlug -}}
-        {{- if gt (len $relatedArticles) 0 }}
-        <div class="related-articles">
-            <h2>Статьи по теме</h2>
-            <p>Экспертные материалы, написанные на основе этой встречи:</p>
-            {{- range $relatedArticles }}
-            <a href="{{ .RelPermalink }}" class="related-article-link">
-                <strong>{{ .Title }}</strong>
-                <span>{{ .Description }}</span>
-            </a>
+            {{- $showToc := or .Params.participants .Params.topics .Params.opinions .Params.takeaways .Params.nextQuestions -}}
+            {{- if $showToc }}
+            <aside class="report-toc" aria-label="Содержание встречи" data-report-toc>
+                <p class="report-toc-title">Содержание</p>
+                <ol>
+                    {{- with .Params.participants }}<li><a href="#participants">Участники</a></li>{{- end }}
+                    {{- with .Params.topics }}<li><a href="#topics">Подтемы</a></li>{{- end }}
+                    {{- with .Params.opinions }}<li><a href="#opinions">Различные мнения</a></li>{{- end }}
+                    {{- with .Params.takeaways }}<li><a href="#takeaways">Основные выводы</a></li>{{- end }}
+                    {{- with .Params.nextQuestions }}<li><a href="#next">Что обсудим дальше</a></li>{{- end }}
+                </ol>
+            </aside>
             {{- end }}
-        </div>
-        {{- end }}
 
-        <div class="report-bottom-nav">
-            <a href="/#events" class="btn btn-secondary">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Все встречи
-            </a>
+            <div class="report-container">
+
+                {{ with .Params.participants }}
+                <div class="report-participants" id="participants">
+                    <h2>Участники</h2>
+                    <div class="participants-grid">
+                        {{ range . }}
+                        {{- $parts := split .name " " -}}
+                        {{- $ini := upper (substr (index $parts 0) 0 1) -}}
+                        {{- if gt (len $parts) 1 -}}{{- $ini = printf "%s%s" $ini (upper (substr (index $parts 1) 0 1)) -}}{{- end -}}
+                        {{- $av := index $accentPalette (mod (len .name) (len $accentPalette)) -}}
+                        <div class="participant">
+                            <span class="participant-avatar" style="--pa: {{ $av }}" aria-hidden="true">{{ $ini }}</span>
+                            <div class="participant-info">
+                                <strong>{{ .name }}</strong>
+                                {{ with .role }}<span>{{ . }}</span>{{ end }}
+                            </div>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+
+                {{ with .Params.topics }}
+                <div class="report-topics" id="topics">
+                    <h2>Подтемы и их суть</h2>
+                    {{ range $i, $t := . }}
+                    <div class="topic-block" id="topic-{{ add $i 1 }}">
+                        <h3><span class="topic-num">{{ add $i 1 }}.</span> {{ $t.title }}</h3>
+                        <p>{{ $t.body }}</p>
+                    </div>
+                    {{ end }}
+                </div>
+                {{ end }}
+
+                {{ with .Params.opinions }}
+                <div class="report-opinions" id="opinions">
+                    <h2>Различные мнения</h2>
+                    <div class="opinions-table-wrap">
+                        <table class="opinions-table">
+                            <thead>
+                                <tr>
+                                    <th>Вопрос</th>
+                                    {{ range .columns }}<th>{{ . }}</th>{{ end }}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ $cols := .columns }}
+                                {{ range .rows }}
+                                <tr>
+                                    <td data-label="Вопрос"><strong>{{ .question }}</strong></td>
+                                    {{ range $j, $v := .values }}<td data-label="{{ index $cols $j }}">{{ $v }}</td>{{ end }}
+                                </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{ end }}
+
+                {{ with .Params.takeaways }}
+                <div class="report-takeaways" id="takeaways">
+                    <h2>Основные выводы</h2>
+                    <div class="takeaways-grid">
+                        {{ range . }}
+                        {{- $accent := .accent | default (index $accentPalette (mod (len .title) (len $accentPalette))) -}}
+                        <div class="takeaway{{ if .wide }} takeaway-wide{{ end }}" style="--takeaway-accent: {{ $accent }};">
+                            <h3>{{ .title }}</h3>
+                            <p>{{ .body }}</p>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+
+                {{ .Content }}
+
+                {{ with .Params.nextQuestions }}
+                <div class="report-next" id="next">
+                    <h2>Вопросы для дальнейшего обсуждения</h2>
+                    <ul>
+                        {{ range . }}
+                        <li>
+                            {{ .question }}
+                            {{ with .answeredIn }}
+                                {{ with site.GetPage (printf "/events/%s" .) }}
+                                    – <a href="{{ .RelPermalink }}">обсудили {{ .Date.Format "02.01.2006" }}</a>
+                                {{ end }}
+                            {{ end }}
+                        </li>
+                        {{ end }}
+                    </ul>
+                </div>
+                {{ end }}
+
+                {{- $eventSlug := .File.ContentBaseName -}}
+                {{- $relatedArticles := where (where .Site.RegularPages "Section" "articles") "Params.sourceEvent" $eventSlug -}}
+                {{- if gt (len $relatedArticles) 0 }}
+                <div class="related-articles">
+                    <h2>Статьи по теме</h2>
+                    <p>Экспертные материалы, написанные на основе этой встречи:</p>
+                    {{- range $relatedArticles }}
+                    <a href="{{ .RelPermalink }}" class="related-article-link">
+                        <strong>{{ .Title }}</strong>
+                        <span>{{ .Description }}</span>
+                    </a>
+                    {{- end }}
+                </div>
+                {{- end }}
+
+                <div class="insight-discuss">
+                    <p>Хотите обсудить эти темы с практикующими тимлидами?</p>
+                    <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
+                        {{ partial "icons/send.html" }}
+                        Обсудить в Telegram
+                    </a>
+                </div>
+
+                <div class="report-bottom-nav">
+                    {{ with .PrevInSection }}
+                    <a href="{{ .RelPermalink }}" class="btn btn-secondary" rel="prev">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        <span>{{ .Title }}</span>
+                    </a>
+                    {{ else }}
+                    <span></span>
+                    {{ end }}
+                    <a href="/#events" class="btn btn-secondary">
+                        Все встречи
+                    </a>
+                    {{ with .NextInSection }}
+                    <a href="{{ .RelPermalink }}" class="btn btn-secondary" rel="next">
+                        <span>{{ .Title }}</span>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                    {{ else }}
+                    <span></span>
+                    {{ end }}
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <span class="logo-icon">◇</span>
-                <span>тимлид не кодит</span>
-            </div>
-            <p class="footer-tagline">Сообщество технических лидеров Казахстана</p>
-            <div class="footer-links">
-                <a href="{{ .Site.Params.telegram }}" target="_blank" rel="noopener">Telegram</a>
-                <a href="/#events">Встречи</a>
-                <a href="https://2025.teamleads.kz" target="_blank" rel="noopener">Итоги 2025</a>
-            </div>
-            <p class="footer-copyright">© {{ now.Year }} Тимлид не кодит</p>
-        </div>
-    </div>
-</footer>
+{{ partial "footer.html" . }}
 {{ end }}
 
 {{ define "structured-data" }}

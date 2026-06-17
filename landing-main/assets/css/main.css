@@ -1213,13 +1213,13 @@ img {
     border: 1px solid var(--gray-100);
 }
 
-.participant strong {
+.participant-info strong {
     display: block;
     color: var(--gray-900);
     margin-bottom: var(--space-xs);
 }
 
-.participant span {
+.participant-info span {
     font-size: 0.875rem;
     color: var(--gray-500);
 }
@@ -1329,17 +1329,12 @@ img {
     background: var(--white);
     border-radius: var(--radius-xl);
     border: 1px solid var(--gray-100);
-    border-left: 4px solid var(--primary);
+    border-left: 4px solid var(--takeaway-accent, var(--primary));
     box-shadow: var(--shadow-sm);
 }
 
-.takeaway:nth-child(2) { border-left-color: var(--kz-gold); }
-.takeaway:nth-child(3) { border-left-color: #8B5CF6; }
-.takeaway:nth-child(4) { border-left-color: #F59E0B; }
-
 .takeaway-wide {
     grid-column: 1 / -1;
-    border-left-color: #10B981;
 }
 
 .takeaway h3 {
@@ -1399,7 +1394,11 @@ img {
 
 /* Bottom nav */
 .report-bottom-nav {
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
     padding-top: var(--space-xl);
     border-top: 1px solid var(--gray-100);
 }
@@ -1408,6 +1407,149 @@ img {
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
+    min-width: 0;
+}
+
+.report-bottom-nav .btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 38ch;
+}
+
+/* ===========================================
+   REPORT LAYOUT, TOC, AVATARS — UX additions
+   =========================================== */
+.report-layout {
+    display: block;
+}
+
+/* Sticky table of contents (#6) */
+.report-toc {
+    margin-bottom: var(--space-2xl);
+    padding: var(--space-lg);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-lg);
+}
+
+.report-toc-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gray-500);
+    margin-bottom: var(--space-sm);
+}
+
+.report-toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+}
+
+.report-toc a {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    transition: color var(--transition-base);
+}
+
+.report-toc a:hover,
+.report-toc .is-active a {
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+@media (min-width: 1080px) {
+    .report-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 800px) 220px;
+        column-gap: var(--space-2xl);
+        align-items: start;
+    }
+
+    .report-container {
+        grid-column: 1;
+    }
+
+    .report-toc {
+        grid-column: 2;
+        position: sticky;
+        top: 96px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        margin-bottom: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+    }
+
+    .report-toc ol {
+        flex-direction: column;
+        gap: var(--space-sm);
+        border-left: 2px solid var(--gray-100);
+        padding-left: var(--space-md);
+    }
+}
+
+/* Add-to-calendar link in hero meta (#10) */
+.report-cal {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.25rem;
+    color: var(--primary-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+.report-cal:hover {
+    text-decoration: underline;
+}
+
+/* Participant avatars (#9) */
+.participant {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+}
+
+.participant .participant-avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.875rem;
+    background: color-mix(in srgb, var(--pa, var(--kz-sky)) 16%, white);
+    color: var(--pa, var(--kz-sky-dark));
+}
+
+@supports not (background: color-mix(in srgb, #000, #fff)) {
+    .participant .participant-avatar {
+        background: var(--primary-light);
+        color: var(--primary-dark);
+    }
+}
+
+.participant-info {
+    min-width: 0;
+}
+
+/* Anchor offset so deep links clear the sticky nav (#7) */
+.report-participants,
+.report-topics,
+.report-opinions,
+.report-takeaways,
+.report-next,
+.topic-block {
+    scroll-margin-top: 90px;
 }
 
 /* Questions page */
