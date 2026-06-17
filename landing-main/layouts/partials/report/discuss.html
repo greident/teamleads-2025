@@ -1,0 +1,9 @@
+{{/* Telegram discuss CTA shared by report pages.
+      Pass: dict "ctx" <page> "text" <optional prompt> */ -}}
+<div class="insight-discuss">
+    <p>{{ with .text }}{{ . }}{{ else }}Хотите обсудить эти темы с практикующими тимлидами?{{ end }}</p>
+    <a href="{{ .ctx.Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
+        {{ partial "icons/send.html" }}
+        Обсудить в Telegram
+    </a>
+</div>

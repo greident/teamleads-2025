@@ -161,52 +161,11 @@
 
                 {{- $eventSlug := .File.ContentBaseName -}}
                 {{- $relatedArticles := where (where .Site.RegularPages "Section" "articles") "Params.sourceEvent" $eventSlug -}}
-                {{- if gt (len $relatedArticles) 0 }}
-                <div class="related-articles">
-                    <h2>Статьи по теме</h2>
-                    <p>Экспертные материалы, написанные на основе этой встречи:</p>
-                    {{- range $relatedArticles }}
-                    <a href="{{ .RelPermalink }}" class="related-article-link">
-                        <strong>{{ .Title }}</strong>
-                        <span>{{ .Description }}</span>
-                    </a>
-                    {{- end }}
-                </div>
-                {{- end }}
+                {{ partial "report/related-articles.html" (dict "pages" $relatedArticles "intro" "Экспертные материалы, написанные на основе этой встречи:") }}
 
-                <div class="insight-discuss">
-                    <p>Хотите обсудить эти темы с практикующими тимлидами?</p>
-                    <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
-                        {{ partial "icons/send.html" }}
-                        Обсудить в Telegram
-                    </a>
-                </div>
+                {{ partial "report/discuss.html" (dict "ctx" . "text" "Хотите обсудить эти темы с практикующими тимлидами?") }}
 
-                <div class="report-bottom-nav">
-                    {{ with .PrevInSection }}
-                    <a href="{{ .RelPermalink }}" class="btn btn-secondary" rel="prev">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                        <span>{{ .Title }}</span>
-                    </a>
-                    {{ else }}
-                    <span></span>
-                    {{ end }}
-                    <a href="/#events" class="btn btn-secondary">
-                        Все встречи
-                    </a>
-                    {{ with .NextInSection }}
-                    <a href="{{ .RelPermalink }}" class="btn btn-secondary" rel="next">
-                        <span>{{ .Title }}</span>
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                    {{ else }}
-                    <span></span>
-                    {{ end }}
-                </div>
+                {{ partial "report/bottom-nav.html" (dict "ctx" . "allHref" "/#events" "allLabel" "Все встречи") }}
             </div>
         </div>
     </div>

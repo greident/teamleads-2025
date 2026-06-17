@@ -101,39 +101,11 @@
 
         {{- $insightSlug := .File.ContentBaseName -}}
         {{- $relatedArticles := where (where .Site.RegularPages "Section" "articles") "Params.relatedInsights" "intersect" (slice $insightSlug) -}}
-        {{- if gt (len $relatedArticles) 0 }}
-        <div class="related-articles">
-            <h2>Статьи по теме</h2>
-            {{- range $relatedArticles }}
-            <a href="{{ .RelPermalink }}" class="related-article-link">
-                <strong>{{ .Title }}</strong>
-                <span>{{ .Description }}</span>
-            </a>
-            {{- end }}
-        </div>
-        {{- end }}
+        {{ partial "report/related-articles.html" (dict "pages" $relatedArticles) }}
 
-        <div class="insight-discuss">
-            <p>Хотите продолжить обсуждение?</p>
-            <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
-                Обсудить в Telegram
-            </a>
-        </div>
+        {{ partial "report/discuss.html" (dict "ctx" . "text" "Хотите продолжить обсуждение?") }}
 
-        <div class="report-bottom-nav">
-            {{ with .PrevInSection }}
-            <a href="{{ .RelPermalink }}" class="btn btn-secondary">← {{ .Title }}</a>
-            {{ end }}
-            <a href="/insights/" class="btn btn-secondary">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Все инсайты
-            </a>
-            {{ with .NextInSection }}
-            <a href="{{ .RelPermalink }}" class="btn btn-secondary">{{ .Title }} →</a>
-            {{ end }}
-        </div>
+        {{ partial "report/bottom-nav.html" (dict "ctx" . "allHref" "/insights/" "allLabel" "Все инсайты") }}
     </div>
 </section>
 

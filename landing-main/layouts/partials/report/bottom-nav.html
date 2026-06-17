@@ -1,0 +1,25 @@
+{{/* Prev / all / next navigation shared by report pages.
+      Pass: dict "ctx" <page> "allHref" <url> "allLabel" <text> */ -}}
+<div class="report-bottom-nav">
+    {{ with .ctx.PrevInSection }}
+    <a href="{{ .RelPermalink }}" class="btn btn-secondary" rel="prev">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span>{{ .Title }}</span>
+    </a>
+    {{ else }}
+    <span></span>
+    {{ end }}
+    <a href="{{ .allHref }}" class="btn btn-secondary">{{ .allLabel }}</a>
+    {{ with .ctx.NextInSection }}
+    <a href="{{ .RelPermalink }}" class="btn btn-secondary" rel="next">
+        <span>{{ .Title }}</span>
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+    </a>
+    {{ else }}
+    <span></span>
+    {{ end }}
+</div>

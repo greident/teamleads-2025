@@ -1,0 +1,14 @@
+{{/* Related-articles block shared by report pages (events, insights).
+      Pass: dict "pages" <page slice> "intro" <optional intro string> */ -}}
+{{- if gt (len .pages) 0 }}
+<div class="related-articles">
+    <h2>Статьи по теме</h2>
+    {{- with .intro }}<p>{{ . }}</p>{{- end }}
+    {{- range .pages }}
+    <a href="{{ .RelPermalink }}" class="related-article-link">
+        <strong>{{ .Title }}</strong>
+        <span>{{ .Description }}</span>
+    </a>
+    {{- end }}
+</div>
+{{- end }}
