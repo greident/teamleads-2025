@@ -2774,6 +2774,7 @@ a.pagination-link:hover {
 }
 .voice-card {
     margin: 0;
+    min-width: 0;
     padding: var(--space-xl);
     background: var(--white);
     border: 1px solid var(--gray-100);
@@ -2791,6 +2792,7 @@ a.pagination-link:hover {
     line-height: 1.5;
     color: var(--gray-800);
     quotes: "«" "»";
+    overflow-wrap: anywhere;
 }
 .voice-text::before { content: open-quote; color: var(--kz-sky); font-weight: 700; }
 .voice-text::after { content: close-quote; color: var(--kz-sky); font-weight: 700; }
@@ -2923,13 +2925,14 @@ body > .nav {
     .next-meetup-actions { width: 100%; }
     .next-meetup-actions .btn { flex: 1; justify-content: center; }
     .next-meetup-pulse { top: var(--space-md); right: var(--space-md); }
-
-    /* Voices single column */
-    .voices-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {
     .voices-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .voices-grid { grid-template-columns: 1fr; }
 }
 
 /* --- Opinions table → cards on small screens --- */
