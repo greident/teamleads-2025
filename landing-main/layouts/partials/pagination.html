@@ -2,15 +2,15 @@
 {{- with .Paginator -}}
 {{- if gt .TotalPages 1 -}}
 <nav class="pagination" aria-label="Пагинация">
-    {{ if .HasPrev }}<a href="{{ .Prev.RelPermalink }}" class="pagination-link" rel="prev">←</a>{{ else }}<span class="pagination-link is-disabled" aria-hidden="true">←</span>{{ end }}
+    {{ if .HasPrev }}<a href="{{ .Prev.URL }}" class="pagination-link" rel="prev">←</a>{{ else }}<span class="pagination-link is-disabled" aria-hidden="true">←</span>{{ end }}
     {{ range .Pagers }}
         {{ if eq . $.Paginator }}
             <span class="pagination-link is-current" aria-current="page">{{ .PageNumber }}</span>
         {{ else }}
-            <a href="{{ .RelPermalink }}" class="pagination-link">{{ .PageNumber }}</a>
+            <a href="{{ .URL }}" class="pagination-link">{{ .PageNumber }}</a>
         {{ end }}
     {{ end }}
-    {{ if .HasNext }}<a href="{{ .Next.RelPermalink }}" class="pagination-link" rel="next">→</a>{{ else }}<span class="pagination-link is-disabled" aria-hidden="true">→</span>{{ end }}
+    {{ if .HasNext }}<a href="{{ .Next.URL }}" class="pagination-link" rel="next">→</a>{{ else }}<span class="pagination-link is-disabled" aria-hidden="true">→</span>{{ end }}
 </nav>
 {{- end -}}
 {{- end -}}
