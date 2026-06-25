@@ -3184,10 +3184,12 @@ body > .nav {
 /* Desktop: the shell page fills exactly one viewport below the sticky nav, so the
    terminal fits by height without scrolling the page. shell-wrap flexes; term grows. */
 @media (min-width:769px){
-  .shell-wrap{display:flex;flex-direction:column;min-height:calc(100vh - 90px)}
+  .shell-wrap{display:flex;flex-direction:column;height:calc(100vh - 90px)}
   .shell-inner{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
   .shell-head{flex:0 0 auto}
-  .shell-wrap .term{flex:1 1 auto;height:auto;min-height:260px}
+  /* flex-basis 0 + min-height:0 → the terminal fills the free space and stays a
+     fixed box; long output scrolls inside .term-body instead of growing the page. */
+  .shell-wrap .term{flex:1 1 0;height:auto;min-height:0}
 }
 
 /* On phones the fixed bottom-nav (64px) overlays the page, so size the terminal
