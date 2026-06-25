@@ -55,7 +55,8 @@
         [
           ['ls [раздел]', 'что вокруг / содержимое раздела'],
           ['cd <раздел>', 'войти в раздел (cd .. — наверх)'],
-          ['open <стр>', 'открыть страницу (cat — синоним)'],
+          ['open <стр>', 'открыть страницу в браузере'],
+          ['cat <стр>', 'показать markdown страницы здесь'],
           ['pwd', 'где я сейчас'],
           ['tree', 'всё дерево сайта'],
           ['find <слово>', 'поиск по заголовкам'],
@@ -119,6 +120,31 @@
         if (!hit) pool.forEach(function (it) { if (it.n === name) hit = it; });
         if (hit) { go(hit.u); return; }
         print('open: не найдено: ' + arg, 'err');
+      },
+      cat: function (a) {
+        var arg = (a[0] || '').replace(/^\/|\/$/g, '');
+        if (!arg) { print('cat: укажите страницу. Список — ls.', 'err'); return; }
+        if (links[arg]) { print('cat: «' + arg + '» — служебная страница без markdown. Откройте: open ' + arg, 'dim'); return; }
+        var sec = null, name = arg;
+        if (arg.indexOf('/') !== -1) { var p = arg.split('/'); sec = p[0]; name = p[1]; }
+        else if (cwd) { sec = cwd; }
+        var hit = null;
+        if (sec && sections[sec]) sections[sec].forEach(function (it) { if (it.n === name) hit = it; });
+        if (!hit) pool.forEach(function (it) { if (it.n === name) hit = it; });
+        if (!hit) { print('cat: не найдено: ' + arg, 'err'); return; }
+        if (!w.fetch) { print('cat: fetch недоступен в этом браузере — попробуйте open ' + arg, 'err'); return; }
+        var url = hit.u + 'index.md';
+        print('— ' + url + ' —', 'dim');
+        var loading = print('загрузка…', 'dim');
+        w.fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (txt) {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          var lines = txt.replace(/\s+$/, '').split('\n'), CAP = 400;
+          lines.slice(0, CAP).forEach(function (l) { print(l); });
+          if (lines.length > CAP) print('… обрезано (' + (lines.length - CAP) + ' строк). open ' + arg + ' — полная версия.', 'dim');
+        }).catch(function (e) {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          print('cat: не удалось загрузить — ' + e.message, 'err');
+        });
       },
       pwd: function () { print(pathStr()); },
       tree: function () {
@@ -184,7 +210,8 @@
         var pages = {
           ls: 'ls [раздел] — содержимое текущего или указанного раздела.',
           cd: 'cd <раздел> — войти. cd .. — наверх. cd — в корень.',
-          open: 'open <страница> — перейти на страницу. Синоним: cat.',
+          open: 'open <страница> — открыть страницу в браузере.',
+          cat: 'cat <страница> — показать markdown-версию страницы прямо в терминале.',
           pwd: 'pwd — текущий путь.',
           tree: 'tree — всё дерево сайта со счётчиками.',
           find: 'find <слово> — поиск по заголовкам и именам.',
@@ -233,7 +260,7 @@
       home: function () { go('/'); },
       exit: function () { go('/'); }
     };
-    commands.cat = commands.open; commands.go = commands.open; commands.search = commands.find;
+    commands.go = commands.open; commands.search = commands.find;
     commands.answer = commands['42']; commands.vi = commands.vim;
     commands.ai = commands.claude; commands.ask = commands.claude;
 

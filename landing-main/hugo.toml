@@ -8,6 +8,18 @@ title = "Тимлид не кодит – Сообщество тимлидов 
 [taxonomies]
   tag = "tags"
 
+# Plain-markdown rendition of each page, emitted next to its HTML as index.md.
+# The Shell's `cat` command fetches it on demand (same-origin).
+[outputFormats.cat]
+  mediaType = "text/markdown"
+  suffix = "md"
+  baseName = "index"
+  isPlainText = true
+  notAlternative = true
+
+[outputs]
+  page = ["html", "cat"]
+
 [params]
   description = "Крупнейшее сообщество тимлидов и технических лидеров Казахстана. Архитектура. Люди. Процессы разработки."
   telegram = "https://t.me/teamleads_kz"
