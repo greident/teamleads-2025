@@ -25,6 +25,9 @@ title = "Тимлид не кодит – Сообщество тимлидов 
 
   # Recurring meetup schedule — every Wednesday 17:00, Astana (UTC+5)
   [params.meetup]
+    # TODO: replace with the real recurring meeting link. Single source of truth:
+    # /join redirects here, and the calendar points at the constant /join URL.
+    joinUrl = "https://meet.google.com/xxx-xxxx-xxx"
     weekdayNominative = "среда"
     weekdayAccusative = "среду"
     time = "17:00"

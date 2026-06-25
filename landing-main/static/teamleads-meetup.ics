@@ -24,9 +24,9 @@ RRULE:FREQ=WEEKLY;BYDAY=WE
 SUMMARY:Встреча сообщества «Тимлид не кодит»
 DESCRIPTION:Еженедельная онлайн-встреча сообщества тимлидов и технических ли
  деров Казахстана. Разбираем кейсы\, спорим об архитектуре\, обсуждаем найм\,
-  AI и карьеру. Подключайтесь в Telegram: https://t.me/teamleads_kz
-LOCATION:Онлайн · Telegram (@teamleads_kz)
-URL:https://t.me/teamleads_kz
+  AI и карьеру. Ссылка для подключения: https://teamleads.kz/join
+LOCATION:Онлайн · https://teamleads.kz/join
+URL:https://teamleads.kz/join
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

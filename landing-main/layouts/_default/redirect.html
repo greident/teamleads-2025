@@ -1,0 +1,53 @@
+{{- $url := .Params.redirectTo | default .Site.Params.meetup.joinUrl -}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Title }} – {{ .Site.Title }}</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="{{ $url }}">
+  <meta http-equiv="refresh" content="5; url={{ $url }}">
+  <style>
+    :root { --primary: {{ .Site.Params.colors.primary }}; --accent: {{ .Site.Params.colors.accent }}; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #E5F7FA, #ffffff 60%); color: #1F2937; text-align: center; padding: 24px;
+    }
+    .card { max-width: 460px; }
+    .logo { font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); margin-bottom: 24px; }
+    h1 { font-size: 28px; margin: 0 0 12px; }
+    p { font-size: 16px; line-height: 1.5; color: #4B5563; margin: 0 0 28px; }
+    .count { color: var(--primary); font-weight: 700; }
+    .btn {
+      display: inline-block; background: var(--primary); color: #fff; text-decoration: none;
+      padding: 14px 28px; border-radius: 12px; font-weight: 600; font-size: 16px; transition: opacity .2s;
+    }
+    .btn:hover { opacity: .9; }
+    .alt { display: block; margin-top: 18px; font-size: 13px; color: #9CA3AF; }
+    .alt a { color: #6B7280; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">◇ тимлид не кодит</div>
+    <h1>Подключаемся к встрече</h1>
+    <p>Перенаправляем вас на еженедельную встречу через <span class="count" id="count">5</span> сек.</p>
+    <a class="btn" href="{{ $url }}" id="join">Подключиться сейчас</a>
+    <span class="alt">Если ничего не произошло — <a href="{{ $url }}">откройте ссылку вручную</a>.</span>
+  </div>
+  <script>
+    (function () {
+      var url = {{ $url | jsonify }};
+      var n = 5, el = document.getElementById("count");
+      var t = setInterval(function () {
+        n -= 1;
+        if (el) el.textContent = n < 0 ? 0 : n;
+        if (n <= 0) { clearInterval(t); window.location.replace(url); }
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>
