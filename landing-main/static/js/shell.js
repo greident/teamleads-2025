@@ -749,9 +749,12 @@
     }
     function bootSeq(i) { if (i >= boot.length) { ready(); return; } print(boot[i][0], boot[i][1]); setTimeout(function () { bootSeq(i + 1); }, reduced ? 0 : 200); }
     setPrompt(); bootSeq(0);
+
+    // Let other UI (the Claude/Codex assistants) run a command in this live terminal.
+    if (mode === 'full') { w.TeamleadsShell = w.TeamleadsShell || {}; w.TeamleadsShell.run = function (c) { if (simSt) simExit(); input.value = ''; run(String(c || '')); }; }
   }
 
   function autoMount() { var ns = d.querySelectorAll('[data-term]'); for (var i = 0; i < ns.length; i++) mount(ns[i]); }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', autoMount); else autoMount();
-  w.TeamleadsShell = { mount: mount };
+  w.TeamleadsShell = w.TeamleadsShell || {}; w.TeamleadsShell.mount = mount;
 })(window, document);

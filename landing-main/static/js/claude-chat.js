@@ -113,7 +113,7 @@
         var lead = hits.length === 1
           ? 'Прошёлся по полным текстам (grep) — ближе всего этот разбор:'
           : 'Прошёлся по полным текстам (grep) — вот ' + hits.length + ' наиболее релевантных:';
-        return { text: lead, links: hits.map(function (h) { return { title: h.t, url: h.u, s: h.s, snip: h.snip }; }) };
+        return { text: lead, links: hits.map(function (h) { return { title: h.t, url: h.u, s: h.s, snip: h.snip }; }), cmd: R && R.suggest ? R.suggest(q, hits) : null, q: q };
       }
       // fallback: title-only search over the shell filesystem (find-style)
       var words = ql.split(/\s+/).filter(function (x) { return x.length > 2; });
@@ -121,11 +121,11 @@
       Object.keys(FS.sections || {}).forEach(function (s) {
         (FS.sections[s] || []).forEach(function (it) {
           var t = (it.t || '').toLowerCase();
-          if (words.some(function (x) { return t.indexOf(x) !== -1; })) thits.push(it);
+          if (words.some(function (x) { return t.indexOf(x) !== -1; })) thits.push({ t: it.t, u: it.u, s: s, n: it.n });
         });
       });
       if (thits.length)
-        return { text: 'По заголовкам нашёл — загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }) };
+        return { text: 'По заголовкам нашёл — загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }), cmd: R && R.suggest ? R.suggest(q, thits) : null, q: q };
 
       var quips = [
         'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени. Передавайте «почему», а не только «что».',
@@ -133,8 +133,38 @@
         'Не нашёл прямого совпадения. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
         'Прямого ответа в материалах нет. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
       ];
-      return { text: quips[Math.floor(Math.random() * quips.length)] + ' Попробуйте уточнить запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
+      return { text: quips[Math.floor(Math.random() * quips.length)] + ' Попробуйте уточнить запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }], q: q };
     });
+  }
+
+  var VERB = 'claude';
+  function copy(t) {
+    if (w.navigator && w.navigator.clipboard && w.navigator.clipboard.writeText) return w.navigator.clipboard.writeText(t);
+    return new Promise(function (res, rej) { try { var ta = d.createElement('textarea'); ta.value = t; ta.style.position = 'absolute'; ta.style.left = '-9999px'; d.body.appendChild(ta); ta.select(); var ok = d.execCommand('copy'); d.body.removeChild(ta); ok ? res() : rej(); } catch (e) { rej(e); } });
+  }
+  function runInShell(cmd) { close(); if (w.TeamleadsShell && w.TeamleadsShell.run) w.TeamleadsShell.run(cmd); else w.location.href = '/shell/?cmd=' + encodeURIComponent(cmd); }
+  function shareAnswer(q, btn) {
+    var R = w.TeamleadsRetrieval, url = (R && R.shareUrl) ? R.shareUrl(VERB, q) : ((w.location.origin || '') + '/shell/?cmd=' + VERB + '+' + encodeURIComponent(q)), label = btn.textContent;
+    copy(url).then(function () { btn.textContent = 'Ссылка скопирована ✓'; }, function () { btn.textContent = 'Не удалось'; });
+    setTimeout(function () { btn.textContent = label; }, 1800);
+  }
+  // Answers that end in a command (run it in the live terminal) + a shareable deep-link.
+  function appendExtras(bubbleEl, a) {
+    if (!a) return;
+    if (a.cmd && a.cmd.cmd) {
+      var row = el('div', 'cl-cmd-row');
+      var b = el('button', 'cl-cmd'); b.type = 'button';
+      b.appendChild(el('span', 'cl-cmd-p', '$')); b.appendChild(d.createTextNode(' ' + a.cmd.cmd));
+      b.title = (a.cmd.label || '') + ' — выполнить в терминале';
+      b.addEventListener('click', function () { runInShell(a.cmd.cmd); });
+      row.appendChild(b); bubbleEl.appendChild(row);
+    }
+    if (a.q) {
+      var sh = el('button', 'cl-share', 'Поделиться ответом'); sh.type = 'button';
+      sh.addEventListener('click', function () { shareAnswer(a.q, sh); });
+      bubbleEl.appendChild(sh);
+    }
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
   function botReply(q) {
@@ -145,7 +175,7 @@
     var reduced = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var t0 = Date.now();
     Promise.resolve(answer(q)).then(function (a) {
-      function render() { msgs.removeChild(typing); typeInto(bubble('bot'), a.text, a.links); }
+      function render() { msgs.removeChild(typing); var bb = bubble('bot'); typeInto(bb, a.text, a.links, function () { appendExtras(bb, a); }); }
       if (reduced) { render(); return; }
       var wait = 450 - (Date.now() - t0);
       setTimeout(render, wait > 0 ? wait : 0);

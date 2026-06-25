@@ -61,7 +61,7 @@
         var i = b.indexOf(wd), c = 0;
         while (i !== -1 && c < 3) { score += 1; c++; i = b.indexOf(wd, i + wd.length); }
       });
-      if (score > 0) out.push({ u: p.u, t: p.t, s: p.s, score: score, snip: snip(p.b, phrase || words[0]) });
+      if (score > 0) out.push({ u: p.u, n: p.n, t: p.t, s: p.s, score: score, snip: snip(p.b, phrase || words[0]) });
     });
     out.sort(function (a, b2) { return b2.score - a.score; });
     return out;
@@ -71,5 +71,25 @@
     return fetchIndex().then(function () { return rank(query).slice(0, limit || 5); }).catch(function () { return []; });
   }
 
-  w.TeamleadsRetrieval = { retrieve: retrieve, rank: rank, fetchIndex: fetchIndex, tokens: tokens };
+  // Suggest the next shell command for an answer — a topical tool when the query
+  // calls for one, otherwise `cat` of the best hit so the reader can open it inline.
+  function suggest(query, hits) {
+    var q = (query || '').toLowerCase();
+    if (/зарплат|зп|вилк|грейд|сколько (?:получа|зараба|стоит)|salary/.test(q))
+      return { cmd: 'salary', label: 'зарплатные вилки сообщества' };
+    if (/симул|развилк|дилемм|\bsim\b/.test(q))
+      return { cmd: 'sim', label: 'тимлид-симулятор' };
+    var top = hits && hits[0];
+    if (top && top.s && top.n) return { cmd: 'cat ' + top.s + '/' + top.n, label: 'прочитать в терминале' };
+    return null;
+  }
+
+  // Shareable deep-link that reopens this question in the assistant (claude/codex)
+  // via the shell's ?cmd= reader. Spaces become + (the reader maps them back).
+  function shareUrl(verb, query) {
+    var base = (w.location && w.location.origin) || 'https://teamleads.kz';
+    return base + '/shell/?cmd=' + verb + '+' + encodeURIComponent((query || '').trim()).replace(/%20/g, '+');
+  }
+
+  w.TeamleadsRetrieval = { retrieve: retrieve, rank: rank, fetchIndex: fetchIndex, tokens: tokens, suggest: suggest, shareUrl: shareUrl };
 })(window);

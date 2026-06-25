@@ -9,14 +9,15 @@
     {{- $parts := slice (.Params.mainTopic | default "") -}}
     {{- range (.Params.topics | default slice) }}{{ $parts = $parts | append (.title | default "") (.body | default "") }}{{ end -}}
     {{- range (.Params.takeaways | default slice) }}{{ $parts = $parts | append (.title | default "") (.body | default "") }}{{ end -}}
+    {{- with .Params.opinions }}{{ range (.rows | default slice) }}{{ $parts = $parts | append (.question | default "") }}{{ range (.values | default slice) }}{{ $parts = $parts | append . }}{{ end }}{{ end }}{{ end -}}
     {{- range (.Params.nextQuestions | default slice) }}{{ $parts = $parts | append (.question | default "") }}{{ end -}}
     {{- range (.Params.participants | default slice) }}{{ $parts = $parts | append (.name | default "") (.role | default "") }}{{ end -}}
     {{- $b = delimit $parts " " -}}
   {{- else if eq .Section "insights" -}}
     {{- $parts := slice (.Description | default "") -}}
-    {{- range (.Params.topics | default slice) }}{{ $parts = $parts | append (.title | default "") }}{{ range (.paragraphs | default slice) }}{{ $parts = $parts | append . }}{{ end }}{{ end -}}
+    {{- range (.Params.topics | default slice) }}{{ $parts = $parts | append (.title | default "") }}{{ range (.paragraphs | default slice) }}{{ $parts = $parts | append . }}{{ end }}{{ range (.quotes | default slice) }}{{ $parts = $parts | append . }}{{ end }}{{ end -}}
     {{- $b = delimit $parts " " -}}
   {{- end -}}
-  {{- $idx = $idx | append (dict "u" .RelPermalink "t" .Title "s" .Section "b" ($b | plainify | chomp)) -}}
+  {{- $idx = $idx | append (dict "u" .RelPermalink "n" .File.ContentBaseName "t" .Title "s" .Section "b" ($b | plainify | chomp)) -}}
 {{- end -}}
 {{ $idx | jsonify }}
