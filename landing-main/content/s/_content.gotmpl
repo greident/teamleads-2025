@@ -1,0 +1,17 @@
+{{/* Generate one share page per Shell command from data/shell_commands.toml. */}}
+{{ range $c := site.Data.shell_commands.commands }}
+  {{ $.AddPage (dict
+    "kind" "page"
+    "path" $c.id
+    "title" (printf "$ %s — терминал «Тимлид не кодит»" $c.cmd)
+    "description" $c.desc
+    "params" (dict
+      "id" $c.id
+      "cmd" $c.cmd
+      "run" (or $c.run $c.cmd)
+      "desc" $c.desc
+      "out" $c.out
+    )
+    "content" (dict "mediaType" "text/markdown" "value" "")
+  ) }}
+{{ end }}

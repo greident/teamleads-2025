@@ -1,0 +1,26 @@
+{{ define "head" }}
+<meta name="robots" content="noindex, follow">
+{{ end }}
+
+{{ define "main" }}
+{{- $run := .Params.run | default .Params.cmd -}}
+<section class="nf-wrap">
+  <div class="container nf-inner" style="text-align:center">
+    <span class="section-tag" style="display:inline-block;margin-bottom:var(--space-sm)">SHELL</span>
+    <h1 class="section-title" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">$ {{ .Params.cmd }}</h1>
+    <p class="section-desc">{{ .Params.desc }}</p>
+    <p class="section-desc" style="opacity:.7">Открываем терминал…</p>
+    <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-primary" href="/shell/?{{ querify "cmd" $run }}">Открыть терминал</a>
+      <a class="btn btn-secondary" href="/shell/">Shell Mode</a>
+    </div>
+  </div>
+</section>
+<script>
+  // Humans (JS) get bounced straight into the shell with the command pre-run.
+  // Crawlers (no JS) stay here and read this page's terminal-style OG image.
+  (function () {
+    try { window.location.replace('/shell/?cmd=' + encodeURIComponent({{ $run | jsonify }})); } catch (e) {}
+  })();
+</script>
+{{ end }}

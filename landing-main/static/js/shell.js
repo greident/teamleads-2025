@@ -19,6 +19,7 @@
     var input = root.querySelector('[data-term-input]');
     var promptEl = root.querySelector('[data-term-prompt]');
     var titleEl = root.querySelector('[data-term-title]');
+    var simPanel = root.querySelector('[data-term-sim]');
     if (!out || !body || !input) return;
 
     var mode = root.getAttribute('data-mode') || 'full';
@@ -62,10 +63,11 @@
     }
     function go(href) { print(''); print('переход → ' + href, 'ok'); setTimeout(function () { w.location.href = href; }, reduced ? 0 : 360); }
 
-    // ── Тимлид-симулятор: a stateful, branching decision mode (like vim, it
-    //    captures the input line until you quit). Scenarios come from data-scenarios.
-    var simSt = null;
-    var SIM_RULE = '──────────────────────────────────────────';
+    // ── Тимлид-симулятор: an interactive panel mode. Instead of streaming
+    //    append-only lines, it takes over the terminal body with a card that
+    //    re-renders in place on each step. Scenarios come from data-scenarios.
+    var simSt = null;   // { list, idx, score, phase: 'choice'|'outcome'|'done', chosen }
+    var simToastT = null;
     function copyText(t) {
       if (w.navigator && w.navigator.clipboard && w.navigator.clipboard.writeText) return w.navigator.clipboard.writeText(t);
       return new Promise(function (res, rej) {
@@ -79,63 +81,139 @@
       if (!hit) pool.forEach(function (it) { if (it.n === name) hit = it; });
       return hit;
     }
+    function simBtn(label, cls, onclick) { var b = el('button', 'sim-btn' + (cls ? ' ' + cls : ''), label); b.type = 'button'; b.onclick = onclick; return b; }
+    function simToast(msg) {
+      var t = simPanel && simPanel.querySelector('.sim-toast'); if (!t) return;
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(simToastT); simToastT = setTimeout(function () { t.classList.remove('show'); }, 2000);
+    }
+    function simFocus() { if (!simPanel) return; try { simPanel.focus({ preventScroll: true }); } catch (e) { simPanel.focus(); } }
     function simStart() {
+      if (!simPanel) { print('sim: панель симулятора недоступна на этой странице.', 'err'); return; }
       var list = (SCEN.scenarios || []).slice();
       if (!list.length) { print('sim: сценарии не загружены', 'err'); return; }
       for (var i = list.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = list[i]; list[i] = list[j]; list[j] = t; }
-      simSt = { list: list, idx: 0, score: 0, await: 'choice' };
-      print(''); print(SCEN.title || 'Тимлид-симулятор', 'accent');
-      if (SCEN.intro) print(SCEN.intro, 'hint');
-      simShow();
+      simSt = { list: list, idx: 0, score: 0, phase: 'choice', chosen: null };
+      body.style.display = 'none';
+      if (keysBar) keysBar.style.display = 'none';
+      simPanel.hidden = false;
+      if (titleEl) titleEl.textContent = 'guest@teamleads: ~/sim';
+      simRender();
+      simPanel.focus();
     }
-    function simShow() {
-      var s = simSt.list[simSt.idx];
-      print(''); print('сценарий ' + (simSt.idx + 1) + '/' + simSt.list.length + '            [q] выйти', 'cy');
-      print(SIM_RULE, 'dim');
-      String(s.prompt || '').split('\n').forEach(function (l) { if (l.trim()) print(l.trim()); });
-      print('');
-      s.options.forEach(function (o, i) { print('  ' + String.fromCharCode(97 + i) + ') ' + o.label); });
-      print('');
-      print('Ваш выбор: ' + s.options.map(function (o, i) { return String.fromCharCode(97 + i); }).join(' / '), 'hint');
-      simSt.await = 'choice';
+    function simExit() {
+      simSt = null;
+      if (simPanel) { simPanel.hidden = true; simPanel.innerHTML = ''; }
+      body.style.display = '';
+      if (keysBar) keysBar.style.display = '';
+      setPrompt();
+      input.focus();
     }
-    function simChoose(letter) {
-      var s = simSt.list[simSt.idx], idx = 'abcdefgh'.indexOf(letter);
-      if (idx < 0 && /^[1-9]$/.test(letter)) idx = parseInt(letter, 10) - 1;
-      if (idx < 0 || idx >= s.options.length) { print('Выберите вариант: ' + s.options.map(function (o, i) { return String.fromCharCode(97 + i); }).join(' / '), 'err'); return; }
-      var o = s.options[idx];
-      if (o.good) simSt.score++;
-      print((o.good ? '✓ ' : '✗ ') + o.outcome, o.good ? 'ok' : 'err');
-      if (s.lesson) print('💡 ' + s.lesson, 'hint');
-      if (o.votes != null) print('📊 так выбрали ' + o.votes + '%', 'dim');
-      var hit = simLink(s.link);
-      if (hit) { var n = el('span'); n.appendChild(el('span', 'dim', 'разбор → ')); n.appendChild(link(hit.u, hit.t)); printNode(n); }
-      print(SIM_RULE, 'dim');
-      var last = simSt.idx >= simSt.list.length - 1;
-      print('[enter] ' + (last ? 'итог' : 'дальше') + ' · [s] поделиться · [q] выйти', 'hint');
-      simSt.await = 'next';
+    function simPick(i) {
+      if (!simSt || simSt.phase !== 'choice') return;
+      var o = simSt.list[simSt.idx].options[i]; if (!o) return;
+      simSt.chosen = i; if (o.good) simSt.score++;
+      simSt.phase = 'outcome'; simRender();
     }
-    function simNext() { simSt.idx++; if (simSt.idx >= simSt.list.length) simFinish(); else simShow(); }
-    function simFinish() {
-      simSt.await = 'done';
-      var n = simSt.list.length, sc = simSt.score;
-      print(''); print('ИТОГ: ' + sc + '/' + n + ' разумных решений', 'accent');
-      print(sc === n ? 'Чистый прогон. Тимлид не кодит – тимлид анблокает.'
-        : sc >= Math.ceil(n / 2) ? 'Крепко. Но часть развилок стоит обсудить вживую.'
-          : 'Есть над чем подумать – как раз тема для встречи.');
-      print(SIM_RULE, 'dim');
-      print('Продолжить вживую: join (среда 17:00) · telegram', 'hint');
-      print('[s] поделиться · [enter] ещё раз · [q] выйти', 'hint');
+    function simAdvance() {
+      if (!simSt) return;
+      if (simSt.phase === 'outcome') {
+        simSt.idx++;
+        if (simSt.idx >= simSt.list.length) simSt.phase = 'done';
+        else { simSt.phase = 'choice'; simSt.chosen = null; }
+        simRender();
+      } else if (simSt.phase === 'done') simStart();
     }
-    function simShare() {
+    function simShareUI() {
       var url = SCEN.shareUrl || (w.location.origin + '/shell/#sim');
-      var played = simSt.await === 'done' || simSt.idx > 0;
+      var played = simSt.phase === 'done' || simSt.idx > 0 || simSt.phase === 'outcome';
       var txt = played ? ('Тимлид-симулятор: ' + simSt.score + '/' + simSt.list.length + ' разумных решений. Пройди и ты: ' + url)
-        : ('Тимлид-симулятор в терминале сообщества: ' + url);
-      copyText(txt).then(function () { print('Результат скопирован, делись 👇', 'ok'); }, function () { print('Скопируй ссылку вручную 👇', 'dim'); });
-      var n = el('span'); n.appendChild(el('span', 'dim', '→ ')); n.appendChild(link(url, url)); printNode(n);
+        : ('Тимлид-симулятор: ' + url);
+      copyText(txt).then(function () { simToast('Ссылка скопирована'); }, function () { simToast('Не удалось скопировать'); });
     }
-    function simQuit() { simSt = null; print('вышли из симулятора. Возвращайтесь – развилок много.', 'ok'); }
+    function simHead() {
+      var head = el('div', 'sim-head');
+      head.appendChild(el('span', 'sim-kicker', SCEN.title || 'Тимлид-симулятор'));
+      head.appendChild(el('span', 'sim-progress', simSt.phase === 'done' ? 'итог' : (simSt.idx + 1) + ' / ' + simSt.list.length));
+      head.appendChild(simBtn('✕', 'sim-x', simExit));
+      simPanel.appendChild(head);
+      var bar = el('div', 'sim-bar'), fill = el('span');
+      var done = simSt.idx + (simSt.phase === 'outcome' || simSt.phase === 'done' ? 1 : 0);
+      fill.style.width = Math.round(done / simSt.list.length * 100) + '%';
+      bar.appendChild(fill); simPanel.appendChild(bar);
+    }
+    function simRender() {
+      if (!simPanel) return;
+      simPanel.innerHTML = '';
+      simHead();
+      if (simSt.phase === 'done') { simRenderDone(); simPanel.appendChild(el('div', 'sim-toast')); simFocus(); return; }
+      var s = simSt.list[simSt.idx];
+      var pr = el('div', 'sim-prompt');
+      String(s.prompt || '').split('\n').forEach(function (l) { if (l.trim()) pr.appendChild(el('p', null, l.trim())); });
+      simPanel.appendChild(pr);
+      var opts = el('div', 'sim-opts');
+      s.options.forEach(function (o, i) {
+        var b = el('button', 'sim-opt'); b.type = 'button';
+        b.appendChild(el('span', 'sim-opt-key', String.fromCharCode(97 + i)));
+        b.appendChild(el('span', 'sim-opt-label', o.label));
+        if (simSt.phase === 'outcome') {
+          b.disabled = true;
+          if (i === simSt.chosen) b.className += o.good ? ' is-good' : ' is-bad';
+          else if (o.good) b.className += ' is-answer';
+        } else {
+          b.onclick = (function (idx) { return function () { simPick(idx); }; })(i);
+        }
+        opts.appendChild(b);
+      });
+      simPanel.appendChild(opts);
+      if (simSt.phase === 'choice') {
+        simPanel.appendChild(el('p', 'sim-hint', 'Выберите вариант – клик или клавиша a / b / c'));
+        simFocus(); return;
+      }
+      var o = s.options[simSt.chosen];
+      var res = el('div', 'sim-result');
+      var verdict = el('p', 'sim-outcome ' + (o.good ? 'is-good' : 'is-bad'));
+      verdict.appendChild(el('span', 'sim-mark', o.good ? '✓' : '✗'));
+      verdict.appendChild(d.createTextNode(' ' + o.outcome));
+      res.appendChild(verdict);
+      if (s.lesson) { var ls = el('p', 'sim-lesson'); ls.appendChild(d.createTextNode('💡 ' + s.lesson)); res.appendChild(ls); }
+      if (o.votes != null) {
+        var vr = el('div', 'sim-votes');
+        var vbar = el('span', 'sim-votebar'), vf = el('span'); vf.style.width = o.votes + '%'; vbar.appendChild(vf);
+        vr.appendChild(vbar); vr.appendChild(el('span', 'sim-votenum', 'так выбрали ' + o.votes + '%'));
+        res.appendChild(vr);
+      }
+      var hit = simLink(s.link);
+      if (hit) { var rm = el('div', 'sim-readmore'); rm.appendChild(el('span', 'dim', 'разбор → ')); rm.appendChild(link(hit.u, hit.t)); res.appendChild(rm); }
+      simPanel.appendChild(res);
+      var last = simSt.idx >= simSt.list.length - 1;
+      var acts = el('div', 'sim-actions');
+      acts.appendChild(simBtn(last ? 'Итог →' : 'Дальше →', 'primary', simAdvance));
+      acts.appendChild(simBtn('Поделиться', '', simShareUI));
+      acts.appendChild(simBtn('Выйти', 'ghost', simExit));
+      simPanel.appendChild(acts);
+      simPanel.appendChild(el('div', 'sim-toast'));
+      simFocus();
+    }
+    function simRenderDone() {
+      var n = simSt.list.length, sc = simSt.score;
+      var card = el('div', 'sim-done');
+      card.appendChild(el('p', 'sim-score', 'ИТОГ: ' + sc + ' / ' + n + ' разумных решений'));
+      card.appendChild(el('p', 'sim-verdict', sc === n ? 'Чистый прогон. Тимлид не кодит – тимлид анблокает.'
+        : sc >= Math.ceil(n / 2) ? 'Крепко. Но часть развилок стоит обсудить вживую.'
+          : 'Есть над чем подумать – как раз тема для встречи.'));
+      var funnel = el('div', 'sim-funnel');
+      funnel.appendChild(d.createTextNode('Продолжить вживую: '));
+      var j = el('a', null, 'join'); j.href = '/join/'; funnel.appendChild(j);
+      funnel.appendChild(d.createTextNode(' · ')); funnel.appendChild(link(TG, 'telegram', true));
+      card.appendChild(funnel);
+      var acts = el('div', 'sim-actions');
+      acts.appendChild(simBtn('Ещё раз', 'primary', simStart));
+      acts.appendChild(simBtn('Поделиться', '', simShareUI));
+      acts.appendChild(simBtn('Выйти', 'ghost', simExit));
+      card.appendChild(acts);
+      simPanel.appendChild(card);
+    }
 
     var commands = {
       help: function () {
@@ -475,19 +553,6 @@
         else print('E37: незаписанные изменения. :q! чтобы выйти не сохраняя.', 'err');
         body.scrollTop = body.scrollHeight; return;
       }
-      if (simSt) {
-        var low = str.toLowerCase();
-        if (!str) {
-          if (simSt.await === 'next') simNext();
-          else if (simSt.await === 'done') simStart();
-          else print('Введите букву варианта.', 'dim');
-        } else if (low === 'q' || low === 'quit' || low === 'exit' || low === ':q') { simQuit(); }
-        else if (low === 's' || low === 'share' || low === 'поделиться') { simShare(); }
-        else if (simSt.await === 'choice') { simChoose(low); }
-        else if (simSt.await === 'next') { if (low === 'n' || low === 'next' || low === 'д') simNext(); else print('[enter] дальше · [s] поделиться · [q] выйти', 'dim'); }
-        else if (simSt.await === 'done') { simStart(); }
-        body.scrollTop = body.scrollHeight; return;
-      }
       if (!str) { body.scrollTop = body.scrollHeight; return; }
       if (!noTrack) { hist.push(str); track(str); saveHist(); }
       hpos = hist.length;
@@ -528,12 +593,28 @@
     }
 
     input.addEventListener('keydown', function (e) {
+      if (simSt) return;  // simulator panel owns the keyboard while active
       if (e.key === 'Enter') { run(input.value); input.value = ''; }
       else if (e.key === 'Tab') { e.preventDefault(); complete(); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); histPrev(); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); histNext(); }
       else if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'L')) { e.preventDefault(); commands.clear(); }
-      else if (e.key === 'Escape' && simSt) { e.preventDefault(); input.value = ''; simQuit(); body.scrollTop = body.scrollHeight; }
+    });
+
+    // Simulator keyboard: a/b/c (or 1/2/3) to choose, Enter to advance, s share, q/Esc quit.
+    root.addEventListener('keydown', function (e) {
+      if (!simSt) return;
+      var k = (e.key || '');
+      if (k === 'Escape' || k.toLowerCase() === 'q') { e.preventDefault(); simExit(); return; }
+      if (k.toLowerCase() === 's') { e.preventDefault(); simShareUI(); return; }
+      if (simSt.phase === 'choice') {
+        var idx = 'abcdefgh'.indexOf(k.toLowerCase());
+        if (idx < 0 && /^[1-9]$/.test(k)) idx = parseInt(k, 10) - 1;
+        if (idx >= 0 && idx < simSt.list[simSt.idx].options.length) { e.preventDefault(); simPick(idx); }
+      } else if (k === 'Enter') {
+        if (e.target && e.target.tagName === 'BUTTON') return;  // let the focused button fire its own click
+        e.preventDefault(); simAdvance();
+      }
     });
     body.addEventListener('click', function (e) { if (e.target.tagName !== 'A') input.focus(); });
 

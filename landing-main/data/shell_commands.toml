@@ -1,0 +1,164 @@
+# Catalog of shareable Shell commands. Each entry mints a real page at /s/<id>/
+# with a terminal-style OG image (built by partials/og-shell.html) and a JS
+# redirect into /shell/ that auto-runs `run`. See content/s/_content.gotmpl.
+
+[[commands]]
+id = "help"
+cmd = "help"
+run = "help"
+desc = "Список команд интерактивного терминала сообщества «Тимлид не кодит»."
+out = ["НАВИГАЦИЯ  ·  УТИЛИТЫ  ·  пасхалки", "ls · cd · open · cat · grep · find · latest · random"]
+
+[[commands]]
+id = "ls"
+cmd = "ls"
+run = "ls"
+desc = "Содержимое сайта как файловой системы."
+out = ["events/ 13 · articles/ 8 · insights/ 10 · showcase/ 1", "cd <раздел> — войти, open <страница> — открыть"]
+
+[[commands]]
+id = "tree"
+cmd = "tree"
+run = "tree"
+desc = "Всё дерево сайта сообщества."
+out = ["├─ events (13)   ├─ articles (8)   ├─ insights (10)", "└─ questions — бэклог тем для обсуждения"]
+
+[[commands]]
+id = "grep"
+cmd = "grep бас-фактор"
+run = "grep бас-фактор"
+desc = "Полнотекстовый поиск по всем материалам сообщества."
+out = ["найдено: …восстанавливать процессы реверс-инжинирингом…", "→ articles/Бас-фактор: когда проект держит один человек"]
+
+[[commands]]
+id = "find"
+cmd = "find карьера"
+run = "find карьера"
+desc = "Поиск материалов по заголовкам."
+out = ["→ articles/Карьерный трек разработчика после сеньора", "→ events/Встреча сообщества – 24 июня 2026"]
+
+[[commands]]
+id = "cat"
+cmd = "cat events/meetup-2026-06-24"
+run = "cat events/meetup-2026-06-24"
+desc = "Прочитать материал прямо в терминале."
+out = ["# Встреча сообщества – 24 июня 2026", "Основная тема: продуктовые разработчики и экспертиза"]
+
+[[commands]]
+id = "latest"
+cmd = "latest"
+run = "latest"
+desc = "Открыть последнюю встречу сообщества."
+out = ["последняя встреча: 24 июня 2026  →"]
+
+[[commands]]
+id = "random"
+cmd = "random"
+run = "random"
+desc = "Случайный материал сообщества."
+out = ["случайный выбор → открываю…"]
+
+[[commands]]
+id = "tools"
+cmd = "tools"
+run = "tools"
+desc = "Топ инструментов, которые советует сообщество."
+out = ["Claude Code · Hetzner · GitHub · SonarQube", "Swagger/OpenAPI · Sales Navigator"]
+
+[[commands]]
+id = "neofetch"
+cmd = "neofetch"
+run = "neofetch"
+desc = "Инфо о «системе» сообщества."
+out = ["OS: Teamleads OS (rolling) · 32 материала", "Встречи: каждую среду, 17:00 Астана"]
+
+[[commands]]
+id = "claude"
+cmd = "claude как бороться с бас-фактором"
+run = "claude как бороться с бас-фактором"
+desc = "Офлайн-ассистент в стиле Claude — отвечает по материалам сообщества."
+out = ["офлайн-Claude ищет ответ в материалах сообщества…"]
+
+[[commands]]
+id = "codex"
+cmd = "codex что почитать про найм"
+run = "codex что почитать про найм"
+desc = "Офлайн-ассистент в стиле Codex — отвечает по материалам сообщества."
+out = ["офлайн-Codex ищет ответ в материалах сообщества…"]
+
+[[commands]]
+id = "fortune"
+cmd = "fortune"
+run = "fortune"
+desc = "Случайная мудрость тимлида."
+out = ["« Сеньора не дают — сеньора берут »"]
+
+[[commands]]
+id = "top"
+cmd = "top"
+run = "top"
+desc = "Чем заняты тимлиды прямо сейчас."
+out = ["daily-standup 38%  ·  retro 12%  ·  coffee 73%", "тимлид не кодит — тимлид анблокает"]
+
+[[commands]]
+id = "sudo"
+cmd = "sudo уволить всех"
+run = "sudo"
+desc = "Недоступно для guest."
+out = ["guest отсутствует в файле sudoers.", "Инцидент запротоколирован. 🚨"]
+
+[[commands]]
+id = "git-blame"
+cmd = "git blame"
+run = "git blame"
+desc = "Винить некого."
+out = ["fatal: винить некого — 404 это не баг,", "а фича вашего URL."]
+
+[[commands]]
+id = "coffee"
+cmd = "coffee"
+run = "coffee"
+desc = "Тимлид пьёт кофе."
+out = ["☕  Тимлид не кодит. Тимлид пьёт кофе", "и анблокает команду."]
+
+[[commands]]
+id = "answer"
+cmd = "42"
+run = "42"
+desc = "Главный вопрос жизни, вселенной и всего такого."
+out = ["Ответ — 42.", "Но запрошенной страницы среди ответов нет."]
+
+[[commands]]
+id = "vim"
+cmd = "vim"
+run = "vim"
+desc = "Войти в vim. Выход — отдельный квест."
+out = ["~  VIM — Vi IMproved", "Удачи с выходом: :q (или :q!)."]
+
+[[commands]]
+id = "join"
+cmd = "join"
+run = "join"
+desc = "Подключиться к еженедельной онлайн-встрече."
+out = ["еженедельная встреча: среда 17:00 (Астана)"]
+
+[[commands]]
+id = "telegram"
+cmd = "telegram"
+run = "telegram"
+desc = "Telegram сообщества «Тимлид не кодит»."
+out = ["@teamleads_kz — присоединяйтесь"]
+
+[[commands]]
+id = "contribute"
+cmd = "contribute"
+run = "contribute"
+desc = "Код сайта открыт — присылайте правки и PR."
+out = ["сайт открытый — буду рад pull request:", "github.com/belyaevsa/teamleads-2025"]
+
+[[commands]]
+id = "sim"
+cmd = "sim"
+run = "sim"
+desc = "Тимлид-симулятор: развилки управленческих ситуаций."
+out = ["сценарий 1/…  — что выберете?", "a) … b) … c) …"]

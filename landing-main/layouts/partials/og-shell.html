@@ -1,0 +1,30 @@
+{{- /* Terminal-style OG card for a Shell command. Reads .Params.cmd / .out / .id */ -}}
+{{- $bg := resources.Get "images/og-bg.png" -}}
+{{- $fontBold := resources.Get "fonts/Inter-Bold.ttf" -}}
+{{- $fontReg := resources.Get "fonts/Inter-Regular.ttf" -}}
+
+{{/* flatten the branded background into a uniform dark "terminal" field */}}
+{{- $bg = $bg | images.Filter (images.Colorize 220 16 8) -}}
+
+{{/* window chrome — three dots + title bar */}}
+{{- $bg = $bg | images.Filter (images.Text "●" (dict "color" "#ff5f56" "size" 28 "font" $fontBold "x" 72 "y" 54)) -}}
+{{- $bg = $bg | images.Filter (images.Text "●" (dict "color" "#ffbd2e" "size" 28 "font" $fontBold "x" 110 "y" 54)) -}}
+{{- $bg = $bg | images.Filter (images.Text "●" (dict "color" "#27c93f" "size" 28 "font" $fontBold "x" 148 "y" 54)) -}}
+{{- $bg = $bg | images.Filter (images.Text "guest@teamleads: ~   —   teamleads.kz/shell" (dict "color" "#8b949e" "size" 25 "font" $fontReg "x" 200 "y" 56)) -}}
+
+{{/* the command */}}
+{{- $bg = $bg | images.Filter (images.Text (printf "$ %s" (.Params.cmd | truncate 42)) (dict "color" "#39c5cf" "size" 54 "font" $fontBold "x" 78 "y" 172)) -}}
+
+{{/* sample output (up to 3 lines) */}}
+{{- $y := 286 -}}
+{{- range first 3 (.Params.out | default slice) -}}
+  {{- $bg = $bg | images.Filter (images.Text (. | truncate 66) (dict "color" "#c9d1d9" "size" 30 "font" $fontReg "x" 80 "y" $y)) -}}
+  {{- $y = add $y 48 -}}
+{{- end -}}
+
+{{/* footer */}}
+{{- $bg = $bg | images.Filter (images.Text "◇  тимлид не кодит · интерактивный терминал" (dict "color" "#FEC50C" "size" 26 "font" $fontReg "x" 78 "y" 556)) -}}
+
+{{- $path := printf "og/s/%s.png" .Params.id -}}
+{{- $og := $bg.Content | resources.FromString $path -}}
+{{- return $og -}}

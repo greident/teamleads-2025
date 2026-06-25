@@ -37,7 +37,9 @@
     <meta property="og:site_name" content="{{ .Site.Title }}">
     <meta property="og:locale" content="ru_RU">
     {{- $ogImage := "" -}}
-    {{- if and .File (or (eq .Section "events") (eq .Section "insights") (eq .Section "articles")) .IsPage -}}
+    {{- if and (eq .Section "s") .IsPage -}}
+      {{- $ogImage = (partial "og-shell.html" .).Permalink -}}
+    {{- else if and .File (or (eq .Section "events") (eq .Section "insights") (eq .Section "articles")) .IsPage -}}
       {{- $ogImage = (partial "og-image.html" .).Permalink -}}
     {{- else if and .File (eq .Section "showcase") .IsPage -}}
       {{- $ogImage = (partial "og-showcase.html" .).Permalink -}}

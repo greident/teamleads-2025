@@ -3166,11 +3166,62 @@ body > .nav {
 .shell-head .section-desc{max-width:600px;margin:var(--space-sm) auto 0}
 .shell-wrap .term{height:80vh;min-height:420px;max-height:none}
 
+/* ── Тимлид-симулятор: interactive panel that replaces the terminal body ── */
+.term-sim{flex:1 1 auto;min-height:0;overflow-y:auto;padding:22px;color:#c9d1d9;font-size:14px;line-height:1.6;outline:none;scrollbar-width:thin;scrollbar-color:#30363d #0d1117}
+.term-sim[hidden]{display:none}
+.term-sim::-webkit-scrollbar{width:9px}.term-sim::-webkit-scrollbar-thumb{background:#30363d;border-radius:5px}
+.sim-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sim-kicker{color:#FEC50C;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.sim-progress{margin-left:auto;color:#8b949e;font-size:13px;font-variant-numeric:tabular-nums}
+.sim-x{padding:2px 8px;line-height:1.4}
+.sim-bar{height:4px;background:#21262d;border-radius:3px;overflow:hidden;margin-bottom:20px}
+.sim-bar>span{display:block;height:100%;background:#39c5cf;border-radius:3px;transition:width .35s ease}
+.sim-prompt p{margin:0 0 6px;color:#e6edf3;font-size:16px;line-height:1.5}
+.sim-opts{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.sim-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;background:#161b22;border:1px solid #232b36;border-radius:10px;color:#c9d1d9;font:inherit;cursor:pointer;transition:border-color .15s ease,background .15s ease,transform .1s ease}
+.sim-opt:hover:not(:disabled){border-color:#39c5cf;background:#1c2230}
+.sim-opt:active:not(:disabled){transform:translateY(1px)}
+.sim-opt:disabled{cursor:default}
+.sim-opt-key{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#21262d;color:#8b949e;font-weight:600;text-transform:uppercase}
+.sim-opt-label{flex:1}
+.sim-opt.is-good{border-color:#3fb950;background:rgba(63,185,80,.12)}
+.sim-opt.is-good .sim-opt-key{background:#3fb950;color:#0d1117}
+.sim-opt.is-bad{border-color:#f85149;background:rgba(248,81,73,.1)}
+.sim-opt.is-bad .sim-opt-key{background:#f85149;color:#0d1117}
+.sim-opt.is-answer{border-color:#3fb950;border-style:dashed;opacity:.85}
+.sim-hint{color:#6e7681;font-size:13px;margin:14px 0 0}
+.sim-result{margin-top:18px;border-top:1px solid #232b36;padding-top:16px}
+.sim-outcome{margin:0 0 8px;font-size:15px}
+.sim-outcome.is-good{color:#3fb950}.sim-outcome.is-bad{color:#f85149}
+.sim-mark{font-weight:700;margin-right:4px}
+.sim-lesson{margin:0 0 10px;color:#c9d1d9}
+.sim-votes{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.sim-votebar{flex:0 0 130px;height:8px;background:#21262d;border-radius:4px;overflow:hidden}
+.sim-votebar>span{display:block;height:100%;background:#FEC50C;border-radius:4px}
+.sim-votenum{color:#8b949e;font-size:13px}
+.sim-readmore a{color:#39c5cf;text-decoration:none;border-bottom:1px dotted #39c5cf}
+.sim-readmore a:hover{color:#FEC50C;border-bottom-color:#FEC50C}
+.sim-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.sim-btn{padding:9px 16px;border:1px solid #30363d;border-radius:8px;background:#21262d;color:#c9d1d9;font:inherit;font-size:14px;cursor:pointer;transition:background .15s ease,border-color .15s ease}
+.sim-btn:hover{background:#2a313a;border-color:#39c5cf}
+.sim-btn.primary{background:#39c5cf;border-color:#39c5cf;color:#0d1117;font-weight:600}
+.sim-btn.primary:hover{background:#5fd2da}
+.sim-btn.ghost{background:transparent;border-color:transparent;color:#8b949e}
+.sim-btn.ghost:hover{color:#c9d1d9;background:#161b22}
+.sim-done .sim-score{margin:0 0 6px;color:#FEC50C;font-size:20px;font-weight:700}
+.sim-done .sim-verdict{margin:0 0 12px;color:#e6edf3}
+.sim-funnel{color:#8b949e;font-size:13px}
+.sim-funnel a{color:#39c5cf;text-decoration:none;border-bottom:1px dotted #39c5cf}
+.sim-toast{min-height:18px;margin-top:10px;color:#3fb950;font-size:13px;opacity:0;transition:opacity .2s ease}
+.sim-toast.show{opacity:1}
+
 @media (max-width:480px){
   .term{height:78vh}
   .shell-wrap .term{height:80vh}
   .term-input{font-size:16px}
   .term-title{display:none}
+  .term-sim{padding:16px}
+  .sim-prompt p{font-size:15px}
 }
 
 /* ============================================================
