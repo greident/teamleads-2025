@@ -84,8 +84,15 @@
     if (!links || !links.length) return;
     var box = el('div', 'cl-links');
     links.forEach(function (l) {
-      var a = el('a', 'cl-link', l.title); a.href = l.url;
-      box.appendChild(a);
+      if (l.snip) {
+        var card = el('div', 'cl-link');
+        if (l.s) card.appendChild(el('span', 'cl-link-s', l.s));
+        var a = el('a', 'cl-link-a', l.title); a.href = l.url; card.appendChild(a);
+        card.appendChild(el('p', 'cl-link-snip', l.snip));
+        box.appendChild(card);
+      } else {
+        var a2 = el('a', 'cl-link', l.title); a2.href = l.url; box.appendChild(a2);
+      }
     });
     bubbleEl.appendChild(box); msgs.scrollTop = msgs.scrollHeight;
   }
@@ -93,33 +100,41 @@
   function answer(q) {
     var ql = q.toLowerCase().trim();
     if (/(^|\s)(привет|здравств|хай|hello|hi|добр)/.test(ql))
-      return { text: 'Привет! Я офлайн-версия Claude на сайте сообщества «Тимлид не кодит». Сетевых вызовов нет — я подсказываю по материалам встреч и статей. Спросите про бас-фактор, карьерные треки, найм или продуктовых разработчиков.', links: [] };
+      return Promise.resolve({ text: 'Привет! Я офлайн-версия Claude на сайте сообщества «Тимлид не кодит». Сетевых вызовов нет — отвечаю по материалам встреч и статей, ищу по полному тексту (как grep). Спросите про бас-фактор, карьерные треки, найм или продуктовых разработчиков.', links: [] });
     if (/(кто ты|что ты|ты кто|кто это|про тебя)/.test(ql))
-      return { text: 'Я демонстрационный ассистент в стиле Claude — без обращения к API. Отвечаю тем, что нахожу в материалах сообщества. Настоящий Claude живёт в Claude Code.', links: [{ title: 'claude.com/claude-code', url: 'https://claude.com/claude-code' }] };
+      return Promise.resolve({ text: 'Я демонстрационный ассистент в стиле Claude — без обращения к API. Отвечаю тем, что нахожу в материалах сообщества полнотекстовым поиском. Настоящий Claude живёт в Claude Code.', links: [{ title: 'claude.com/claude-code', url: 'https://claude.com/claude-code' }] });
     if (/(спасибо|благодар|thanks|thx)/.test(ql))
-      return { text: 'Пожалуйста! Если хотите — спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
+      return Promise.resolve({ text: 'Пожалуйста! Если хотите — спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] });
 
-    var words = ql.split(/\s+/).filter(function (x) { return x.length > 2; });
-    var hits = [];
-    Object.keys(FS.sections || {}).forEach(function (s) {
-      (FS.sections[s] || []).forEach(function (it) {
-        var t = (it.t || '').toLowerCase();
-        if (words.some(function (x) { return t.indexOf(x) !== -1; })) hits.push(it);
+    var R = w.TeamleadsRetrieval;
+    var retr = (R && R.retrieve) ? R.retrieve(q, 5) : Promise.resolve([]);
+    return retr.then(function (hits) {
+      if (hits && hits.length) {
+        var lead = hits.length === 1
+          ? 'Прошёлся по полным текстам (grep) — ближе всего этот разбор:'
+          : 'Прошёлся по полным текстам (grep) — вот ' + hits.length + ' наиболее релевантных:';
+        return { text: lead, links: hits.map(function (h) { return { title: h.t, url: h.u, s: h.s, snip: h.snip }; }) };
+      }
+      // fallback: title-only search over the shell filesystem (find-style)
+      var words = ql.split(/\s+/).filter(function (x) { return x.length > 2; });
+      var thits = [];
+      Object.keys(FS.sections || {}).forEach(function (s) {
+        (FS.sections[s] || []).forEach(function (it) {
+          var t = (it.t || '').toLowerCase();
+          if (words.some(function (x) { return t.indexOf(x) !== -1; })) thits.push(it);
+        });
       });
-    });
-    if (hits.length)
-      return {
-        text: 'Покопался в материалах сообщества и вот что нашёл по вашему вопросу — загляните:',
-        links: hits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; })
-      };
+      if (thits.length)
+        return { text: 'По заголовкам нашёл — загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }) };
 
-    var quips = [
-      'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени. Передавайте «почему», а не только «что».',
-      'По этой теме в архиве ничего точного, но сообщество любит повторять: сеньора не дают — сеньора берут.',
-      'Не нашёл прямого совпадения. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
-      'Прямого ответа в материалах нет. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
-    ];
-    return { text: quips[Math.floor(Math.random() * quips.length)] + ' Попробуйте уточнить запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
+      var quips = [
+        'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени. Передавайте «почему», а не только «что».',
+        'По этой теме в архиве ничего точного, но сообщество любит повторять: сеньора не дают — сеньора берут.',
+        'Не нашёл прямого совпадения. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
+        'Прямого ответа в материалах нет. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
+      ];
+      return { text: quips[Math.floor(Math.random() * quips.length)] + ' Попробуйте уточнить запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
+    });
   }
 
   function botReply(q) {
@@ -128,11 +143,13 @@
     var dots = el('div', 'cl-bubble cl-typing'); dots.innerHTML = '<span></span><span></span><span></span>';
     typing.appendChild(dots); msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
     var reduced = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(function () {
-      msgs.removeChild(typing);
-      var a = answer(q);
-      typeInto(bubble('bot'), a.text, a.links);
-    }, reduced ? 0 : 450);
+    var t0 = Date.now();
+    Promise.resolve(answer(q)).then(function (a) {
+      function render() { msgs.removeChild(typing); typeInto(bubble('bot'), a.text, a.links); }
+      if (reduced) { render(); return; }
+      var wait = 450 - (Date.now() - t0);
+      setTimeout(render, wait > 0 ? wait : 0);
+    });
   }
 
   // user messages appear instantly, not typed

@@ -76,50 +76,74 @@
       else { p.textContent = text; appendLinks(bubbleEl, links); }
     })();
   }
-
   function appendLinks(bubbleEl, links) {
     if (!links || !links.length) return;
     var box = el('div', 'cx-links');
-    links.forEach(function (l) { var a = el('a', 'cx-link', l.title); a.href = l.url; box.appendChild(a); });
+    links.forEach(function (l) {
+      if (l.snip) {
+        var card = el('div', 'cx-link');
+        if (l.s) card.appendChild(el('span', 'cx-link-s', l.s));
+        var a = el('a', 'cx-link-a', l.title); a.href = l.url; card.appendChild(a);
+        card.appendChild(el('p', 'cx-link-snip', l.snip));
+        box.appendChild(card);
+      } else {
+        var a2 = el('a', 'cx-link', l.title); a2.href = l.url; box.appendChild(a2);
+      }
+    });
     bubbleEl.appendChild(box); msgs.scrollTop = msgs.scrollHeight;
   }
 
   function answer(q) {
     var ql = q.toLowerCase().trim();
     if (/(^|\s)(привет|здравств|хай|hello|hi|добр)/.test(ql))
-      return { text: 'Привет! Я офлайн-версия Codex на сайте «Тимлид не кодит». Сетевых вызовов нет — подсказываю по материалам встреч и статей. Спросите про бас-фактор, карьеру, найм или продуктовых разработчиков.', links: [] };
+      return Promise.resolve({ text: 'Привет! Я офлайн-версия Codex на сайте «Тимлид не кодит». Сетевых вызовов нет — отвечаю по материалам встреч и статей, ищу по полному тексту (как grep). Спросите про бас-фактор, карьеру, найм или продуктовых разработчиков.', links: [] });
     if (/(кто ты|что ты|ты кто|кто это|про тебя)/.test(ql))
-      return { text: 'Я демонстрационный ассистент в стиле Codex (OpenAI) — без обращения к API. Отвечаю тем, что нахожу в материалах сообщества.', links: [{ title: 'openai.com/codex', url: 'https://openai.com/codex/' }] };
+      return Promise.resolve({ text: 'Я демонстрационный ассистент в стиле Codex (OpenAI) — без обращения к API. Отвечаю тем, что нахожу в материалах сообщества полнотекстовым поиском.', links: [{ title: 'openai.com/codex', url: 'https://openai.com/codex/' }] });
     if (/(спасибо|благодар|thanks|thx)/.test(ql))
-      return { text: 'Пожалуйста! Спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
+      return Promise.resolve({ text: 'Пожалуйста! Спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] });
 
-    var words = ql.split(/\s+/).filter(function (x) { return x.length > 2; });
-    var hits = [];
-    Object.keys(FS.sections || {}).forEach(function (s) {
-      (FS.sections[s] || []).forEach(function (it) {
-        var t = (it.t || '').toLowerCase();
-        if (words.some(function (x) { return t.indexOf(x) !== -1; })) hits.push(it);
+    var R = w.TeamleadsRetrieval;
+    var retr = (R && R.retrieve) ? R.retrieve(q, 5) : Promise.resolve([]);
+    return retr.then(function (hits) {
+      if (hits && hits.length) {
+        var lead = hits.length === 1
+          ? 'Прошёлся по полным текстам (grep) — ближе всего этот разбор:'
+          : 'Прошёлся по полным текстам (grep) — вот ' + hits.length + ' наиболее релевантных:';
+        return { text: lead, links: hits.map(function (h) { return { title: h.t, url: h.u, s: h.s, snip: h.snip }; }) };
+      }
+      var words = ql.split(/\s+/).filter(function (x) { return x.length > 2; });
+      var thits = [];
+      Object.keys(FS.sections || {}).forEach(function (s) {
+        (FS.sections[s] || []).forEach(function (it) {
+          var t = (it.t || '').toLowerCase();
+          if (words.some(function (x) { return t.indexOf(x) !== -1; })) thits.push(it);
+        });
       });
+      if (thits.length)
+        return { text: 'По заголовкам нашёл — загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }) };
+
+      var quips = [
+        'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени.',
+        'Прямого совпадения нет. Сообщество любит повторять: сеньора не дают — сеньора берут.',
+        'Не нашёл прямого ответа. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
+        'В архиве ничего точного. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
+      ];
+      return { text: quips[Math.floor(Math.random() * quips.length)] + ' Уточните запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
     });
-    if (hits.length)
-      return { text: 'Поискал в материалах сообщества — вот что релевантно вашему вопросу:', links: hits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }) };
-
-    var quips = [
-      'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени.',
-      'Прямого совпадения нет. Сообщество любит повторять: сеньора не дают — сеньора берут.',
-      'Не нашёл прямого ответа. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
-      'В архиве ничего точного. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
-    ];
-    return { text: quips[Math.floor(Math.random() * quips.length)] + ' Уточните запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] };
   }
-
   function botReply(q) {
     var typing = el('div', 'cx-row cx-bot');
     var av = el('span', 'cx-av'); av.appendChild(mark()); typing.appendChild(av);
     var dots = el('div', 'cx-bubble cx-typing'); dots.innerHTML = '<span></span><span></span><span></span>';
     typing.appendChild(dots); msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
     var reduced = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(function () { msgs.removeChild(typing); var a = answer(q); typeInto(bubble('bot'), a.text, a.links); }, reduced ? 0 : 450);
+    var t0 = Date.now();
+    Promise.resolve(answer(q)).then(function (a) {
+      function render() { msgs.removeChild(typing); typeInto(bubble('bot'), a.text, a.links); }
+      if (reduced) { render(); return; }
+      var wait = 450 - (Date.now() - t0);
+      setTimeout(render, wait > 0 ? wait : 0);
+    });
   }
 
   function userBubble(t) { var b = bubble('user'); b.appendChild(el('p', null, t)); msgs.scrollTop = msgs.scrollHeight; }
