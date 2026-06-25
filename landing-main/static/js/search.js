@@ -17,9 +17,23 @@
   function openClaude(q) { var C = w.TeamleadsClaude; return !!(C && C.open && (C.open(q || ''), true)); }
   function openCodex(q) { var X = w.TeamleadsCodex; return !!(X && X.open && (X.open(q || ''), true)); }
 
-  // The single entry point every trigger calls.
-  function open(query, tool) {
+  // Yandex.Metrika goal: who opened search, and from where (counter 106055675).
+  // Records the SOURCE and whether a query was present — never the query text.
+  function track(source, q, tool) {
+    try {
+      if (!w.ym) return;
+      w.ym(106055675, 'reachGoal', 'search_open', {
+        source: source || 'unknown',
+        tool: tool || (codexVisible() ? 'codex' : 'claude'),
+        query: q ? 'yes' : 'no'
+      });
+    } catch (e) {}
+  }
+
+  // The single entry point every trigger calls. `source` = who called it.
+  function open(query, tool, source) {
     var q = (query == null ? '' : String(query)).trim();
+    track(source, q, tool);
     if (tool === 'codex' && openCodex(q)) return true;
     if (tool === 'claude' && openClaude(q)) return true;
     // if a tool is already open, keep that surface
@@ -38,9 +52,9 @@
   }
   function switchTool() {
     var q = currentQuery();
-    if (claudeVisible()) { w.TeamleadsClaude && w.TeamleadsClaude.close && w.TeamleadsClaude.close(); openCodex(q); }
-    else if (codexVisible()) { w.TeamleadsCodex && w.TeamleadsCodex.close && w.TeamleadsCodex.close(); openClaude(q); }
-    else open(q, 'claude');
+    if (claudeVisible()) { track('switch', q, 'codex'); w.TeamleadsClaude && w.TeamleadsClaude.close && w.TeamleadsClaude.close(); openCodex(q); }
+    else if (codexVisible()) { track('switch', q, 'claude'); w.TeamleadsCodex && w.TeamleadsCodex.close && w.TeamleadsCodex.close(); openClaude(q); }
+    else open(q, 'claude', 'switch');
   }
 
   // Global Ctrl/Cmd+K: open Claude, or close if a tool is already open (toggle).
@@ -52,16 +66,17 @@
       e.preventDefault();
       if (claudeVisible()) { w.TeamleadsClaude.close(); return; }
       if (codexVisible()) { w.TeamleadsCodex.close(); return; }
-      open();
+      open('', '', 'hotkey');
     }
   });
 
   // Declarative triggers: any [data-search-open] opens search.
+  // Label the source via data-search-source (e.g. the nav magnifier → "nav").
   d.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-search-open]');
     if (!t) return;
     e.preventDefault();
-    open(t.getAttribute('data-search-q') || '', t.getAttribute('data-search-tool') || '');
+    open(t.getAttribute('data-search-q') || '', t.getAttribute('data-search-tool') || '', t.getAttribute('data-search-source') || 'button');
   });
 
   // /search/ page: bind the form + auto-run ?q= on load.
@@ -70,11 +85,11 @@
     if (!page) return;
     var form = page.querySelector('[data-search-form]');
     var input = page.querySelector('[data-search-input]');
-    if (form && input) form.addEventListener('submit', function (e) { e.preventDefault(); open(input.value, ''); });
+    if (form && input) form.addEventListener('submit', function (e) { e.preventDefault(); open(input.value, '', 'search_page'); });
     var q = '';
     try { q = (new URLSearchParams(w.location.search || '')).get('q') || ''; } catch (e) {}
     q = q.trim();
-    if (q) { if (input) input.value = q; setTimeout(function () { open(q, ''); }, 250); }
+    if (q) { if (input) input.value = q; setTimeout(function () { open(q, '', 'search_page_url'); }, 250); }
   }
 
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', initSearchPage);

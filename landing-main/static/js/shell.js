@@ -483,6 +483,7 @@
       },
       claude: function (a) {
         var q = a.join(' ').trim();
+        try { if (w.ym) w.ym(106055675, 'reachGoal', 'search_open', { source: 'shell', tool: 'claude', query: q ? 'yes' : 'no' }); } catch (e) {}
         if (w.TeamleadsClaude) {
           print('открываю Claude' + (q ? ' с вашим вопросом' : '') + '…', 'cy');
           w.TeamleadsClaude.open(q);
@@ -503,6 +504,7 @@
       },
       codex: function (a) {
         var q = a.join(' ').trim();
+        try { if (w.ym) w.ym(106055675, 'reachGoal', 'search_open', { source: 'shell', tool: 'codex', query: q ? 'yes' : 'no' }); } catch (e) {}
         if (w.TeamleadsCodex) { print('открываю Codex' + (q ? ' с вашим вопросом' : '') + '…', 'cy'); w.TeamleadsCodex.open(q); return; }
         print('Codex-окно недоступно на этой странице.', 'dim');
       },
@@ -643,11 +645,17 @@
     function syncUrl(cmd) {
       try {
         if (!(w.history && w.history.replaceState)) return;
-        var verb = (cmd.split(/\s+/)[0] || '').toLowerCase();
-        var id = SHARE[verb];
-        var url = id ? (w.location.origin + '/s/' + id + '/') : (w.location.origin + '/shell/#' + encodeURIComponent(cmd));
+        var parts = cmd.split(/\s+/), verb = (parts[0] || '').toLowerCase(), args = parts.slice(1).join(' ');
+        var id = SHARE[verb], url;
+        if (id) {
+          // /s/<id>/ card, carrying the exact arguments as ?cmd= (e.g. `find metrics` → /s/find/?cmd=metrics)
+          url = w.location.origin + '/s/' + id + '/';
+          if (args) url += '?cmd=' + encodeURIComponent(args).replace(/%20/g, '+');
+        } else {
+          url = w.location.origin + '/shell/#' + encodeURIComponent(cmd);
+        }
         w.history.replaceState(null, '', url);
-        if (!hintedShare) { hintedShare = true; print('адрес в строке браузера обновился — это ссылка на эту команду, делитесь', 'dim'); }
+        if (!hintedShare) { hintedShare = true; print('адрес в строке браузера обновился — это ссылка на эту команду с запросом, делитесь', 'dim'); }
       } catch (e) {}
     }
 
