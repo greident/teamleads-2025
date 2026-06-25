@@ -5,14 +5,25 @@
 (function() {
     'use strict';
 
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    // Smooth scroll for same-page anchors. Handles '#x' and '/#x' / '/path#x'
+    // (e.g. the nav "О нас" → /#about), but lets cross-page links navigate natively.
+    document.querySelectorAll('a[href*="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href') || '';
+            const hi = href.indexOf('#');
+            if (hi < 0) return;
+            const path = href.slice(0, hi);
+            const hash = href.slice(hi);
+            if (hash.length < 2) return;
+            const here = location.pathname;
+            const samePage = path === '' || path === here ||
+                path.replace(/\/$/, '') === here.replace(/\/$/, '');
+            if (!samePage) return;                 // cross-page: let the browser navigate
+            const target = document.querySelector(hash);
+            if (!target) return;
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (history.replaceState) history.replaceState(null, '', hash);
         });
     });
 
