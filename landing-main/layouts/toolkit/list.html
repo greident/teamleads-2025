@@ -1,0 +1,62 @@
+{{ define "main" }}
+<section class="insights-hero">
+    <div class="container">
+        <div class="page-header">
+            <a href="/" class="report-back">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Главная
+            </a>
+            <span class="section-tag">Операционка</span>
+        </div>
+        <h1 class="section-title">Операционка тимлида</h1>
+        <p class="section-desc">
+            Рабочие шаблоны, которые команда использует в продакшене. Откройте на сайте,
+            скопируйте в Notion/Confluence или читайте в терминале: <code>cat toolkit/one-on-one</code>.
+        </p>
+    </div>
+</section>
+
+<section class="insights-list">
+    <div class="container">
+        {{- $pages := where .RegularPages "Params.draft" "ne" true -}}
+        {{- if gt (len $pages) 0 }}
+        <div class="articles-grid">
+            {{- range sort $pages "Date" "desc" }}
+            <a href="{{ .RelPermalink }}" class="article-card">
+                <div class="article-card-header">
+                    {{- with .Params.category }}<span class="event-tag">{{ . }}</span>{{ end }}
+                </div>
+                <h3 class="insight-card-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
+                <p class="insight-card-desc">{{ with .Params.cardDesc }}{{ . }}{{ else }}{{ .Description }}{{ end }}</p>
+                <div class="insight-card-meta">
+                    <span class="insight-stat">cat toolkit/{{ .File.ContentBaseName }}</span>
+                    <span class="event-arrow">→</span>
+                </div>
+            </a>
+            {{- end }}
+        </div>
+        {{- else }}
+        <div class="insights-empty">
+            <p>Шаблоны появятся здесь совсем скоро.</p>
+        </div>
+        {{- end }}
+    </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Операционка – Тимлид не кодит",
+    "description": "Рабочие шаблоны для тимлидов: 1-on-1, ретро, постмортем, найм, ADR.",
+    "url": "{{ .Permalink }}",
+    "isPartOf": { "@type": "WebSite", "name": "{{ .Site.Title }}", "url": "{{ .Site.BaseURL }}" }
+}
+</script>
+{{ end }}

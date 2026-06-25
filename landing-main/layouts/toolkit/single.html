@@ -1,0 +1,56 @@
+{{ define "main" }}
+<section class="report-hero">
+    <div class="container">
+        <a href="/toolkit/" class="report-back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Вся операционка
+        </a>
+        <h1 class="report-title">{{ .Title }}</h1>
+        <div class="article-meta">
+            {{- with .Params.category }}<span class="event-tag">{{ . }}</span>{{ end }}
+        </div>
+    </div>
+</section>
+
+<section class="report-content">
+    <div class="container">
+        <div class="report-layout">
+            <div class="report-container">
+                <div class="toolkit-actions">
+                    <button class="btn btn-secondary" type="button" data-toolkit-copy>Скопировать</button>
+                    <a class="btn btn-secondary" href="{{ printf "/shell/#cat toolkit/%s" .File.ContentBaseName | relURL }}">Открыть в Shell</a>
+                </div>
+                <div class="article-body" data-toolkit-body>{{ .Content }}</div>
+
+                {{ partial "report/discuss.html" (dict "ctx" . "text" "Используете шаблон иначе — поделитесь опытом?") }}
+                {{ partial "report/bottom-nav.html" (dict "ctx" . "allHref" "/toolkit/" "allLabel" "Вся операционка") }}
+            </div>
+        </div>
+    </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "scripts" }}
+<script>
+(function () {
+  var btn = document.querySelector('[data-toolkit-copy]');
+  if (!btn) return;
+  var url = {{ path.Join .RelPermalink "index.md" | jsonify }};
+  btn.addEventListener('click', function () {
+    btn.textContent = 'Копирую…';
+    fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (t) {
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+        throw new Error('no clipboard');
+      })
+      .then(function () { btn.textContent = 'Скопировано'; })
+      .catch(function () { btn.textContent = 'Ошибка'; })
+      .then(function () { setTimeout(function () { btn.textContent = 'Скопировать'; }, 1500); });
+  });
+})();
+</script>
+{{ end }}

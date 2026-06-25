@@ -273,6 +273,7 @@
           ['sim', 'тимлид-симулятор: развилки и решения'],
           ['principles', 'доктрина сообщества: принципы из реальных кейсов'],
           ['tools', 'топ инструментов сообщества'],
+          ['toolkit', 'шаблоны операционки: 1-on-1, ретро, постмортем…'],
           ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
@@ -426,6 +427,13 @@
       },
       latest: function () { var ev = sections.events || []; if (ev.length) { print('последняя встреча: ' + ev[0].t, 'cy'); go(ev[0].u); } else print('latest: нет данных', 'err'); },
       random: function () { if (!pool.length) { print('random: нет данных', 'err'); return; } var r = pool[Math.floor(Math.random() * pool.length)]; print('случайный выбор: ' + r.t, 'cy'); go(r.u); },
+      toolkit: function () {
+        var items = (sections.toolkit || []).slice().sort(function (a, b) { return (a.n || '').localeCompare(b.n || ''); });
+        if (!items.length) { print('toolkit: шаблоны не загружены', 'err'); return; }
+        print('Операционка тимлида — рабочие шаблоны сообщества:', 'accent');
+        items.forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(it.u, pad(it.n, 22))); n.appendChild(el('span', 'dim', it.t)); printNode(n); });
+        print(''); print('cat toolkit/<имя> — открыть здесь. /toolkit/ — на сайте.', 'dim');
+      },
       tools: function () {
         print('Топ инструментов, которые советует сообщество:', 'accent');
         [
@@ -572,6 +580,7 @@
           latest: 'latest — открыть последнюю встречу.',
           random: 'random — открыть случайный материал.',
           tools: 'tools — топ инструментов сообщества.',
+          toolkit: 'toolkit — рабочие шаблоны (1-on-1, ретро, постмортем, найм, ADR). cat toolkit/<имя> — открыть шаблон здесь.',
           salary: 'salary <грейд> <роль> — зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
           sim: 'sim — тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
           principles: 'principles — доктрина сообщества: принципы управления, выжатые из реальных кейсов и статей. Синонимы: doctrine, manifesto.',

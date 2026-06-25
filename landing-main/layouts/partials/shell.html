@@ -1,6 +1,6 @@
 {{- /* Reusable terminal component. Call: {{ partial "shell.html" (dict "mode" "full") }} */ -}}
 {{- $mode := .mode | default "full" -}}
-{{- $sectionList := slice "events" "articles" "insights" "showcase" -}}
+{{- $sectionList := slice "events" "articles" "insights" "showcase" "toolkit" -}}
 {{- $sections := dict -}}
 {{- range $s := $sectionList -}}
   {{- $pages := (where site.RegularPages "Section" $s).ByDate.Reverse -}}

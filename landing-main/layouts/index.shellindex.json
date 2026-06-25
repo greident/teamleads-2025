@@ -1,5 +1,5 @@
 {{- /* Search index for the Shell's grep: one record per content page with plain text. */ -}}
-{{- $secs := slice "events" "articles" "insights" "showcase" -}}
+{{- $secs := slice "events" "articles" "insights" "showcase" "toolkit" -}}
 {{- $idx := slice -}}
 {{- range where site.RegularPages "Section" "in" $secs -}}
   {{- $b := "" -}}

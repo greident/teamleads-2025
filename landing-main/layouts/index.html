@@ -252,6 +252,41 @@
 </section>
 {{- end }}
 
+<!-- Toolkit Highlight -->
+{{- $toolkitPages := where (where .Site.RegularPages "Section" "toolkit") "Params.draft" "ne" true -}}
+{{- if gt (len $toolkitPages) 0 }}
+<section class="toolkit-highlight" id="toolkit">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Операционка</span>
+            <h2 class="section-title">Шаблоны на каждый день</h2>
+            <p class="section-desc">
+                Рабочие форматы, которые выручат в понедельник утром: 1-on-1, ретро, постмортем, найм, ADR.
+                Откройте на сайте или в терминале: <code>cat toolkit/one-on-one</code>.
+            </p>
+        </div>
+        <div class="articles-grid">
+            {{- range sort $toolkitPages "Date" "desc" }}
+            <a href="{{ .RelPermalink }}" class="article-card">
+                <div class="article-card-header">
+                    {{- with .Params.category }}<span class="event-tag">{{ . }}</span>{{ end }}
+                </div>
+                <h3 class="insight-card-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
+                <p class="insight-card-desc">{{ with .Params.cardDesc }}{{ . }}{{ else }}{{ .Description }}{{ end }}</p>
+                <div class="insight-card-meta">
+                    <span class="insight-stat">cat toolkit/{{ .File.ContentBaseName }}</span>
+                    <span class="event-arrow">→</span>
+                </div>
+            </a>
+            {{- end }}
+        </div>
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/toolkit/" class="btn btn-secondary">Вся операционка →</a>
+        </div>
+    </div>
+</section>
+{{- end }}
+
 <!-- Articles Highlight -->
 {{- $articlePages := where (where .Site.RegularPages "Section" "articles") "Params.draft" "ne" true -}}
 {{- if gt (len $articlePages) 0 }}
