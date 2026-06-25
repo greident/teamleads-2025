@@ -5,25 +5,28 @@
        The shell part only renders for sections that emit a `catshare` card. */ -}}
 {{- $shellHref := "" -}}
 {{- $cmd := "" -}}
+{{- $cmdUrl := "" -}}
 {{- with .OutputFormats.Get "catshare" -}}
   {{- $shellHref = .Permalink -}}
 {{- end -}}
 {{- if and $shellHref .File -}}
   {{- $cmd = printf "cat %s/%s" $.Section $.File.ContentBaseName -}}
+  {{- /* shareable deep-link that opens the shell with the command pre-run */ -}}
+  {{- $cmdUrl = absURL (printf "shell/?cmd=%s" (replace $cmd " " "+")) -}}
 {{- end -}}
 {{- $copy := "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>" -}}
-<div class="report-share" data-share data-url="{{ .Permalink }}" data-title="{{ .Title }}"{{ with $cmd }} data-cmd="{{ . }}"{{ end }}>
+<div class="report-share" data-share data-url="{{ .Permalink }}" data-title="{{ .Title }}"{{ with $cmdUrl }} data-cmd-url="{{ . }}"{{ end }}>
     <button type="button" class="share-copy" data-share-copy>
         {{ $copy | safeHTML }}
         <span>Скопировать ссылку</span>
     </button>
     {{- with $cmd }}
     <div class="share-term">
-        <a class="share-term-cmd" href="{{ $shellHref }}" title="Открыть страницу в терминале">
+        <a class="share-term-cmd" href="{{ $cmdUrl }}" title="Открыть страницу в терминале">
             <span class="share-term-prompt">guest@teamleads:/$</span>
             <span class="share-term-text">{{ . }}</span>
         </a>
-        <button type="button" class="share-term-copy" data-share-cmd-copy aria-label="Скопировать команду">
+        <button type="button" class="share-term-copy" data-share-cmd-copy aria-label="Скопировать ссылку на терминал">
             {{ $copy | safeHTML }}
         </button>
     </div>

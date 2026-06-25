@@ -3180,6 +3180,14 @@ body > .nav {
 .shell-inner{width:min(1180px,94vw);margin:0 auto}
 .shell-head{text-align:center;margin-bottom:var(--space-lg)}
 .shell-head .section-desc{max-width:600px;margin:var(--space-sm) auto 0}
+.shell-proof{max-width:640px;margin:var(--space-sm) auto 0;text-align:center}
+.shell-proof-lead{font-size:.95rem;color:var(--gray-600);line-height:1.55}
+.shell-proof-lead strong{color:var(--gray-900)}
+.shell-proof-lead .dim{color:var(--gray-500)}
+.shell-proof-links{display:flex;gap:10px 18px;justify-content:center;flex-wrap:wrap;list-style:none;padding:0;margin:10px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem}
+.shell-proof-links a{color:var(--kz-sky,#008BA3);text-decoration:none;border-bottom:1px dashed currentColor}
+.shell-proof-links a:hover{color:#005f6e}
+@media (max-width:768px){.shell-proof-links{display:none}}
 .shell-wrap .term{height:80vh;min-height:420px;max-height:none}
 
 /* Desktop: the shell page fills exactly one viewport below the sticky nav, so the

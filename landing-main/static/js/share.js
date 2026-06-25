@@ -1,8 +1,8 @@
 /*!
  * Teamleads Share — a tiny, dependency-free copy control for report pages.
  * Reads config from data-* on the [data-share] root:
- *   data-url   canonical page URL  → copied by [data-share-copy]
- *   data-cmd   shell command (cat …) → copied by [data-share-cmd-copy]
+ *   data-url       canonical page URL → copied by [data-share-copy]
+ *   data-cmd-url   /shell/?cmd=… deep-link → copied by [data-share-cmd-copy]
  * Auto-mounts every [data-share] on load. Also exposed as window.TeamleadsShare.
  */
 (function (w, d) {
@@ -33,7 +33,7 @@
     root.__share = true;
 
     var url = root.getAttribute('data-url') || w.location.href;
-    var cmd = root.getAttribute('data-cmd') || '';
+    var cmdUrl = root.getAttribute('data-cmd-url') || '';
     var toast = root.querySelector('[data-share-toast]');
     var toastT;
 
@@ -50,7 +50,7 @@
       if (!btn || !root.contains(btn)) return;
       e.preventDefault();
       if (btn.hasAttribute('data-share-cmd-copy')) {
-        copy(cmd).then(function () { flash('Команда скопирована'); }, function () { flash('Не удалось скопировать'); });
+        copy(cmdUrl).then(function () { flash('Ссылка на терминал скопирована'); }, function () { flash('Не удалось скопировать'); });
       } else {
         copy(url).then(function () { flash('Ссылка скопирована'); }, function () { flash('Не удалось скопировать'); });
       }
