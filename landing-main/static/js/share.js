@@ -1,9 +1,8 @@
 /*!
- * Teamleads Share — a tiny, dependency-free share control for report pages.
- * Two modes, both reading config from data-* on the [data-share] root:
- *   data-url    canonical page URL (general share)
- *   data-title  page title (passed to the Web Share API)
- *   data-shell  deep-link into /shell/ that auto-runs `cat <section>/<base>`
+ * Teamleads Share — a tiny, dependency-free copy control for report pages.
+ * Reads config from data-* on the [data-share] root:
+ *   data-url   canonical page URL  → copied by [data-share-copy]
+ *   data-cmd   shell command (cat …) → copied by [data-share-cmd-copy]
  * Auto-mounts every [data-share] on load. Also exposed as window.TeamleadsShare.
  */
 (function (w, d) {
@@ -34,13 +33,8 @@
     root.__share = true;
 
     var url = root.getAttribute('data-url') || w.location.href;
-    var title = root.getAttribute('data-title') || d.title;
-    var shell = root.getAttribute('data-shell') || '';
-    var trigger = root.querySelector('[data-share-trigger]');
-    var menu = root.querySelector('[data-share-menu]');
+    var cmd = root.getAttribute('data-cmd') || '';
     var toast = root.querySelector('[data-share-toast]');
-    var nativeBtn = root.querySelector('[data-share-native]');
-    var canShare = !!(w.navigator && w.navigator.share);
     var toastT;
 
     function flash(msg) {
@@ -48,45 +42,18 @@
       toast.textContent = msg;
       root.classList.add('is-toast');
       clearTimeout(toastT);
-      toastT = setTimeout(function () { root.classList.remove('is-toast'); }, 2200);
+      toastT = setTimeout(function () { root.classList.remove('is-toast'); }, 2000);
     }
-    function openMenu(o) {
-      if (!menu) return;
-      menu.hidden = !o;
-      root.classList.toggle('is-open', o);
-      if (trigger) trigger.setAttribute('aria-expanded', o ? 'true' : 'false');
-    }
-    function done(msg) { flash(msg); openMenu(false); }
-
-    if (nativeBtn && canShare) nativeBtn.hidden = false;
-
-    if (trigger) trigger.addEventListener('click', function (e) {
-      e.stopPropagation();
-      openMenu(!!menu.hidden);
-    });
 
     root.addEventListener('click', function (e) {
-      var item = e.target.closest ? e.target.closest('[data-share-act]') : null;
-      if (!item || !root.contains(item)) return;
-      var act = item.getAttribute('data-share-act');
-      if (act === 'copy') {
-        e.preventDefault();
-        copy(url).then(function () { done('Ссылка скопирована'); }, function () { done('Не удалось скопировать'); });
-      } else if (act === 'shell-copy') {
-        e.preventDefault();
-        copy(shell).then(function () { done('Shell-ссылка скопирована'); }, function () { done('Не удалось скопировать'); });
-      } else if (act === 'native') {
-        e.preventDefault();
-        if (canShare) w.navigator.share({ title: title, url: url }).catch(function () {});
-        openMenu(false);
-      } else if (act === 'shell-open') {
-        openMenu(false); // it's a real <a> — let it navigate to the terminal
+      var btn = e.target.closest ? e.target.closest('[data-share-copy],[data-share-cmd-copy]') : null;
+      if (!btn || !root.contains(btn)) return;
+      e.preventDefault();
+      if (btn.hasAttribute('data-share-cmd-copy')) {
+        copy(cmd).then(function () { flash('Команда скопирована'); }, function () { flash('Не удалось скопировать'); });
+      } else {
+        copy(url).then(function () { flash('Ссылка скопирована'); }, function () { flash('Не удалось скопировать'); });
       }
-    });
-
-    d.addEventListener('click', function (e) { if (!root.contains(e.target)) openMenu(false); });
-    d.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' || e.key === 'Esc') { openMenu(false); if (trigger) trigger.focus(); }
     });
   }
 

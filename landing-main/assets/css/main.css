@@ -1197,20 +1197,16 @@ img {
 
 /* ── Share control (under report titles) ─────────────────────────── */
 .report-share {
-    position: relative;
-    display: inline-flex;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-sm);
     margin-top: calc(-1 * var(--space-sm));
     margin-bottom: var(--space-lg);
 }
 
-.report-share [hidden],
-.share-menu[hidden] {
-    display: none !important;
-}
-
-.share-trigger {
+/* Classic «copy link» button */
+.share-copy {
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
@@ -1226,78 +1222,83 @@ img {
     transition: all var(--transition-base);
 }
 
-.share-trigger:hover {
+.share-copy:hover {
     background: var(--gray-50);
     border-color: var(--gray-400);
+    color: var(--gray-900);
 }
 
-.share-trigger svg {
+.share-copy svg {
     width: 16px;
     height: 16px;
 }
 
-.report-share.is-open .share-trigger {
-    border-color: var(--primary);
-    color: var(--primary-dark);
-}
-
-.share-menu {
-    position: absolute;
-    top: calc(100% + var(--space-xs));
-    left: 0;
-    z-index: 30;
-    min-width: 240px;
-    padding: var(--space-sm);
-    background: var(--white);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-}
-
-.share-menu-group {
-    margin: var(--space-sm) var(--space-sm) var(--space-xs);
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--gray-400);
-}
-
-.share-menu-group:first-child {
-    margin-top: var(--space-xs);
-}
-
-.share-item {
-    display: flex;
+/* Terminal-styled command snippet with its own copy button */
+.share-term {
+    display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    width: 100%;
-    padding: var(--space-sm);
-    font-family: inherit;
-    font-size: 0.9rem;
-    color: var(--gray-700);
-    text-align: left;
-    background: none;
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast);
+    padding: 4px 4px 4px var(--space-md);
+    background: #0d1117;
+    border: 1px solid #232b36;
+    border-radius: var(--radius-full);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    max-width: 100%;
 }
 
-.share-item:hover {
-    background: var(--primary-light);
-    color: var(--primary-dark);
+.share-term-cmd {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+    color: #c9d1d9;
 }
 
-.share-item svg {
-    width: 16px;
-    height: 16px;
+.share-term-cmd:hover .share-term-text {
+    color: #FEC50C;
+    border-bottom-color: #FEC50C;
+}
+
+.share-term-prompt {
+    color: #3fb950;
+    font-weight: 600;
     flex-shrink: 0;
-    color: var(--gray-400);
+    user-select: none;
 }
 
-.share-item:hover svg {
-    color: var(--primary-dark);
+.share-term-text {
+    color: #39c5cf;
+    border-bottom: 1px dotted #39c5cf;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.share-term-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    color: #8b949e;
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.share-term-copy:hover {
+    color: #c9d1d9;
+    background: #2a313a;
+    border-color: #39c5cf;
+}
+
+.share-term-copy svg {
+    width: 15px;
+    height: 15px;
 }
 
 .share-toast {
