@@ -1,320 +1,272 @@
+{{ define "head" }}
+<style>
+/* ============================================================
+   HOME – floating fixed terminal dock (right) + content (left)
+   ============================================================ */
+:root { --dock-w: 50vw; --dock-gut: 24px; }
+
+/* prototype: drop the auto "edit on GitHub" aside so the bottom is just the footer */
+.report-contribute { display: none; }
+
+.dock-page { position: relative; }
+.dock-wrap { width: 90%; max-width: 1500px; margin: 0 auto; padding: var(--space-2xl) 0 var(--space-4xl); }
+
+/* Desktop: 50/50 grid – content left, sticky terminal right.
+   Sticky (not fixed) so the terminal never overlaps the footer below. */
+@media (min-width: 1024px) {
+  body.dock-open .dock-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--dock-w);
+    column-gap: var(--dock-gut);
+    align-items: start;
+    margin-bottom: var(--space-4xl);   /* breathing room before the footer */
+  }
+  body.dock-open .dock-wrap {
+    width: auto; max-width: none; margin: 0;
+    padding: var(--space-2xl) 0 var(--space-4xl) clamp(24px, 5vw, 80px);
+  }
+}
+
+.lab-eyebrow { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--primary-dark); }
+.lab-eyebrow::before { content: "~/"; color: var(--gray-400); }
+.lab-h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.015em;
+  font-size: clamp(2.1rem, 4.5vw, 3.1rem); line-height: 1.08; color: var(--gray-900);
+  margin: var(--space-sm) 0 var(--space-md); }
+.lab-lead { font-size: 1.15rem; color: var(--gray-600); line-height: 1.7; max-width: 56ch; }
+.lab-cta-row { display: flex; flex-wrap: wrap; gap: var(--space-md); margin: var(--space-xl) 0; }
+.lab-h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.01em;
+  font-size: 1.7rem; color: var(--gray-900); margin: var(--space-3xl) 0 var(--space-md);
+  scroll-margin-top: 112px; /* clear the sticky nav when jumped to via #anchor */ }
+.lab-p { color: var(--gray-600); line-height: 1.8; margin-bottom: var(--space-md); }
+
+/* reference lists mirroring the homepage sections */
+.lab-rail { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); margin: var(--space-md) 0; }
+.lab-rail a { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg); border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+  background: var(--white); color: var(--gray-800); font-weight: 600; transition: all var(--transition-fast); }
+.lab-rail a:hover { border-color: var(--primary); color: var(--primary-dark); }
+.lab-rail a b { font-family: var(--font-mono); font-weight: 500; color: var(--gray-400); }
+.lab-list { list-style: none; padding: 0; margin: var(--space-md) 0; }
+.lab-list li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-md);
+  padding: var(--space-sm) 0; border-bottom: 1px solid var(--gray-100); }
+.lab-list a { color: var(--gray-800); font-weight: 500; }
+.lab-list a:hover { color: var(--primary-dark); }
+.lab-date { flex: 0 0 auto; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600;
+  color: var(--primary-dark); background: var(--primary-light); padding: 3px 10px; border-radius: var(--radius-full); }
+
+/* voices ("Что говорят участники") + 2025 year-review link */
+.lab-quotes { margin: var(--space-md) 0; }
+.lab-quote { color: var(--gray-700); line-height: 1.7; padding: var(--space-sm) 0; border-bottom: 1px solid var(--gray-100); }
+.lab-quote-meta { display: block; margin-top: 2px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-dark); }
+.lab-year { margin: var(--space-2xl) 0; }
+
+/* "run in the terminal" inline chips – clicking runs the real command in the dock */
+.lab-try { margin: var(--space-lg) 0; padding: var(--space-lg);
+  background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); }
+.lab-try-label { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--gray-500); margin-bottom: var(--space-sm); }
+.lab-chips { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.cmd-chip { font-family: var(--font-mono); font-size: 0.85rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: var(--radius-full);
+  background: #0d1117; color: #39c5cf; border: 1px solid #232b36; transition: all var(--transition-fast); }
+.cmd-chip::before { content: "$"; color: #3fb950; }
+.cmd-chip:hover { border-color: #39c5cf; color: #FEC50C; }
+
+/* ── The dock ──────────────────────────────────────────────── */
+.term-dock { display: flex; flex-direction: column; }
+.term-dock[hidden] { display: none; }
+.term-dock .term { flex: 1 1 auto; height: auto; max-height: none; min-height: 0; }
+
+.dock-close { position: absolute; top: 11px; right: 12px; z-index: 3;
+  width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer; line-height: 1;
+  background: #21262d; color: #8b949e; border: 1px solid #30363d; font-size: 14px; }
+.dock-close:hover { color: #f85149; border-color: #f85149; }
+
+/* reopen launcher */
+.dock-fab { position: fixed; z-index: 60; right: 24px; bottom: 24px;
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 12px 18px; border-radius: var(--radius-full);
+  background: #0d1117; color: #e6edf3; border: 1px solid #232b36;
+  font-family: var(--font-mono); font-size: 0.9rem; box-shadow: var(--shadow-lg); }
+.dock-fab[hidden] { display: none; }
+.dock-fab .fab-prompt { color: #3fb950; font-weight: 600; }
+.dock-fab:hover { border-color: #39c5cf; }
+
+/* Desktop: sticky right column – stays in view while scrolling,
+   stops above the footer instead of floating over it. */
+@media (min-width: 1024px) {
+  body.dock-open .term-dock {
+    position: sticky; top: 96px; height: calc(100vh - 124px);
+    z-index: 5; border-radius: 14px; box-shadow: 0 24px 60px -18px rgba(0,0,0,.45);
+  }
+}
+
+/* Tablet / mobile: not a side panel – a bottom sheet opened from the FAB */
+@media (max-width: 1023px) {
+  .term-dock { position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+    width: 100%; height: 80vh; z-index: 1000; border-radius: 16px 16px 0 0; }
+  .term-dock .term { border-radius: 16px 16px 0 0; }
+  .dock-fab { bottom: 84px; }   /* clear the mobile bottom-nav */
+}
+</style>
+{{ end }}
+
 {{ define "main" }}
-<!-- Hero Section -->
-<section class="hero">
-    {{ partial "hero-bg.html" . }}
-
-    <div class="hero-content">
-        <div class="badge">
-            <span class="badge-dot"></span>
-            Сообщество для тимлидов и tech-лидеров
-        </div>
-
-        <h1 class="hero-title">
-            <span class="title-line">Расти как лидер</span>
-            <span class="title-line title-accent">среди своих</span>
-        </h1>
-
-        <p class="hero-subtitle">
-            Место, где тимлиды Казахстана делятся опытом, решают проблемы и развиваются вместе.
-            Архитектура, люди, процессы – всё, что важно для технического лидера.
-        </p>
-
-        <div class="hero-actions">
-            <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
-                {{ partial "icons/send.html" }}
-                Вступить в Telegram
-            </a>
-            <a href="#about" class="btn btn-secondary">
-                Узнать больше
-            </a>
-        </div>
-
-        {{ partial "hero-stats.html" . }}
-
-        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
-        {{- $lastEvent := index (sort (where .Site.RegularPages "Section" "events") "Date" "desc") 0 -}}
-        {{- $lastInsight := index (sort (where .Site.RegularPages "Section" "insights") "Date" "desc") 0 -}}
-        <p class="hero-freshness">
-            <span class="hero-freshness-dot" aria-hidden="true"></span>
-            {{ with $lastEvent }}Последняя встреча {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}{{ end }}{{ with $lastInsight }} · свежий дайджест {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}{{ end }}
-        </p>
-    </div>
-
-    <div class="scroll-indicator">
-        <span>Листайте вниз</span>
-        {{ partial "icons/arrow-down.html" }}
-    </div>
-</section>
-
-{{ partial "next-meetup.html" . }}
-
-<!-- Events Section — recent only; full archive lives on /events/ -->
-<section class="events" id="events">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">events</span>
-            <h2 class="section-title">Мы не только пишем – мы встречаемся</h2>
-            <p class="section-desc">
-                Регулярные онлайн-встречи сообщества: разбираем реальные кейсы, спорим об архитектуре и делимся опытом.
-            </p>
-        </div>
-
-        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
-        {{- $events := where (where .Site.RegularPages "Section" "events") "Params.cardTitle" "!=" nil -}}
-        <div class="events-grid">
-            {{- range first 4 (sort $events "Date" "desc") -}}
-            <a href="{{ .RelPermalink }}" class="event-card">
-                <div class="event-date">
-                    <span class="event-day">{{ .Date.Day }}</span>
-                    <span class="event-month">{{ index $months (printf "%d" .Date.Month) }}</span>
-                </div>
-                <div class="event-info">
-                    <h3 class="event-title">{{ .Params.cardTitle }}</h3>
-                    <p class="event-desc">{{ .Params.cardDesc }}</p>
-                    {{- with .Params.tags }}
-                    <div class="event-tags">
-                        {{- range . }}
-                        <span class="event-tag">{{ . }}</span>
-                        {{- end }}
-                    </div>
-                    {{- end }}
-                </div>
-                <div class="event-arrow">→</div>
-            </a>
-            {{- end }}
-        </div>
-
-        <div class="section-cta-row">
-            <a href="/events/" class="btn btn-secondary">Все встречи →</a>
-            <a href="/questions/" class="btn btn-ghost">Что обсудить дальше?</a>
-        </div>
-    </div>
-</section>
-
-<!-- About Section -->
-<section class="about" id="about">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">about</span>
-            <h2 class="section-title">Место силы для технических лидеров</h2>
-            <p class="section-desc">
-                «Тимлид не кодит» – это не просто чат, а профессиональное сообщество,
-                где лидеры казахстанского IT обмениваются опытом и поддерживают друг друга.
-            </p>
-        </div>
-
-        <div class="features-grid">
-            {{ partial "feature-card.html" (dict
-                "icon" "users"
-                "title" "Живое общение"
-                "desc" "Реальные кейсы, честные ответы. Никаких теорий – только практика от тех, кто прошёл через это."
-            ) }}
-            {{ partial "feature-card.html" (dict
-                "icon" "layers"
-                "title" "Глубокие темы"
-                "desc" "AI/ML, архитектура, найм, конфликты в команде, карьерный рост – обсуждаем всё, что волнует лидеров."
-            ) }}
-            {{ partial "feature-card.html" (dict
-                "icon" "clock"
-                "title" "Всегда на связи"
-                "desc" "Пик активности в рабочие часы. Задайте вопрос – получите ответ от опытных коллег за минуты."
-            ) }}
-            {{ partial "feature-card.html" (dict
-                "icon" "activity"
-                "title" "Профессиональный тон"
-                "desc" "Сообщество экспертов, где ценят факты и конструктивный диалог. Без флуда и токсичности."
-            ) }}
-            {{ partial "feature-card.html" (dict
-                "icon" "sun"
-                "title" "Локальный контекст"
-                "desc" "Понимаем специфику рынка Казахстана и СНГ. Зарплаты, найм, культура – всё с учётом региона."
-            ) }}
-            {{ partial "feature-card.html" (dict
-                "icon" "users"
-                "title" "Нетворкинг"
-                "desc" "Знакомства с коллегами из Kaspi, Kolesa, DAR, Chocofamily и других топовых компаний."
-            ) }}
-        </div>
-    </div>
-</section>
-
-<!-- Topics Section — compact pill cloud -->
-<section class="topics" id="topics">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">topics</span>
-            <h2 class="section-title">Темы, которые волнуют</h2>
-        </div>
-
-        <div class="topics-cloud">
-            <span class="topic-pill topic-pill-featured">AI &amp; ML</span>
-            <span class="topic-pill">Управление командой</span>
-            <span class="topic-pill">Архитектура</span>
-            <span class="topic-pill">Найм</span>
-            <span class="topic-pill">Процессы разработки</span>
-            <span class="topic-pill">Карьера и рост</span>
-            <span class="topic-pill">Технический долг</span>
-            <span class="topic-pill">Зарплаты и переговоры</span>
-            <span class="topic-pill">Выгорание</span>
-            <span class="topic-pill">Code review</span>
-        </div>
-
-        <div class="topics-insight">
-            <div class="insight-icon">
-                {{ partial "icons/sun.html" }}
-            </div>
-            <p>
-                <strong>AI/ML доминирует в обсуждениях</strong> – большинство технических дискуссий связаны с искусственным интеллектом и его применением в разработке.
-            </p>
-        </div>
-    </div>
-</section>
-
-<!-- Voices Section — moving marquee of raw chat replies -->
-{{- with .Site.Data.voices }}
-<section class="voices" id="voices">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">voices</span>
-            <h2 class="section-title">Что говорят участники</h2>
-            <p class="section-desc">
-                Реальные реплики из обсуждений в чате – без редактуры, как есть.
-            </p>
-        </div>
-    </div>
-
-    <div class="voices-marquee" aria-label="Реплики участников чата">
-        <div class="voices-track">
-            {{- range . }}
-            <figure class="voice-card">
-                <blockquote class="voice-text">{{ .text }}</blockquote>
-                <figcaption class="voice-meta">
-                    <span class="voice-author">{{ .author }}</span>
-                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
-                </figcaption>
-            </figure>
-            {{- end }}
-            {{- /* duplicate track for a seamless loop */ -}}
-            {{- range . }}
-            <figure class="voice-card" aria-hidden="true">
-                <blockquote class="voice-text">{{ .text }}</blockquote>
-                <figcaption class="voice-meta">
-                    <span class="voice-author">{{ .author }}</span>
-                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
-                </figcaption>
-            </figure>
-            {{- end }}
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="section-cta-row">
-            <a href="/insights/" class="btn btn-secondary">Больше из чата →</a>
-        </div>
-    </div>
-</section>
-{{- end }}
-
-<!-- Knowledge Hub — Articles + Insights + Toolkit + Showcase, consolidated -->
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
 {{- $articlePages := where (where .Site.RegularPages "Section" "articles") "Params.draft" "ne" true -}}
 {{- $insightPages := where (where .Site.RegularPages "Section" "insights") "Params.draft" "ne" true -}}
 {{- $toolkitPages := where (where .Site.RegularPages "Section" "toolkit") "Params.draft" "ne" true -}}
 {{- $showcasePages := where (where .Site.RegularPages "Section" "showcase") "Params.draft" "ne" true -}}
-{{- $recentArticles := first 2 (sort $articlePages "Date" "desc") -}}
-{{- $recentInsights := first 2 (sort $insightPages "Date" "desc") -}}
-{{- $recentToolkit := first 2 (sort $toolkitPages "Date" "desc") -}}
-{{- $feed := sort (union $recentArticles (union $recentInsights $recentToolkit)) "Date" "desc" -}}
-{{- if gt (len $feed) 0 }}
-{{- $typeLabels := dict "articles" "Статья" "insights" "Инсайт" "toolkit" "Шаблон" -}}
-{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
-<section class="hub" id="materials">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">knowledge</span>
-            <h2 class="section-title">Знания, которые не тонут</h2>
-            <p class="section-desc">
-                Дискуссии превращаются в статьи, дайджесты и рабочие шаблоны.
-                Откройте на сайте или в терминале: <code>cat toolkit/one-on-one</code>.
-            </p>
-        </div>
+{{- $events := where (where .Site.RegularPages "Section" "events") "Params.cardTitle" "!=" nil -}}
+<div class="dock-page">
+  <div class="dock-wrap">
+    <p class="lab-eyebrow">home</p>
+    <h1 class="lab-h1">Сообщество тимлидов Казахстана</h1>
+    <p class="lab-lead">
+      {{ .Site.Params.participantsCount }} технических лидеров. Архитектура, найм, люди, выгорание – и живой чат,
+      который отвечает за минуты. А ещё весь сайт можно листать прямо из терминала справа.
+    </p>
 
-        <div class="hub-layout">
-            <nav class="hub-rail" aria-label="Разделы базы знаний">
-                <a href="/articles/" class="hub-rail-link">
-                    <span class="hub-rail-name">Статьи</span>
-                    <span class="hub-rail-desc">Экспертные разборы</span>
-                    <span class="hub-rail-count">{{ len $articlePages }}</span>
-                </a>
-                <a href="/insights/" class="hub-rail-link">
-                    <span class="hub-rail-name">Инсайты</span>
-                    <span class="hub-rail-desc">Дайджесты из чата</span>
-                    <span class="hub-rail-count">{{ len $insightPages }}</span>
-                </a>
-                <a href="/toolkit/" class="hub-rail-link">
-                    <span class="hub-rail-name">Операционка</span>
-                    <span class="hub-rail-desc">Шаблоны на каждый день</span>
-                    <span class="hub-rail-count">{{ len $toolkitPages }}</span>
-                </a>
-                <a href="/showcase/" class="hub-rail-link">
-                    <span class="hub-rail-name">Проекты</span>
-                    <span class="hub-rail-desc">Что делают участники</span>
-                    <span class="hub-rail-count">{{ len $showcasePages }}</span>
-                </a>
-            </nav>
-
-            <div class="hub-feed">
-                <div class="hub-feed-label">Свежее</div>
-                {{- range first 6 $feed }}
-                <a href="{{ .RelPermalink }}" class="feed-row">
-                    <span class="feed-type feed-type-{{ .Section }}">{{ index $typeLabels .Section }}</span>
-                    <span class="feed-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</span>
-                    <span class="feed-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}</span>
-                    <span class="event-arrow">→</span>
-                </a>
-                {{- end }}
-            </div>
-        </div>
+    <div class="lab-cta-row">
+      <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
+        {{ partial "icons/send.html" }} Вступить в Telegram
+      </a>
     </div>
-</section>
-{{- end }}
 
-<!-- Year Review strip -->
-<section class="year-review">
-    <div class="container">
-        <a href="https://2025.teamleads.kz" class="year-review-card" target="_blank" rel="noopener">
-            <div class="year-review-content">
-                <span class="year-review-badge">Итоги года</span>
-                <h3 class="year-review-title">Как прошёл 2025 год</h3>
-                <p class="year-review-desc">Аналитика сообщества: темы, люди, тренды и главные инсайты года</p>
-            </div>
-            <div class="year-review-arrow">→</div>
-        </a>
+    <div class="lab-try">
+      <div class="lab-try-label"># попробуйте – команда выполнится в терминале справа</div>
+      <div class="lab-chips">
+        <button class="cmd-chip" data-run="latest" type="button">latest</button>
+        <button class="cmd-chip" data-run="ls" type="button">ls</button>
+        <button class="cmd-chip" data-run="grep найм" type="button">grep найм</button>
+        <button class="cmd-chip" data-run="salary senior backend almaty" type="button">salary senior backend</button>
+        <button class="cmd-chip" data-run="voices" type="button">voices</button>
+        <button class="cmd-chip" data-run="help" type="button">help</button>
+      </div>
     </div>
-</section>
 
-<!-- CTA Section -->
-<section class="cta" id="join">
-    <div class="container">
-        <div class="cta-content">
-            <div class="cta-ornament cta-ornament-1"></div>
-            <div class="cta-ornament cta-ornament-2"></div>
+    <h2 class="lab-h2" id="about">Место силы для технических лидеров</h2>
+    <p class="lab-p">
+      «Тимлид не кодит» – не просто чат, а профессиональное сообщество, где лидеры
+      казахстанского IT обмениваются опытом и поддерживают друг друга. Реальные кейсы,
+      честные ответы, никаких теорий – только практика от тех, кто прошёл через это.
+    </p>
+    <p class="lab-p">
+      Прокрутите страницу: терминал остаётся на месте. Его можно закрыть крестиком –
+      тогда контент займёт всю ширину, а вернуть терминал можно кнопкой внизу справа.
+    </p>
 
-            <h2 class="cta-title">Готовы расти вместе?</h2>
-            <p class="cta-desc">
-                Присоединяйтесь к сообществу тимлидов Казахстана.
-                Здесь ваш опыт ценен, а вопросы находят ответы.
-            </p>
-
-            <a href="{{ .Site.Params.telegram }}" class="btn btn-cta" target="_blank" rel="noopener">
-                {{ partial "icons/send.html" }}
-                Вступить в {{ .Site.Params.telegramHandle }}
-            </a>
-
-            <p class="cta-note">Это бесплатно. Просто нажмите и присоединяйтесь.</p>
-        </div>
+    <h2 class="lab-h2">База знаний</h2>
+    <p class="lab-p">
+      Дискуссии превращаются в статьи, дайджесты и рабочие шаблоны. Откройте на сайте
+      или в терминале: <code>cat toolkit/one-on-one</code>.
+    </p>
+    <div class="lab-rail">
+      <a href="/articles/">Статьи <b>{{ len $articlePages }}</b></a>
+      <a href="/insights/">Инсайты <b>{{ len $insightPages }}</b></a>
+      <a href="/toolkit/">Операционка <b>{{ len $toolkitPages }}</b></a>
+      <a href="/showcase/">Проекты <b>{{ len $showcasePages }}</b></a>
     </div>
-</section>
 
-<!-- Footer -->
+    <h2 class="lab-h2">Последние инсайты</h2>
+    <ul class="lab-list">
+      {{- range first 6 (sort $insightPages "Date" "desc") }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</a>
+        <span class="lab-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}</span>
+      </li>
+      {{- end }}
+    </ul>
+
+    <h2 class="lab-h2">Встречи</h2>
+    <ul class="lab-list">
+      {{- range first 6 (sort $events "Date" "desc") }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .Params.cardTitle }}</a>
+        <span class="lab-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}</span>
+      </li>
+      {{- end }}
+    </ul>
+    <h2 class="lab-h2">Что говорят участники</h2>
+    <p class="lab-p">
+      Реальные реплики из обсуждений в чате – без редактуры, как есть.
+      В терминале справа: <code>voices</code>.
+    </p>
+    <div class="lab-quotes">
+      {{- range first 5 .Site.Data.voices }}
+      <p class="lab-quote">«&nbsp;{{ .text }}&nbsp;»<span class="lab-quote-meta">– {{ .author }}{{ with .topic }} · {{ . }}{{ end }}</span></p>
+      {{- end }}
+    </div>
+
+    <a href="https://2025.teamleads.kz" class="year-review-card lab-year" target="_blank" rel="noopener">
+      <div class="year-review-content">
+        <span class="year-review-badge">Итоги года</span>
+        <h3 class="year-review-title">Как прошёл 2025 год</h3>
+        <p class="year-review-desc">Аналитика сообщества: темы, люди, тренды и главные инсайты года</p>
+      </div>
+      <div class="year-review-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- Floating fixed terminal dock -->
+  <div class="term-dock" data-dock hidden>
+    <button class="dock-close" data-dock-close type="button" aria-label="Закрыть терминал" title="Закрыть">✕</button>
+    {{ partial "shell.html" (dict "mode" "full") }}
+  </div>
+
+  <button class="dock-fab" data-dock-open type="button" hidden aria-label="Открыть терминал">
+    <span class="fab-prompt">❯_</span> Терминал
+  </button>
+</div>
+
 {{ partial "footer.html" . }}
+{{ end }}
+
+{{ define "scripts" }}
+<script>
+(function () {
+  var body = document.body;
+  var dock = document.querySelector('[data-dock]');
+  var fab = document.querySelector('[data-dock-open]');
+  var closeBtn = document.querySelector('[data-dock-close]');
+  if (!dock || !fab) return;
+
+  var KEY = 'tnk_dock_open';
+  function setOpen(open) {
+    body.classList.toggle('dock-open', open);
+    dock.hidden = !open;
+    fab.hidden = open;
+    try { localStorage.setItem(KEY, open ? '1' : '0'); } catch (e) {}
+  }
+
+  // Default: open on wide screens, closed on phones – unless the user chose before.
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  var wide = window.matchMedia('(min-width: 1024px)').matches;
+  setOpen(saved === null ? wide : saved === '1');
+
+  closeBtn && closeBtn.addEventListener('click', function () { setOpen(false); });
+  fab.addEventListener('click', function () { setOpen(true); });
+
+  // Content chips → run the command in the live docked terminal.
+  function runInShell(cmd) {
+    var tries = 0;
+    var t = setInterval(function () {
+      tries++;
+      if (window.TeamleadsShell && window.TeamleadsShell.run) {
+        clearInterval(t);
+        window.TeamleadsShell.run(cmd);
+      } else if (tries > 50) { clearInterval(t); }
+    }, 60);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-run]'), function (b) {
+    b.addEventListener('click', function () {
+      var cmd = b.getAttribute('data-run');
+      if (!body.classList.contains('dock-open')) setOpen(true);
+      runInShell(cmd);
+    });
+  });
+})();
+</script>
 {{ end }}

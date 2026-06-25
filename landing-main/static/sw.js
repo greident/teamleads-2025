@@ -1,4 +1,4 @@
-// Тимлид не кодит — service worker.
+// Тимлид не кодит – service worker.
 // Strategy: navigations are network-first (always fresh online, offline page as
 // fallback); fingerprinted/static assets are cache-first. main.js and .ics are
 // intentionally NOT cache-first so they update without a cache bust.

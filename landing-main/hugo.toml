@@ -17,7 +17,7 @@ title = "Тимлид не кодит – Сообщество тимлидов 
   isPlainText = true
   notAlternative = true
 
-# Full-text search index for the Shell's `grep` command — one JSON file, fetched once.
+# Full-text search index for the Shell's `grep` command – one JSON file, fetched once.
 [outputFormats.shellindex]
   mediaType = "application/json"
   baseName = "shell-index"
@@ -43,7 +43,7 @@ title = "Тимлид не кодит – Сообщество тимлидов 
   telegram = "https://t.me/teamleads_kz"
   telegramHandle = "@teamleads_kz"
 
-  # Stats — participantsCount is the external Telegram member count (update manually);
+  # Stats – participantsCount is the external Telegram member count (update manually);
   # the other homepage stats are computed live from content and never go stale.
   participantsCount = "510"
   topicsCount = "50+"
@@ -55,12 +55,12 @@ title = "Тимлид не кодит – Сообщество тимлидов 
   #   salaryApi = "/api/salaries/chart?allowReadonly=true"
   salaryApi = ""
 
-  # GitHub edit links — used by "Edit on GitHub" button on event pages
+  # GitHub edit links – used by "Edit on GitHub" button on event pages
   githubRepo = "belyaevsa/teamleads-2025"
   githubBranch = "master"
   githubContentPath = "landing-main/content"
 
-  # Recurring meetup schedule — every Wednesday 17:00, Astana (UTC+5)
+  # Recurring meetup schedule – every Wednesday 17:00, Astana (UTC+5)
   [params.meetup]
     # TODO: replace with the real recurring meeting link. Single source of truth:
     # /join redirects here, and the calendar points at the constant /join URL.
@@ -71,7 +71,7 @@ title = "Тимлид не кодит – Сообщество тимлидов 
     tzLabel = "Астана, UTC+5"
     tzId = "Asia/Almaty"
     ics = "/teamleads-meetup.ics"
-    isoWeekday = 3   # Mon=1 … Wed=3 — used by JS to compute the next occurrence
+    isoWeekday = 3   # Mon=1 … Wed=3 – used by JS to compute the next occurrence
     hour = 17
 
   # Kazakhstan-inspired colors

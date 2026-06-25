@@ -19,6 +19,8 @@
     </div>
 </section>
 
+{{ partial "next-meetup.html" . }}
+
 <section class="insights-list">
     <div class="container">
         {{- $pages := where .Pages "Params.cardTitle" "ne" nil -}}

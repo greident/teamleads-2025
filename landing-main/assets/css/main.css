@@ -3182,8 +3182,8 @@ body > .nav {
 .term-body{flex:1 1 auto;min-height:0;padding:16px;overflow-y:auto;font-size:14px;line-height:1.6;color:#c9d1d9;cursor:text;scrollbar-width:thin;scrollbar-color:#30363d #0d1117}
 .term-body::-webkit-scrollbar{width:9px}.term-body::-webkit-scrollbar-thumb{background:#30363d;border-radius:5px}
 .term-out .ln{white-space:pre-wrap;word-break:break-word;margin:0}
-.term-out a{color:#39c5cf;text-decoration:none;border-bottom:1px dotted #39c5cf}
-.term-out a:hover{color:#FEC50C;border-bottom-color:#FEC50C}
+.term-out a{color:#39c5cf;text-decoration:none}
+.term-out a:hover{color:#FEC50C;text-decoration:underline}
 .term .dim{color:#6e7681}.term .hint{color:#8b949e}.term .ok{color:#3fb950}.term .err{color:#f85149}.term .accent{color:#FEC50C}.term .cy{color:#39c5cf}
 /* `cat` markdown coloring */
 .term-out .md-h{font-weight:700;margin-top:1.3em;margin-bottom:.4em}
@@ -3200,10 +3200,30 @@ body > .nav {
 .term-out .md-strong{color:#e6edf3;font-weight:700}
 .term-out .md-em{color:#c9d1d9;font-style:italic}
 .term-out .md-code{background:#161b22;border:1px solid #21262d;border-radius:4px;padding:0 4px;color:#FEC50C}
+/* `cat` markdown tables */
+.term-out .term-table{border-collapse:collapse;width:100%;margin:.7em 0;font-size:.95em;table-layout:auto}
+.term-out .term-table th,.term-out .term-table td{border:1px solid #30363d;padding:5px 10px;text-align:left;vertical-align:top;word-break:break-word}
+.term-out .term-table th{color:#39c5cf;font-weight:700;background:#161b22;white-space:nowrap}
+.term-out .term-table td{color:#c9d1d9}
+.term-out .term-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.025)}
 .term-line{display:flex;align-items:baseline;margin-top:2px}
 .term-prompt{color:#39c5cf;margin-right:8px;white-space:nowrap;user-select:none}
 .term-prompt b{color:#3fb950;font-weight:600}
 .term-input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#e6edf3;font:inherit;caret-color:#FEC50C;padding:0}
+/* PowerShell skin — applied to .term--ps (set by shell.js for Windows visitors):
+   the classic console blue, white prompt text, lighter cyan links. */
+.term--ps{background:#012456;border-color:#0a3a73}
+.term--ps .term-bar{background:#011a3f;border-bottom-color:#0a3a73}
+.term--ps .term-title{color:#bcd0ee}
+.term--ps .term-body{color:#eeedf0;scrollbar-color:#3a5e96 #012456}
+.term--ps .term-body::-webkit-scrollbar-thumb{background:#3a5e96}
+.term--ps .term-prompt{color:#eeedf0}
+.term--ps .term-prompt b{color:#eeedf0;font-weight:400}
+.term--ps .term-input{color:#fff;caret-color:#eeedf0}
+.term--ps .term-out a{color:#7fd6ff;border-bottom-color:#7fd6ff}
+.term--ps .term-out a:hover{color:#FEC50C;border-bottom-color:#FEC50C}
+.term--ps .dim{color:#9fb3d4}.term--ps .hint{color:#bcd0ee}.term--ps .cy{color:#7fd6ff}
+.term--ps .term-keys button{background:#0a3a73;color:#eeedf0;border-color:#1d4f8f}
 .term-keys{display:none}
 @media (max-width:640px){
   .term-keys{display:flex;gap:6px;padding:8px 10px;background:#161b22;border-top:1px solid #232b36;overflow-x:auto;-webkit-overflow-scrolling:touch}

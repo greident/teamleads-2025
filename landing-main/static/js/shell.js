@@ -23,6 +23,16 @@
     if (!out || !body || !input) return;
 
     var mode = root.getAttribute('data-mode') || 'full';
+    // Windows visitors get a PowerShell skin (blue theme + PS prompt + PS aliases);
+    // everyone else keeps the bash-style shell. Detect via UA-CH, then platform/UA.
+    var WIN = false;
+    try {
+      var uad = w.navigator && w.navigator.userAgentData;
+      var plat = (uad && uad.platform) || (w.navigator && w.navigator.platform) || '';
+      var ua = (w.navigator && w.navigator.userAgent) || '';
+      WIN = /win/i.test(plat) || /Windows/i.test(ua);
+    } catch (e) {}
+    if (WIN) root.classList.add('term--ps');
     var TG = root.getAttribute('data-tg') || 'https://t.me/teamleads_kz';
     var FS = {};
     try { FS = JSON.parse(root.getAttribute('data-fs') || '{}') || {}; } catch (e) { FS = {}; }
@@ -36,6 +46,8 @@
     try { SHARE = JSON.parse(root.getAttribute('data-share') || '{}') || {}; } catch (e) { SHARE = {}; }
     var QUESTIONS = [];  // open discussion backlog (events' nextQuestions) → `discuss`
     try { QUESTIONS = JSON.parse(root.getAttribute('data-questions') || '[]') || []; } catch (e) { QUESTIONS = []; }
+    var VOICES = [];     // curated chat quotes (data/voices.yaml) → `voices`
+    try { VOICES = JSON.parse(root.getAttribute('data-voices') || '[]') || []; } catch (e) { VOICES = []; }
     var hintedShare = false;
     var sections = FS.sections || {};
     var links = FS.links || {};
@@ -60,10 +72,23 @@
     function printNode(node) { var n = el('div', 'ln'); n.appendChild(node); out.appendChild(n); body.scrollTop = body.scrollHeight; return n; }
     function link(href, text, ext) { var a = el('a', null, text); a.href = href; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
     function pad(s, n) { s = String(s); return s.length >= n ? s + ' ' : s + new Array(n - s.length + 1).join(' '); }
+    // A link whose column padding sits OUTSIDE the anchor, so hover-underline covers only the name.
+    function linkpad(href, name, width, ext) {
+      var f = d.createDocumentFragment();
+      f.appendChild(link(href, name, ext));
+      var gap = width - String(name).length;
+      f.appendChild(el('span', 'dim', gap > 0 ? new Array(gap + 1).join(' ') : ' '));
+      return f;
+    }
     function pathStr() { return '/' + cwd; }
+    // PowerShell maps the section to a Windows path: C:\Users\guest[\section].
+    function winPath() { return 'C:\\Users\\guest' + (cwd ? '\\' + cwd : ''); }
+    function promptMarkup() {
+      return WIN ? ('PS ' + winPath() + '>') : ('<b>guest@teamleads</b>:' + pathStr() + '$');
+    }
     function setPrompt() {
-      if (promptEl) promptEl.innerHTML = '<b>guest@teamleads</b>:' + pathStr() + '$';
-      if (titleEl) titleEl.textContent = 'guest@teamleads: ' + pathStr();
+      if (promptEl) promptEl.innerHTML = promptMarkup();
+      if (titleEl) titleEl.textContent = WIN ? ('Windows PowerShell – ' + winPath()) : ('guest@teamleads: ' + pathStr());
     }
     function go(href) { print(''); print('переход → ' + href, 'ok'); setTimeout(function () { w.location.href = href; }, reduced ? 0 : 360); }
 
@@ -75,7 +100,7 @@
       var a = el('a', null, 'claude «' + qShort + '»'); a.href = 'javascript:void(0)';
       a.addEventListener('click', function (e) { e.preventDefault(); run('claude ' + item.q); });
       row.appendChild(a); printNode(row);
-      print('Обсудить вживую: join — среда 17:00 (Астана) · ещё тема — discuss', 'hint');
+      print('Обсудить вживую: join – среда 17:00 (Астана) · ещё тема – discuss', 'hint');
     }
 
     // Markdown line renderer for `cat`: colorizes headings, quotes, lists, links,
@@ -108,6 +133,35 @@
       }
       if (line.trim()) div.className = 'ln md-p';   // paragraph – gets extra spacing
       return mdInline(div, line);
+    }
+    // ── GitHub-style markdown tables ──────────────────────────────
+    function mdRow(line) {
+      return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function (c) { return c.trim(); });
+    }
+    function mdIsSep(line) {
+      if (!line || line.indexOf('|') === -1) return false;
+      var cells = mdRow(line);
+      return cells.length > 0 && cells.every(function (c) { return /^:?-{1,}:?$/.test(c); });
+    }
+    // If a table starts at lines[i] (header row + `|---|` separator), build it.
+    // Returns { node, next } where next is the index after the table, else null.
+    function mdTable(lines, i) {
+      if (!lines[i] || lines[i].indexOf('|') === -1) return null;
+      if (!mdIsSep(lines[i + 1] || '')) return null;
+      var headers = mdRow(lines[i]);
+      var table = el('table', 'term-table');
+      var thead = d.createElement('thead'), htr = d.createElement('tr');
+      headers.forEach(function (c) { var th = d.createElement('th'); mdInline(th, c); htr.appendChild(th); });
+      thead.appendChild(htr); table.appendChild(thead);
+      var tbody = d.createElement('tbody'), j = i + 2;
+      for (; j < lines.length; j++) {
+        if (!lines[j] || !lines[j].trim() || lines[j].indexOf('|') === -1) break;
+        var cells = mdRow(lines[j]), tr = d.createElement('tr');
+        for (var c = 0; c < headers.length; c++) { var td = d.createElement('td'); mdInline(td, cells[c] || ''); tr.appendChild(td); }
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      return { node: table, next: j };
     }
 
     // ── Тимлид-симулятор: an interactive panel mode. Instead of streaming
@@ -376,6 +430,7 @@
           ['principles', 'доктрина сообщества: принципы из реальных кейсов'],
           ['tools', 'топ инструментов сообщества'],
           ['toolkit', 'шаблоны операционки: 1-on-1, ретро, постмортем…'],
+          ['voices', 'реальные реплики участников из чата'],
           ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
@@ -388,11 +443,13 @@
         print(''); print('Пасхалки: fortune, vim, top, sudo, git blame, coffee, 42, rm -rf /.', 'dim');
       },
       ls: function (a) {
-        var where = (a[0] || '').replace(/^\/|\/$/g, '') || cwd;
+        // accept and ignore flags (-l, -a, -la, -al …); first non-flag arg is the path
+        var args = (a || []).filter(function (x) { return x && x.charAt(0) !== '-'; });
+        var where = (args[0] || '').replace(/^\/|\/$/g, '') || cwd;
         if (!where) {
           print('drwxr-xr-x  разделы:', 'dim');
           sectionNames.forEach(function (s) {
-            var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link('/' + s + '/', pad(s + '/', 13))); n.appendChild(el('span', 'dim', (sections[s] || []).length + ' материалов')); printNode(n);
+            var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(linkpad('/' + s + '/', s + '/', 13)); n.appendChild(el('span', 'dim', (sections[s] || []).length + ' материалов')); printNode(n);
           });
           if (linkNames.length) { print(''); print('-rw-r--r--  страницы:', 'dim'); linkNames.forEach(function (k) { var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link(links[k], k)); printNode(n); }); }
           print(''); print('cd <раздел> – войти, open <страница> – открыть, find <слово> – поиск.', 'dim');
@@ -402,7 +459,7 @@
           var items = sections[where];
           if (!items.length) { print('пусто', 'dim'); return; }
           items.forEach(function (it) {
-            var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link(it.u, pad(it.n, 26)));
+            var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(linkpad(it.u, it.n, 26));
             if (it.d) n.appendChild(el('span', 'dim', it.d + '  ')); n.appendChild(d.createTextNode(it.t)); printNode(n);
           });
           return;
@@ -452,7 +509,15 @@
         w.fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (txt) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
           var lines = txt.replace(/\s+$/, '').split('\n'), CAP = 400;
-          lines.slice(0, CAP).forEach(function (l) { if (raw) { print(l); return; } var node = mdLine(l); if (node) out.appendChild(node); });
+          var slice = lines.slice(0, CAP);
+          if (raw) { slice.forEach(function (l) { print(l); }); }
+          else {
+            for (var li = 0; li < slice.length; li++) {
+              var tbl = mdTable(slice, li);
+              if (tbl) { out.appendChild(tbl.node); li = tbl.next - 1; continue; }
+              var node = mdLine(slice[li]); if (node) out.appendChild(node);
+            }
+          }
           body.scrollTop = body.scrollHeight;
           if (lines.length > CAP) print('… обрезано (' + (lines.length - CAP) + ' строк). open ' + arg + ' – полная версия.', 'dim');
         }).catch(function (e) {
@@ -547,7 +612,7 @@
                 var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(h.u, h.t)); printNode(n);
                 if (h.snip) print('   ' + h.snip, 'dim');
               });
-            } else { print('Прямого разбора в архиве нет — отличный повод обсудить первыми.', 'dim'); }
+            } else { print('Прямого разбора в архиве нет – отличный повод обсудить первыми.', 'dim'); }
             discussFooter(item);
           }).catch(function () { discussFooter(item); });
         } else { discussFooter(item); }
@@ -556,8 +621,17 @@
         var items = (sections.toolkit || []).slice().sort(function (a, b) { return (a.n || '').localeCompare(b.n || ''); });
         if (!items.length) { print('toolkit: шаблоны не загружены', 'err'); return; }
         print('Операционка тимлида – рабочие шаблоны сообщества:', 'accent');
-        items.forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(it.u, pad(it.n, 22))); n.appendChild(el('span', 'dim', it.t)); printNode(n); });
+        items.forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(linkpad(it.u, it.n, 22)); n.appendChild(el('span', 'dim', it.t)); printNode(n); });
         print(''); print('cat toolkit/<имя> – открыть здесь. /toolkit/ – на сайте.', 'dim');
+      },
+      voices: function () {
+        if (!VOICES.length) { print('voices: реплики не загружены', 'err'); return; }
+        print('Голоса сообщества – реальные реплики из чата, без редактуры:', 'accent');
+        VOICES.forEach(function (v) {
+          print('  « ' + v.text + ' »');
+          print('    – ' + v.author + (v.topic ? '  · ' + v.topic : ''), 'dim');
+        });
+        print(''); print('Больше из чата: open insights', 'hint');
       },
       tools: function () {
         print('Топ инструментов, которые советует сообщество:', 'accent');
@@ -759,7 +833,21 @@
     commands.github = commands.contribute; commands.gh = commands.contribute; commands.pr = commands.contribute;
     commands.simulator = commands.sim; commands.game = commands.sim; commands.play = commands.sim;
     commands.topic = commands.discuss; commands['обсудить'] = commands.discuss; commands['тема'] = commands.discuss;
+    commands.chat = commands.voices; commands['голоса'] = commands.voices; commands.quotes = commands.voices;
     commands.about = commands.whoami; commands.manifesto = commands.principles; commands.doctrine = commands.principles;
+
+    // PowerShell dialect – so Windows visitors can drive the shell with the verbs
+    // (and aliases) they already know. Cmdlet names arrive lowercased via run().
+    commands.dir = commands.gci = commands['get-childitem'] = commands.ls;
+    commands.sl = commands.chdir = commands['set-location'] = commands.cd;
+    commands.type = commands.gc = commands['get-content'] = commands.cat;
+    commands.gl = commands['get-location'] = commands.pwd;
+    commands.cls = commands['clear-host'] = commands.clear;
+    commands.del = commands.erase = commands.ri = commands['remove-item'] = commands.rm;
+    commands.sls = commands['select-string'] = commands.grep;
+    commands['write-output'] = commands['write-host'] = commands.echo;
+    commands.ghy = commands['get-history'] = commands.history;
+    commands.start = commands.ii = commands['invoke-item'] = commands.open;
 
     // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).
     // Sends only the command NAME (first token) – never the free-text arguments – so no PII.
@@ -793,7 +881,7 @@
 
     function run(raw, noTrack) {
       var str = raw.trim();
-      var p = el('div', 'ln'); var pr = el('span', 'term-prompt'); pr.innerHTML = '<b>guest@teamleads</b>:' + pathStr() + '$ ';
+      var p = el('div', 'ln'); var pr = el('span', 'term-prompt'); pr.innerHTML = promptMarkup() + ' ';
       p.appendChild(pr); p.appendChild(d.createTextNode(str)); out.appendChild(p);
       if (vimMode) {
         if (/^:(q|q!|wq|wq!|x)$/.test(str)) { vimMode = false; print('вышли из vim. Невозможное возможно.', 'ok'); }
@@ -807,6 +895,13 @@
       if (commands.hasOwnProperty(cmd)) { try { commands[cmd](args); } catch (e) { print('ошибка: ' + e.message, 'err'); } }
       else print(cmd + ': команда не найдена. help – список команд.', 'err');
       body.scrollTop = body.scrollHeight;
+    }
+
+    // Echo the current prompt + typed text into the output, like run() does on Enter,
+    // so Tab-completion listings appear BELOW the command instead of above the live prompt.
+    function echoLine() {
+      var p = el('div', 'ln'); var pr = el('span', 'term-prompt'); pr.innerHTML = promptMarkup() + ' ';
+      p.appendChild(pr); p.appendChild(d.createTextNode(input.value)); out.appendChild(p); body.scrollTop = body.scrollHeight;
     }
 
     function complete() {
@@ -829,6 +924,7 @@
         pool = Object.keys(SAL.grades || {}).concat(Object.keys(SAL.roles || {}));
         if (S) pool = pool.concat(S.CITY_KEYS || [], S.SKILL_KEYS || []);
         if (!frag) {
+          echoLine();
           print('грейд: ' + Object.keys(SAL.grades || {}).join(' '), 'dim');
           print('роль:  ' + Object.keys(SAL.roles || {}).join(' '), 'dim');
           if (S) {
@@ -846,14 +942,14 @@
         pool = sectionNames.concat(linkNames);
         if (cwd && sections[cwd]) pool = pool.concat(sections[cwd].map(function (it) { return it.n; }));
       }
-      if (!frag) { if (pool.length) print(pool.slice(0, 40).join('   '), 'dim'); comp.full = null; return; }
+      if (!frag) { if (pool.length) { echoLine(); print(pool.slice(0, 40).join('   '), 'dim'); } comp.full = null; return; }
       var hits = pool.filter(function (c) { return c.indexOf(frag) === 0; });
       if (!hits.length) { comp.full = null; return; }
       comp.base = parts.slice(0, parts.length - 1).join(' '); if (comp.base) comp.base += ' ';
       comp.list = hits; comp.idx = 0;
       input.value = comp.base + hits[0];     // fill the first match…
       comp.full = input.value;
-      if (hits.length > 1) print(hits.slice(0, 40).join('   '), 'dim');  // …and show the rest (Tab cycles them)
+      if (hits.length > 1) { echoLine(); print(hits.slice(0, 40).join('   '), 'dim'); }  // …and show the rest (Tab cycles them)
     }
 
     input.addEventListener('keydown', function (e) {

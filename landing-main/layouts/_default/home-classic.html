@@ -1,0 +1,320 @@
+{{ define "main" }}
+<!-- Hero Section -->
+<section class="hero">
+    {{ partial "hero-bg.html" . }}
+
+    <div class="hero-content">
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Сообщество для тимлидов и tech-лидеров
+        </div>
+
+        <h1 class="hero-title">
+            <span class="title-line">Расти как лидер</span>
+            <span class="title-line title-accent">среди своих</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            Место, где тимлиды Казахстана делятся опытом, решают проблемы и развиваются вместе.
+            Архитектура, люди, процессы – всё, что важно для технического лидера.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ .Site.Params.telegram }}" class="btn btn-primary" target="_blank" rel="noopener">
+                {{ partial "icons/send.html" }}
+                Вступить в Telegram
+            </a>
+            <a href="#about" class="btn btn-secondary">
+                Узнать больше
+            </a>
+        </div>
+
+        {{ partial "hero-stats.html" . }}
+
+        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+        {{- $lastEvent := index (sort (where .Site.RegularPages "Section" "events") "Date" "desc") 0 -}}
+        {{- $lastInsight := index (sort (where .Site.RegularPages "Section" "insights") "Date" "desc") 0 -}}
+        <p class="hero-freshness">
+            <span class="hero-freshness-dot" aria-hidden="true"></span>
+            {{ with $lastEvent }}Последняя встреча {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}{{ end }}{{ with $lastInsight }} · свежий дайджест {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}{{ end }}
+        </p>
+    </div>
+
+    <div class="scroll-indicator">
+        <span>Листайте вниз</span>
+        {{ partial "icons/arrow-down.html" }}
+    </div>
+</section>
+
+{{ partial "next-meetup.html" . }}
+
+<!-- Events Section – recent only; full archive lives on /events/ -->
+<section class="events" id="events">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">events</span>
+            <h2 class="section-title">Мы не только пишем – мы встречаемся</h2>
+            <p class="section-desc">
+                Регулярные онлайн-встречи сообщества: разбираем реальные кейсы, спорим об архитектуре и делимся опытом.
+            </p>
+        </div>
+
+        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+        {{- $events := where (where .Site.RegularPages "Section" "events") "Params.cardTitle" "!=" nil -}}
+        <div class="events-grid">
+            {{- range first 4 (sort $events "Date" "desc") -}}
+            <a href="{{ .RelPermalink }}" class="event-card">
+                <div class="event-date">
+                    <span class="event-day">{{ .Date.Day }}</span>
+                    <span class="event-month">{{ index $months (printf "%d" .Date.Month) }}</span>
+                </div>
+                <div class="event-info">
+                    <h3 class="event-title">{{ .Params.cardTitle }}</h3>
+                    <p class="event-desc">{{ .Params.cardDesc }}</p>
+                    {{- with .Params.tags }}
+                    <div class="event-tags">
+                        {{- range . }}
+                        <span class="event-tag">{{ . }}</span>
+                        {{- end }}
+                    </div>
+                    {{- end }}
+                </div>
+                <div class="event-arrow">→</div>
+            </a>
+            {{- end }}
+        </div>
+
+        <div class="section-cta-row">
+            <a href="/events/" class="btn btn-secondary">Все встречи →</a>
+            <a href="/questions/" class="btn btn-ghost">Что обсудить дальше?</a>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about" id="about">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">about</span>
+            <h2 class="section-title">Место силы для технических лидеров</h2>
+            <p class="section-desc">
+                «Тимлид не кодит» – это не просто чат, а профессиональное сообщество,
+                где лидеры казахстанского IT обмениваются опытом и поддерживают друг друга.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            {{ partial "feature-card.html" (dict
+                "icon" "users"
+                "title" "Живое общение"
+                "desc" "Реальные кейсы, честные ответы. Никаких теорий – только практика от тех, кто прошёл через это."
+            ) }}
+            {{ partial "feature-card.html" (dict
+                "icon" "layers"
+                "title" "Глубокие темы"
+                "desc" "AI/ML, архитектура, найм, конфликты в команде, карьерный рост – обсуждаем всё, что волнует лидеров."
+            ) }}
+            {{ partial "feature-card.html" (dict
+                "icon" "clock"
+                "title" "Всегда на связи"
+                "desc" "Пик активности в рабочие часы. Задайте вопрос – получите ответ от опытных коллег за минуты."
+            ) }}
+            {{ partial "feature-card.html" (dict
+                "icon" "activity"
+                "title" "Профессиональный тон"
+                "desc" "Сообщество экспертов, где ценят факты и конструктивный диалог. Без флуда и токсичности."
+            ) }}
+            {{ partial "feature-card.html" (dict
+                "icon" "sun"
+                "title" "Локальный контекст"
+                "desc" "Понимаем специфику рынка Казахстана и СНГ. Зарплаты, найм, культура – всё с учётом региона."
+            ) }}
+            {{ partial "feature-card.html" (dict
+                "icon" "users"
+                "title" "Нетворкинг"
+                "desc" "Знакомства с коллегами из Kaspi, Kolesa, DAR, Chocofamily и других топовых компаний."
+            ) }}
+        </div>
+    </div>
+</section>
+
+<!-- Topics Section – compact pill cloud -->
+<section class="topics" id="topics">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">topics</span>
+            <h2 class="section-title">Темы, которые волнуют</h2>
+        </div>
+
+        <div class="topics-cloud">
+            <span class="topic-pill topic-pill-featured">AI &amp; ML</span>
+            <span class="topic-pill">Управление командой</span>
+            <span class="topic-pill">Архитектура</span>
+            <span class="topic-pill">Найм</span>
+            <span class="topic-pill">Процессы разработки</span>
+            <span class="topic-pill">Карьера и рост</span>
+            <span class="topic-pill">Технический долг</span>
+            <span class="topic-pill">Зарплаты и переговоры</span>
+            <span class="topic-pill">Выгорание</span>
+            <span class="topic-pill">Code review</span>
+        </div>
+
+        <div class="topics-insight">
+            <div class="insight-icon">
+                {{ partial "icons/sun.html" }}
+            </div>
+            <p>
+                <strong>AI/ML доминирует в обсуждениях</strong> – большинство технических дискуссий связаны с искусственным интеллектом и его применением в разработке.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Voices Section – moving marquee of raw chat replies -->
+{{- with .Site.Data.voices }}
+<section class="voices" id="voices">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">voices</span>
+            <h2 class="section-title">Что говорят участники</h2>
+            <p class="section-desc">
+                Реальные реплики из обсуждений в чате – без редактуры, как есть.
+            </p>
+        </div>
+    </div>
+
+    <div class="voices-marquee" aria-label="Реплики участников чата">
+        <div class="voices-track">
+            {{- range . }}
+            <figure class="voice-card">
+                <blockquote class="voice-text">{{ .text }}</blockquote>
+                <figcaption class="voice-meta">
+                    <span class="voice-author">{{ .author }}</span>
+                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
+                </figcaption>
+            </figure>
+            {{- end }}
+            {{- /* duplicate track for a seamless loop */ -}}
+            {{- range . }}
+            <figure class="voice-card" aria-hidden="true">
+                <blockquote class="voice-text">{{ .text }}</blockquote>
+                <figcaption class="voice-meta">
+                    <span class="voice-author">{{ .author }}</span>
+                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
+                </figcaption>
+            </figure>
+            {{- end }}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-cta-row">
+            <a href="/insights/" class="btn btn-secondary">Больше из чата →</a>
+        </div>
+    </div>
+</section>
+{{- end }}
+
+<!-- Knowledge Hub – Articles + Insights + Toolkit + Showcase, consolidated -->
+{{- $articlePages := where (where .Site.RegularPages "Section" "articles") "Params.draft" "ne" true -}}
+{{- $insightPages := where (where .Site.RegularPages "Section" "insights") "Params.draft" "ne" true -}}
+{{- $toolkitPages := where (where .Site.RegularPages "Section" "toolkit") "Params.draft" "ne" true -}}
+{{- $showcasePages := where (where .Site.RegularPages "Section" "showcase") "Params.draft" "ne" true -}}
+{{- $recentArticles := first 2 (sort $articlePages "Date" "desc") -}}
+{{- $recentInsights := first 2 (sort $insightPages "Date" "desc") -}}
+{{- $recentToolkit := first 2 (sort $toolkitPages "Date" "desc") -}}
+{{- $feed := sort (union $recentArticles (union $recentInsights $recentToolkit)) "Date" "desc" -}}
+{{- if gt (len $feed) 0 }}
+{{- $typeLabels := dict "articles" "Статья" "insights" "Инсайт" "toolkit" "Шаблон" -}}
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+<section class="hub" id="materials">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">knowledge</span>
+            <h2 class="section-title">Знания, которые не тонут</h2>
+            <p class="section-desc">
+                Дискуссии превращаются в статьи, дайджесты и рабочие шаблоны.
+                Откройте на сайте или в терминале: <code>cat toolkit/one-on-one</code>.
+            </p>
+        </div>
+
+        <div class="hub-layout">
+            <nav class="hub-rail" aria-label="Разделы базы знаний">
+                <a href="/articles/" class="hub-rail-link">
+                    <span class="hub-rail-name">Статьи</span>
+                    <span class="hub-rail-desc">Экспертные разборы</span>
+                    <span class="hub-rail-count">{{ len $articlePages }}</span>
+                </a>
+                <a href="/insights/" class="hub-rail-link">
+                    <span class="hub-rail-name">Инсайты</span>
+                    <span class="hub-rail-desc">Дайджесты из чата</span>
+                    <span class="hub-rail-count">{{ len $insightPages }}</span>
+                </a>
+                <a href="/toolkit/" class="hub-rail-link">
+                    <span class="hub-rail-name">Операционка</span>
+                    <span class="hub-rail-desc">Шаблоны на каждый день</span>
+                    <span class="hub-rail-count">{{ len $toolkitPages }}</span>
+                </a>
+                <a href="/showcase/" class="hub-rail-link">
+                    <span class="hub-rail-name">Проекты</span>
+                    <span class="hub-rail-desc">Что делают участники</span>
+                    <span class="hub-rail-count">{{ len $showcasePages }}</span>
+                </a>
+            </nav>
+
+            <div class="hub-feed">
+                <div class="hub-feed-label">Свежее</div>
+                {{- range first 6 $feed }}
+                <a href="{{ .RelPermalink }}" class="feed-row">
+                    <span class="feed-type feed-type-{{ .Section }}">{{ index $typeLabels .Section }}</span>
+                    <span class="feed-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</span>
+                    <span class="feed-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}</span>
+                    <span class="event-arrow">→</span>
+                </a>
+                {{- end }}
+            </div>
+        </div>
+    </div>
+</section>
+{{- end }}
+
+<!-- Year Review strip -->
+<section class="year-review">
+    <div class="container">
+        <a href="https://2025.teamleads.kz" class="year-review-card" target="_blank" rel="noopener">
+            <div class="year-review-content">
+                <span class="year-review-badge">Итоги года</span>
+                <h3 class="year-review-title">Как прошёл 2025 год</h3>
+                <p class="year-review-desc">Аналитика сообщества: темы, люди, тренды и главные инсайты года</p>
+            </div>
+            <div class="year-review-arrow">→</div>
+        </a>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta" id="join">
+    <div class="container">
+        <div class="cta-content">
+            <div class="cta-ornament cta-ornament-1"></div>
+            <div class="cta-ornament cta-ornament-2"></div>
+
+            <h2 class="cta-title">Готовы расти вместе?</h2>
+            <p class="cta-desc">
+                Присоединяйтесь к сообществу тимлидов Казахстана.
+                Здесь ваш опыт ценен, а вопросы находят ответы.
+            </p>
+
+            <a href="{{ .Site.Params.telegram }}" class="btn btn-cta" target="_blank" rel="noopener">
+                {{ partial "icons/send.html" }}
+                Вступить в {{ .Site.Params.telegramHandle }}
+            </a>
+
+            <p class="cta-note">Это бесплатно. Просто нажмите и присоединяйтесь.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{{ partial "footer.html" . }}
+{{ end }}
