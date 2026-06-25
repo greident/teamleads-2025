@@ -17,8 +17,17 @@ title = "Тимлид не кодит – Сообщество тимлидов 
   isPlainText = true
   notAlternative = true
 
+# Full-text search index for the Shell's `grep` command — one JSON file, fetched once.
+[outputFormats.shellindex]
+  mediaType = "application/json"
+  baseName = "shell-index"
+  suffix = "json"
+  isPlainText = true
+  notAlternative = true
+
 [outputs]
   page = ["html", "cat"]
+  home = ["html", "rss", "shellindex"]
 
 [params]
   description = "Крупнейшее сообщество тимлидов и технических лидеров Казахстана. Архитектура. Люди. Процессы разработки."

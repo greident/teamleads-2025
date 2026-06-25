@@ -13,7 +13,13 @@
 {{- $links := dict "questions" "/questions/" "join" "/join/" "home" "/" -}}
 {{- $fs := dict "sections" $sections "links" $links -}}
 
-<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}'>
+{{- /* Friendly services/communities — surfaced via the `friends` command. */ -}}
+{{- $friends := slice
+  (dict "n" "claude-community" "t" "Claude Community KZ — сообщество по AI-разработке" "u" "https://claude-community.kz/")
+  (dict "n" "techinterview" "t" "techinterview.space — зарплаты и подготовка к собеседованиям" "u" "https://techinterview.space/")
+-}}
+
+<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}'>
   <div class="term-bar">
     <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
     <span class="term-title" data-term-title>guest@teamleads: /</span>
@@ -24,6 +30,13 @@
       <span class="term-prompt" data-term-prompt><b>guest@teamleads</b>:/$</span>
       <input class="term-input" data-term-input autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Введите команду">
     </div>
+  </div>
+  <div class="term-keys" data-term-keys aria-hidden="true">
+    <button type="button" data-k="tab">Tab</button>
+    <button type="button" data-k="up">↑</button>
+    <button type="button" data-k="down">↓</button>
+    <button type="button" data-k="run">⏎</button>
+    <button type="button" data-k="clear">clear</button>
   </div>
 </div>
 <script src="{{ "js/claude-chat.js" | relURL }}" defer></script>

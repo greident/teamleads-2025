@@ -1,0 +1,104 @@
+# Зарплатные вилки сообщества — данные для команды `salary` в shell-режиме.
+# Это ГРУБЫЕ ОЦЕНКИ, а не оффер: net (на руки) в тенге/мес по рынку РК.
+# Модель простая и редактируемая: вилка = базовая вилка грейда × множитель роли.
+#   base[grade] = [p25, медиана, p75]  →  умножается на roles[role].
+# Поправляйте цифры по мере того, как сообщество уточняет их на встречах.
+
+currency: "₸"
+unit: "нетто/мес, РК"
+disclaimer: "Грубые оценки сообщества, не оффер. Уточняйте на встречах и на techinterview.space."
+source:
+  title: "techinterview.space — зарплаты и собеседования"
+  url: "https://techinterview.space/salaries"
+
+# Базовая вилка по грейду (тенге/мес): [p25, медиана, p75]
+grades:
+  junior: [300000, 500000, 750000]
+  middle: [700000, 1000000, 1400000]
+  senior: [1300000, 1800000, 2600000]
+  lead: [1800000, 2500000, 3500000]
+  staff: [2500000, 3300000, 5000000]
+
+# Множитель к базовой вилке грейда по роли
+roles:
+  backend: 1.00
+  frontend: 0.92
+  fullstack: 1.00
+  mobile: 1.00
+  devops: 1.12
+  data: 1.08
+  ml: 1.18
+  qa: 0.85
+  analyst: 0.85
+  pm: 1.00
+  design: 0.85
+
+# Человеческие названия ролей (для вывода)
+roleTitles:
+  backend: "Backend"
+  frontend: "Frontend"
+  fullstack: "Fullstack"
+  mobile: "Mobile"
+  devops: "DevOps / SRE"
+  data: "Data Engineer"
+  ml: "ML / AI"
+  qa: "QA"
+  analyst: "Аналитик"
+  pm: "Product / Project"
+  design: "Design"
+
+# Синонимы → каноническое имя (всё в нижнем регистре)
+aliases:
+  mid: middle
+  miid: middle
+  миддл: middle
+  мидл: middle
+  джун: junior
+  джуниор: junior
+  сеньор: senior
+  синьор: senior
+  сениор: senior
+  синиор: senior
+  лид: lead
+  тимлид: lead
+  teamlead: lead
+  techlead: lead
+  стафф: staff
+  принципал: staff
+  principal: staff
+  бэк: backend
+  бэкенд: backend
+  бекенд: backend
+  back: backend
+  фронт: frontend
+  фронтенд: frontend
+  front: frontend
+  фулстек: fullstack
+  фуллстек: fullstack
+  full: fullstack
+  мобайл: mobile
+  мобилка: mobile
+  ios: mobile
+  android: mobile
+  деврпс: devops
+  девопс: devops
+  sre: devops
+  дата: data
+  датаинженер: data
+  мл: ml
+  ai: ml
+  ии: ml
+  кью: qa
+  тестировщик: qa
+  тестер: qa
+  аналитик: analyst
+  ба: analyst
+  product: pm
+  продакт: pm
+  project: pm
+  проджект: pm
+  пм: pm
+  дизайн: design
+  дизайнер: design
+  ux: design
+  ui: design

@@ -25,6 +25,10 @@
     var TG = root.getAttribute('data-tg') || 'https://t.me/teamleads_kz';
     var FS = {};
     try { FS = JSON.parse(root.getAttribute('data-fs') || '{}') || {}; } catch (e) { FS = {}; }
+    var SAL = {};
+    try { SAL = JSON.parse(root.getAttribute('data-salary') || '{}') || {}; } catch (e) { SAL = {}; }
+    var FRIENDS = [];
+    try { FRIENDS = JSON.parse(root.getAttribute('data-friends') || '[]') || []; } catch (e) { FRIENDS = []; }
     var sections = FS.sections || {};
     var links = FS.links || {};
     var sectionNames = Object.keys(sections);
@@ -37,6 +41,12 @@
     var vimMode = false;
     var hist = [], hpos = -1;
     var comp = { base: '', list: [], idx: 0, full: null };  // Tab-completion cycling state
+    var SEARCH_INDEX = null;                                 // grep index (fetched once, cached)
+    var HKEY = 'tnk_shell_history';
+    try { var _hs = w.localStorage && w.localStorage.getItem(HKEY); if (_hs) { hist = JSON.parse(_hs) || []; hpos = hist.length; } } catch (e) {}
+    function saveHist() { try { if (w.localStorage) w.localStorage.setItem(HKEY, JSON.stringify(hist.slice(-100))); } catch (e) {} }
+    function histPrev() { if (hpos > 0) { hpos--; input.value = hist[hpos]; } }
+    function histNext() { if (hpos < hist.length - 1) { hpos++; input.value = hist[hpos]; } else { hpos = hist.length; input.value = ''; } }
 
     function el(t, c, x) { var n = d.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; }
     function print(text, cls) { var n = el('div', 'ln' + (cls ? ' ' + cls : ''), text == null ? '' : text); out.appendChild(n); body.scrollTop = body.scrollHeight; return n; }
@@ -61,6 +71,7 @@
           ['pwd', 'где я сейчас'],
           ['tree', 'всё дерево сайта'],
           ['find <слово>', 'поиск по заголовкам'],
+          ['grep <слово>', 'полнотекстовый поиск по страницам'],
           ['latest', 'последняя встреча'],
           ['random', 'случайный материал']
         ].forEach(function (r) { print('  ' + pad(r[0], 16) + r[1]); });
@@ -68,7 +79,9 @@
         [
           ['claude <вопрос>', 'спросить Claude (офлайн-демо)'],
           ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
+          ['salary', 'зарплатные вилки: salary senior backend'],
           ['tools', 'топ инструментов сообщества'],
+          ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
           ['man <cmd>', 'справка по команде'],
@@ -168,6 +181,38 @@
         print('найдено ' + hits.length + ':', 'dim');
         hits.forEach(function (h) { var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link(h[1].u, (h[0] ? h[0] + '/' : '') + h[1].n)); n.appendChild(el('span', 'dim', '  ' + (h[1].t || ''))); printNode(n); });
       },
+      grep: function (a) {
+        var q = a.join(' ').toLowerCase().trim();
+        if (!q) { print('grep: укажите слово. Напр.: grep бас-фактор', 'dim'); return; }
+        if (!w.fetch) { print('grep: fetch недоступен — попробуйте find <слово>', 'err'); return; }
+        function search(items) {
+          var hits = [];
+          items.forEach(function (p) {
+            var b = (p.b || '').toLowerCase(), pos = b.indexOf(q), inTitle = (p.t || '').toLowerCase().indexOf(q) !== -1;
+            if (pos === -1 && !inTitle) return;
+            var snip = '';
+            if (pos !== -1) { var st = Math.max(0, pos - 32); snip = (st > 0 ? '…' : '') + p.b.substr(st, 90).replace(/\s+/g, ' ').trim() + '…'; }
+            hits.push({ u: p.u, t: p.t, s: p.s, snip: snip });
+          });
+          if (!hits.length) { print('grep: ничего не найдено по «' + q + '»', 'dim'); return; }
+          print('найдено ' + hits.length + ':', 'dim');
+          hits.slice(0, 12).forEach(function (h) {
+            var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(h.u, h.s + '/' + h.t)); printNode(n);
+            if (h.snip) print('   ' + h.snip, 'dim');
+          });
+          if (hits.length > 12) print('… ещё ' + (hits.length - 12) + '. Уточните запрос.', 'dim');
+        }
+        if (SEARCH_INDEX) { search(SEARCH_INDEX); return; }
+        var loading = print('grep: индексирую…', 'dim');
+        w.fetch('/shell-index.json').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+          SEARCH_INDEX = j;
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          search(j);
+        }).catch(function (e) {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          print('grep: индекс недоступен — ' + e.message, 'err');
+        });
+      },
       latest: function () { var ev = sections.events || []; if (ev.length) { print('последняя встреча: ' + ev[0].t, 'cy'); go(ev[0].u); } else print('latest: нет данных', 'err'); },
       random: function () { if (!pool.length) { print('random: нет данных', 'err'); return; } var r = pool[Math.floor(Math.random() * pool.length)]; print('случайный выбор: ' + r.t, 'cy'); go(r.u); },
       tools: function () {
@@ -178,8 +223,52 @@
           ['GitHub / Forgejo', 'код всегда в общем репозитории — лекарство от бас-фактора', 'https://forgejo.org/'],
           ['SonarQube', 'статанализ и дисциплина декомпозиции', 'https://www.sonarsource.com/'],
           ['Swagger / OpenAPI', 'документация API, по которой конформятся новички', 'https://swagger.io/'],
-          ['Sales Navigator', 'выход на западных заказчиков через прогрев', 'https://business.linkedin.com/sales-solutions/sales-navigator']
+          ['Sales Navigator', 'выход на западных заказчиков через прогрев', 'https://business.linkedin.com/sales-solutions/sales-navigator'],
+          ['techinterview.space', 'зарплаты по рынку и подготовка к собеседованиям', 'https://techinterview.space/']
         ].forEach(function (t) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(t[2], t[0], true)); n.appendChild(el('span', 'dim', ' — ' + t[1])); printNode(n); });
+      },
+      friends: function () {
+        if (!FRIENDS.length) { print('friends: список пуст', 'dim'); return; }
+        print('Дружественные сообщества и сервисы:', 'accent');
+        FRIENDS.forEach(function (f) {
+          var dash = (f.t || '').split(' — '); var name = dash[0]; var desc = dash.slice(1).join(' — ');
+          var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(f.u, name, true));
+          if (desc) n.appendChild(el('span', 'dim', ' — ' + desc)); printNode(n);
+        });
+      },
+      salary: function (a) {
+        var grades = SAL.grades || {}, roles = SAL.roles || {}, aliases = SAL.aliases || {}, titles = SAL.roleTitles || {};
+        var gradeNames = Object.keys(grades), roleNames = Object.keys(roles);
+        if (!gradeNames.length || !roleNames.length) { print('salary: данные о зарплатах не загружены', 'err'); return; }
+        // Resolve every token to a grade or a role (via aliases); last one wins.
+        var grade = '', role = '';
+        a.forEach(function (raw) {
+          var t = (aliases[raw.toLowerCase()] || raw.toLowerCase());
+          if (grades[t]) grade = t; else if (roles[t]) role = t;
+        });
+        if (!grade && !role) {
+          print('Зарплатные вилки сообщества — ' + (SAL.unit || ''), 'accent');
+          print('Использование: salary <грейд> <роль>. Напр.: salary senior backend', 'hint');
+          print('  грейды: ' + gradeNames.join(', '), 'dim');
+          print('  роли:   ' + roleNames.join(', '), 'dim');
+          return;
+        }
+        if (!grade) { grade = 'senior'; print('грейд не указан — беру senior', 'dim'); }
+        if (!role) { role = 'backend'; print('роль не указана — беру backend', 'dim'); }
+        var base = grades[grade], k = roles[role];
+        if (!base || k == null) { print('salary: нет данных для этой пары', 'err'); return; }
+        var vals = base.map(function (v) { return Math.round(v * k / 10000) * 10000; });
+        var cur = SAL.currency || '₸', top = vals[2] || 1;
+        function fmt(v) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ' + cur; }
+        function bar(v) { var w = Math.max(1, Math.round(v / top * 14)); return new Array(w + 1).join('▓') + new Array(14 - w + 1).join('░'); }
+        print((titles[role] || role) + ' · ' + grade + ' · ' + (SAL.unit || ''), 'accent');
+        print('────────────────────────────────────────', 'dim');
+        [['p25', vals[0]], ['med', vals[1]], ['p75', vals[2]]].forEach(function (r) {
+          print('  ' + pad(r[0], 5) + bar(r[1]) + '   ' + fmt(r[1]));
+        });
+        print('────────────────────────────────────────', 'dim');
+        if (SAL.disclaimer) print(SAL.disclaimer, 'dim');
+        if (SAL.source && SAL.source.url) { var n = el('span'); n.appendChild(el('span', 'dim', 'Сверить → ')); n.appendChild(link(SAL.source.url, SAL.source.title || SAL.source.url, true)); printNode(n); }
       },
       claude: function (a) {
         var q = a.join(' ').trim();
@@ -222,9 +311,12 @@
           pwd: 'pwd — текущий путь.',
           tree: 'tree — всё дерево сайта со счётчиками.',
           find: 'find <слово> — поиск по заголовкам и именам.',
+          grep: 'grep <слово> — полнотекстовый поиск по содержимому всех страниц.',
           latest: 'latest — открыть последнюю встречу.',
           random: 'random — открыть случайный материал.',
           tools: 'tools — топ инструментов сообщества.',
+          salary: 'salary <грейд> <роль> — зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
+          friends: 'friends — дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
           claude: 'claude <вопрос> — Claude-окно: офлайн-ответ по материалам сообщества.',
           codex: 'codex <вопрос> — Codex-окно: офлайн-ответ по материалам сообщества.',
           join: 'join — ссылка на еженедельную встречу.',
@@ -294,8 +386,8 @@
         body.scrollTop = body.scrollHeight; return;
       }
       if (!str) { body.scrollTop = body.scrollHeight; return; }
-      hist.push(str); hpos = hist.length;
-      if (!noTrack) track(str);
+      if (!noTrack) { hist.push(str); track(str); saveHist(); }
+      hpos = hist.length;
       var parts = str.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
       if (commands.hasOwnProperty(cmd)) { try { commands[cmd](args); } catch (e) { print('ошибка: ' + e.message, 'err'); } }
       else print(cmd + ': команда не найдена. help — список команд.', 'err');
@@ -335,11 +427,24 @@
     input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { run(input.value); input.value = ''; }
       else if (e.key === 'Tab') { e.preventDefault(); complete(); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); if (hpos > 0) { hpos--; input.value = hist[hpos]; } }
-      else if (e.key === 'ArrowDown') { e.preventDefault(); if (hpos < hist.length - 1) { hpos++; input.value = hist[hpos]; } else { hpos = hist.length; input.value = ''; } }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); histPrev(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); histNext(); }
       else if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'L')) { e.preventDefault(); commands.clear(); }
     });
     body.addEventListener('click', function (e) { if (e.target.tagName !== 'A') input.focus(); });
+
+    // Mobile helper bar — taps map to the same actions as the hardware keys.
+    var keysBar = root.querySelector('[data-term-keys]');
+    if (keysBar) keysBar.addEventListener('click', function (e) {
+      var k = e.target && e.target.getAttribute ? e.target.getAttribute('data-k') : null;
+      if (!k) return;
+      input.focus();
+      if (k === 'tab') complete();
+      else if (k === 'up') histPrev();
+      else if (k === 'down') histNext();
+      else if (k === 'run') { run(input.value); input.value = ''; }
+      else if (k === 'clear') commands.clear();
+    });
 
     // A shareable deep-link can carry a command: /shell/#cat events/meetup-2026-06-24
     // or /shell/?cmd=cat%20articles/... — it runs once the shell is ready.

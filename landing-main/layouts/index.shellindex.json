@@ -1,0 +1,22 @@
+{{- /* Search index for the Shell's grep: one record per content page with plain text. */ -}}
+{{- $secs := slice "events" "articles" "insights" "showcase" -}}
+{{- $idx := slice -}}
+{{- range where site.RegularPages "Section" "in" $secs -}}
+  {{- $b := "" -}}
+  {{- if in (slice "articles" "showcase") .Section -}}
+    {{- $b = .Plain -}}
+  {{- else if eq .Section "events" -}}
+    {{- $parts := slice (.Params.mainTopic | default "") -}}
+    {{- range (.Params.topics | default slice) }}{{ $parts = $parts | append (.title | default "") (.body | default "") }}{{ end -}}
+    {{- range (.Params.takeaways | default slice) }}{{ $parts = $parts | append (.title | default "") (.body | default "") }}{{ end -}}
+    {{- range (.Params.nextQuestions | default slice) }}{{ $parts = $parts | append (.question | default "") }}{{ end -}}
+    {{- range (.Params.participants | default slice) }}{{ $parts = $parts | append (.name | default "") (.role | default "") }}{{ end -}}
+    {{- $b = delimit $parts " " -}}
+  {{- else if eq .Section "insights" -}}
+    {{- $parts := slice (.Description | default "") -}}
+    {{- range (.Params.topics | default slice) }}{{ $parts = $parts | append (.title | default "") }}{{ range (.paragraphs | default slice) }}{{ $parts = $parts | append . }}{{ end }}{{ end -}}
+    {{- $b = delimit $parts " " -}}
+  {{- end -}}
+  {{- $idx = $idx | append (dict "u" .RelPermalink "t" .Title "s" .Section "b" ($b | plainify | chomp)) -}}
+{{- end -}}
+{{ $idx | jsonify }}
