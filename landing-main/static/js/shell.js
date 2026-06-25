@@ -263,6 +263,92 @@
       simPanel.appendChild(card);
     }
 
+    // ── salary: live market data from techinterview.space via the shared
+    //    TeamleadsSalary module, with the static community model as an offline
+    //    fallback. salaryLive renders charts/analytics; salaryNudge always asks
+    //    the visitor to contribute their own salary so the sample improves.
+    function salFmt(v, cur) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ' + (cur || '₸'); }
+    function salMoney(v) {
+      v = Number(v);
+      if (v >= 1e6) { var m = v / 1e6; return (m % 1 ? m.toFixed(2).replace(/0+$/, '').replace(/\.$/, '') : m.toFixed(0)) + 'M'; }
+      return Math.round(v / 1e3) + 'k';
+    }
+    function salBar(ch, count, max, width) { var n = max ? Math.max(count > 0 ? 1 : 0, Math.round(count / max * width)) : 0; return new Array(n + 1).join(ch); }
+    function salaryNudge() {
+      var url = (w.TeamleadsSalary && w.TeamleadsSalary.CONTRIBUTE_URL) || 'https://techinterview.space/salaries';
+      var n = el('span'); n.appendChild(el('span', 'accent', '📊 '));
+      n.appendChild(d.createTextNode('В выборке нет твоей вилки? Добавь анонимно за пару минут → '));
+      n.appendChild(link(url, 'techinterview.space/salaries', true));
+      printNode(n);
+      print('Чем больше анкет – тем точнее цифры для всего сообщества.', 'dim');
+    }
+    function salaryLive(grade, role) {
+      var S = w.TeamleadsSalary, titles = SAL.roleTitles || {};
+      var loading = print('запрашиваю свежие данные с techinterview.space…', 'dim');
+      S.chart({ grade: grade, profession: role }).then(function (res) {
+        if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+        if (!res || !res.count) { print('salary: по такому фильтру данных нет – показываю оценку сообщества.', 'dim'); salaryOffline(grade, role); return; }
+        var rate = res.usdRate;
+        function usd(v) { return rate ? ' (~$' + String(S.toUSD(v, rate)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ')' : ''; }
+        var roleLabel = role ? (titles[role] || S.PROF_LABEL[S.resolveProfession(role)] || role) : '';
+        var gradeLabel = grade ? ((res.query && res.query.gradeLabel) || grade) : '';
+        var head = [roleLabel, gradeLabel].filter(Boolean).join(' · ') || 'Весь рынок IT · РК';
+        print('💰 ' + head + ' · нетто/мес', 'accent');
+        print('живые данные · ' + res.count + ' зарплат · обновлено ' + res.updated + (res._cached ? ' · из кеша' : ''), 'dim');
+        print('────────────────────────────────────────', 'dim');
+        print('  медиана  ' + salFmt(res.median) + usd(res.median));
+        print('  среднее  ' + salFmt(res.average) + usd(res.average), 'dim');
+        if (res.remoteMedian) {
+          var prem = res.median ? Math.round((res.remoteMedian / res.median - 1) * 100) : 0;
+          print('  ремоут   ' + salFmt(res.remoteMedian) + (prem > 0 ? '  +' + prem + '% к локальному рынку' : ''), 'cy');
+        }
+        if (!grade && res.byGrade && res.byGrade.length) {
+          print('────────────────────────────────────────', 'dim');
+          print('Грейд-лестница (медиана):', 'accent');
+          var topG = Math.max.apply(null, res.byGrade.map(function (g) { return g.median; })) || 1;
+          res.byGrade.forEach(function (g) {
+            print('  ' + pad(g.label, 8) + salBar('█', g.median, topG, 16) + '  ' + salFmt(g.median) + '  · ' + g.count);
+          });
+        }
+        if (res.histogram && res.histogram.items && res.histogram.items.length) {
+          print('────────────────────────────────────────', 'dim');
+          print('Распределение зарплат:', 'accent');
+          var h = res.histogram, mx = Math.max.apply(null, h.items) || 1;
+          h.labels.forEach(function (lab, i) {
+            var c = h.items[i] || 0;
+            print('  ' + pad(salMoney(lab), 7) + salBar('▓', c, mx, 18) + ' ' + c, c ? null : 'dim');
+          });
+          print('  бакет ' + salMoney(h.step) + ' ₸ · столбик = число анкет', 'dim');
+        }
+        print('────────────────────────────────────────', 'dim');
+        salaryNudge();
+        if (!grade || !role) print('Уточнить: salary <грейд> <роль>. Напр.: salary senior backend', 'hint');
+      }).catch(function (e) {
+        if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+        print('salary: сервис недоступен (' + e.message + ') – показываю оценку сообщества.', 'dim');
+        salaryOffline(grade, role);
+      });
+    }
+    function salaryOffline(grade, role) {
+      var grades = SAL.grades || {}, roles = SAL.roles || {}, titles = SAL.roleTitles || {};
+      if (!Object.keys(grades).length || !Object.keys(roles).length) { print('salary: данные о зарплатах не загружены', 'err'); return; }
+      if (!grade) { grade = 'senior'; print('грейд не указан – беру senior', 'dim'); }
+      if (!role) { role = 'backend'; print('роль не указана – беру backend', 'dim'); }
+      var base = grades[grade], k = roles[role];
+      if (!base || k == null) { print('salary: нет данных для этой пары', 'err'); return; }
+      var vals = base.map(function (v) { return Math.round(v * k / 10000) * 10000; });
+      var cur = SAL.currency || '₸', top = vals[2] || 1;
+      function bar(v) { var ww = Math.max(1, Math.round(v / top * 14)); return new Array(ww + 1).join('▓') + new Array(14 - ww + 1).join('░'); }
+      print((titles[role] || role) + ' · ' + grade + ' · ' + (SAL.unit || '') + ' (оценка сообщества)', 'accent');
+      print('────────────────────────────────────────', 'dim');
+      [['p25', vals[0]], ['med', vals[1]], ['p75', vals[2]]].forEach(function (r) {
+        print('  ' + pad(r[0], 5) + bar(r[1]) + '   ' + salFmt(r[1], cur));
+      });
+      print('────────────────────────────────────────', 'dim');
+      if (SAL.disclaimer) print(SAL.disclaimer, 'dim');
+      salaryNudge();
+    }
+
     var commands = {
       help: function () {
         print('НАВИГАЦИЯ', 'accent');
@@ -282,7 +368,7 @@
         [
           ['claude <вопрос>', 'спросить Claude (офлайн-демо)'],
           ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
-          ['salary', 'зарплатные вилки: salary senior backend'],
+          ['salary', 'зарплаты рынка (живые данные): salary senior backend'],
           ['sim', 'тимлид-симулятор: развилки и решения'],
           ['discuss', 'случайная тема из бэклога + разбор по ней'],
           ['principles', 'доктрина сообщества: принципы из реальных кейсов'],
@@ -493,38 +579,25 @@
         });
       },
       salary: function (a) {
-        var grades = SAL.grades || {}, roles = SAL.roles || {}, aliases = SAL.aliases || {}, titles = SAL.roleTitles || {};
+        var grades = SAL.grades || {}, roles = SAL.roles || {}, aliases = SAL.aliases || {};
         var gradeNames = Object.keys(grades), roleNames = Object.keys(roles);
         if (!gradeNames.length || !roleNames.length) { print('salary: данные о зарплатах не загружены', 'err'); return; }
-        // Resolve every token to a grade or a role (via aliases); last one wins.
+        if (a[0] === 'help' || a[0] === '--help' || a[0] === '-h') {
+          print('Зарплаты рынка РК – живые данные techinterview.space', 'accent');
+          print('Использование: salary [грейд] [роль]. Напр.: salary senior backend', 'hint');
+          print('  без аргументов – обзор всего рынка (медиана, грейд-лестница, распределение)', 'dim');
+          print('  грейды: ' + gradeNames.join(', '), 'dim');
+          print('  роли:   ' + roleNames.join(', '), 'dim');
+          return;
+        }
+        // Resolve every token to a grade or a role (via RU aliases); last one wins.
         var grade = '', role = '';
         a.forEach(function (raw) {
           var t = (aliases[raw.toLowerCase()] || raw.toLowerCase());
           if (grades[t]) grade = t; else if (roles[t]) role = t;
         });
-        if (!grade && !role) {
-          print('Зарплатные вилки сообщества – ' + (SAL.unit || ''), 'accent');
-          print('Использование: salary <грейд> <роль>. Напр.: salary senior backend', 'hint');
-          print('  грейды: ' + gradeNames.join(', '), 'dim');
-          print('  роли:   ' + roleNames.join(', '), 'dim');
-          return;
-        }
-        if (!grade) { grade = 'senior'; print('грейд не указан – беру senior', 'dim'); }
-        if (!role) { role = 'backend'; print('роль не указана – беру backend', 'dim'); }
-        var base = grades[grade], k = roles[role];
-        if (!base || k == null) { print('salary: нет данных для этой пары', 'err'); return; }
-        var vals = base.map(function (v) { return Math.round(v * k / 10000) * 10000; });
-        var cur = SAL.currency || '₸', top = vals[2] || 1;
-        function fmt(v) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ' + cur; }
-        function bar(v) { var w = Math.max(1, Math.round(v / top * 14)); return new Array(w + 1).join('▓') + new Array(14 - w + 1).join('░'); }
-        print((titles[role] || role) + ' · ' + grade + ' · ' + (SAL.unit || ''), 'accent');
-        print('────────────────────────────────────────', 'dim');
-        [['p25', vals[0]], ['med', vals[1]], ['p75', vals[2]]].forEach(function (r) {
-          print('  ' + pad(r[0], 5) + bar(r[1]) + '   ' + fmt(r[1]));
-        });
-        print('────────────────────────────────────────', 'dim');
-        if (SAL.disclaimer) print(SAL.disclaimer, 'dim');
-        if (SAL.source && SAL.source.url) { var n = el('span'); n.appendChild(el('span', 'dim', 'Сверить → ')); n.appendChild(link(SAL.source.url, SAL.source.title || SAL.source.url, true)); printNode(n); }
+        if (w.TeamleadsSalary && w.fetch) salaryLive(grade, role);
+        else salaryOffline(grade, role);
       },
       claude: function (a) {
         var q = a.join(' ').trim();
@@ -619,7 +692,7 @@
           discuss: 'discuss – случайная тема для обсуждения из бэклога /questions/ + что есть по ней в архиве. Синонимы: topic, тема, обсудить.',
           tools: 'tools – топ инструментов сообщества.',
           toolkit: 'toolkit – рабочие шаблоны (1-on-1, ретро, постмортем, найм, ADR). cat toolkit/<имя> – открыть шаблон здесь.',
-          salary: 'salary <грейд> <роль> – зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
+          salary: 'salary [грейд] [роль] – зарплаты рынка РК: живые данные techinterview.space (медиана, среднее, ремоут-премия, грейд-лестница, распределение). Без аргументов – обзор всего рынка. Напр.: salary senior backend. При офлайне – оценка сообщества.',
           sim: 'sim – тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
           principles: 'principles – доктрина сообщества: принципы управления, выжатые из реальных кейсов и статей. Синонимы: doctrine, manifesto.',
           friends: 'friends – дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
