@@ -128,6 +128,7 @@
       var list = (SCEN.scenarios || []).slice();
       if (!list.length) { print('sim: сценарии не загружены', 'err'); return; }
       for (var i = list.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = list[i]; list[i] = list[j]; list[j] = t; }
+      list = list.slice(0, 6);
       simSt = { list: list, idx: 0, score: 0, phase: 'choice', chosen: null };
       body.style.display = 'none';
       if (keysBar) keysBar.style.display = 'none';
@@ -737,7 +738,19 @@
     function ready() {
       if (line) line.hidden = false; input.focus();
       var urlcmd = urlCommand();
-      if (urlcmd) { setTimeout(function () { run(urlcmd); }, reduced ? 0 : 150); return; }
+      if (urlcmd) {
+        // Assistant share links (claude/codex …) land in the terminal with the command
+        // ENTERED in the prompt, ready to run — don't auto-fire someone else's question.
+        // Other share links (cat, sim, salary …) still auto-run.
+        var verb0 = (urlcmd.split(/\s+/)[0] || '').toLowerCase();
+        if (/^(claude|codex|ai|ask|gpt|openai)$/.test(verb0)) {
+          input.value = urlcmd;
+          try { input.setSelectionRange(urlcmd.length, urlcmd.length); } catch (e) {}
+          input.focus();
+          return;
+        }
+        setTimeout(function () { run(urlcmd); }, reduced ? 0 : 150); return;
+      }
       if (mode === 'full') setTimeout(function () { run('ls', true); }, reduced ? 0 : 140);
     }
     var boot;

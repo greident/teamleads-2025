@@ -187,6 +187,10 @@
     {{ partial "bottom-nav.html" . }}
 
     {{ block "scripts" . }}{{ end }}
+    <script src="{{ "js/retrieval.js" | relURL }}" defer></script>
+    <script src="{{ "js/claude-chat.js" | relURL }}" defer></script>
+    <script src="{{ "js/codex-chat.js" | relURL }}" defer></script>
+    <script src="{{ "js/search.js" | relURL }}" defer></script>
     <script src="{{ "js/main.js" | relURL }}" defer></script>
 
     <!-- Yandex.Metrika counter -->

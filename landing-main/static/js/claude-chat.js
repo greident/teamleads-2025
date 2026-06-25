@@ -7,7 +7,7 @@
 (function (w, d) {
   'use strict';
 
-  var built = false, root, msgs, input, sendBtn, FS = { sections: {}, links: {} };
+  var built = false, root, msgs, input, sendBtn, lastQ = '', FS = { sections: {}, links: {} };
 
   function readFS() {
     var term = d.querySelector('[data-term]');
@@ -37,6 +37,7 @@
         '<div class="cl-bar">' +
           '<span class="cl-brand"></span>' +
           '<div class="cl-titles"><strong>Claude</strong><span>офлайн-демо · отвечает по материалам сообщества</span></div>' +
+          '<button class="cl-switch" type="button" aria-label="Переключиться на Codex" title="Тот же вопрос в Codex">Codex</button>' +
           '<button class="cl-close" aria-label="Закрыть">✕</button>' +
         '</div>' +
         '<div class="cl-msgs" data-cl-msgs></div>' +
@@ -50,6 +51,7 @@
     sendBtn = root.querySelector('.cl-send');
 
     root.querySelector('.cl-close').addEventListener('click', close);
+    var sw = root.querySelector('.cl-switch'); if (sw) sw.addEventListener('click', function () { if (w.TeamleadsSearch && w.TeamleadsSearch.switchTool) w.TeamleadsSearch.switchTool(); });
     root.addEventListener('mousedown', function (e) { if (e.target === root) close(); });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !root.hasAttribute('hidden')) close(); });
     root.querySelector('.cl-form').addEventListener('submit', function (e) { e.preventDefault(); submit(); });
@@ -187,7 +189,7 @@
 
   function submit() {
     var t = input.value.trim(); if (!t) return;
-    userBubble(t); input.value = ''; autoGrow(); botReply(t);
+    lastQ = t; userBubble(t); input.value = ''; autoGrow(); botReply(t);
   }
 
   function open(initial) {
@@ -198,9 +200,9 @@
     root.removeAttribute('hidden');
     d.body.classList.add('cl-lock');
     setTimeout(function () { input.focus(); }, 50);
-    if (initial && initial.trim()) { userBubble(initial.trim()); botReply(initial.trim()); }
+    if (initial && initial.trim()) { lastQ = initial.trim(); userBubble(lastQ); botReply(lastQ); }
   }
   function close() { if (root) { root.setAttribute('hidden', ''); d.body.classList.remove('cl-lock'); } }
 
-  w.TeamleadsClaude = { open: open, close: close };
+  w.TeamleadsClaude = { open: open, close: close, lastQuery: function () { return lastQ; } };
 })(window, document);

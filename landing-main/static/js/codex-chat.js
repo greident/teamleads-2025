@@ -6,7 +6,7 @@
 (function (w, d) {
   'use strict';
 
-  var built = false, root, msgs, input, FS = { sections: {}, links: {} };
+  var built = false, root, msgs, input, lastQ = '', FS = { sections: {}, links: {} };
 
   function readFS() {
     var term = d.querySelector('[data-term]');
@@ -36,6 +36,7 @@
         '<div class="cx-bar">' +
           '<span class="cx-brand"></span>' +
           '<div class="cx-titles"><strong>Codex</strong><span>офлайн-демо · отвечает по материалам сообщества</span></div>' +
+          '<button class="cx-switch" type="button" aria-label="Переключиться на Claude" title="Тот же вопрос в Claude">Claude</button>' +
           '<button class="cx-close" aria-label="Закрыть">✕</button>' +
         '</div>' +
         '<div class="cx-msgs" data-cx-msgs></div>' +
@@ -48,6 +49,7 @@
     input = root.querySelector('[data-cx-input]');
 
     root.querySelector('.cx-close').addEventListener('click', close);
+    var sw = root.querySelector('.cx-switch'); if (sw) sw.addEventListener('click', function () { if (w.TeamleadsSearch && w.TeamleadsSearch.switchTool) w.TeamleadsSearch.switchTool(); });
     root.addEventListener('mousedown', function (e) { if (e.target === root) close(); });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !root.hasAttribute('hidden')) close(); });
     root.querySelector('.cx-form').addEventListener('submit', function (e) { e.preventDefault(); submit(); });
@@ -179,7 +181,7 @@
 
   function submit() {
     var t = input.value.trim(); if (!t) return;
-    userBubble(t); input.value = ''; autoGrow(); botReply(t);
+    lastQ = t; userBubble(t); input.value = ''; autoGrow(); botReply(t);
   }
 
   function open(initial) {
@@ -188,9 +190,9 @@
       typeInto(bubble('bot'), 'Здравствуйте! Я офлайн-ассистент в стиле Codex. Сетевых вызовов нет — отвечаю по материалам сообщества «Тимлид не кодит». О чём расскажете?', []);
     root.removeAttribute('hidden'); d.body.classList.add('cx-lock');
     setTimeout(function () { input.focus(); }, 50);
-    if (initial && initial.trim()) { userBubble(initial.trim()); botReply(initial.trim()); }
+    if (initial && initial.trim()) { lastQ = initial.trim(); userBubble(lastQ); botReply(lastQ); }
   }
   function close() { if (root) { root.setAttribute('hidden', ''); d.body.classList.remove('cx-lock'); } }
 
-  w.TeamleadsCodex = { open: open, close: close };
+  w.TeamleadsCodex = { open: open, close: close, lastQuery: function () { return lastQ; } };
 })(window, document);
