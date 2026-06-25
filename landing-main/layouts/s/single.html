@@ -4,6 +4,7 @@
 
 {{ define "main" }}
 {{- $run := .Params.run | default .Params.cmd -}}
+{{- $verb := index (split $run " ") 0 -}}
 <section class="nf-wrap">
   <div class="container nf-inner" style="text-align:center">
     <span class="section-tag" style="display:inline-block;margin-bottom:var(--space-sm)">SHELL</span>
@@ -19,8 +20,15 @@
 <script>
   // Humans (JS) get bounced straight into the shell with the command pre-run.
   // Crawlers (no JS) stay here and read this page's terminal-style OG image.
+  // A ?cmd= on this card is the ARGUMENT for this command: /s/find/?cmd=метрики → `find метрики`.
   (function () {
-    try { window.location.replace('/shell/?{{ querify "cmd" $run }}'); } catch (e) {}
+    var verb = {{ $verb }}, fallback = {{ $run }}, run = fallback;
+    try {
+      var m = (window.location.search || '').match(/[?&]cmd=([^&]*)/);
+      var arg = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')).trim() : '';
+      if (arg) run = verb + ' ' + arg;
+    } catch (e) {}
+    try { window.location.replace('/shell/?cmd=' + encodeURIComponent(run)); } catch (e) {}
   })();
 </script>
 {{ end }}

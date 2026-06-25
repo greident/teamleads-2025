@@ -47,7 +47,6 @@
     var vimMode = false;
     var hist = [], hpos = -1;
     var comp = { base: '', list: [], idx: 0, full: null };  // Tab-completion cycling state
-    var SEARCH_INDEX = null;                                 // grep index (fetched once, cached)
     var HKEY = 'tnk_shell_history';
     try { var _hs = w.localStorage && w.localStorage.getItem(HKEY); if (_hs) { hist = JSON.parse(_hs) || []; hpos = hist.length; } } catch (e) {}
     function saveHist() { try { if (w.localStorage) w.localStorage.setItem(HKEY, JSON.stringify(hist.slice(-100))); } catch (e) {} }
@@ -261,8 +260,8 @@
           ['cat <стр>', 'показать markdown страницы здесь'],
           ['pwd', 'где я сейчас'],
           ['tree', 'всё дерево сайта'],
-          ['find <слово>', 'поиск по заголовкам'],
-          ['grep <слово>', 'полнотекстовый поиск по страницам'],
+          ['find <запрос>', 'поиск по материалам (ранжированный)'],
+          ['grep <запрос>', 'полнотекстовый поиск; --exact — подстрока'],
           ['latest', 'последняя встреча'],
           ['random', 'случайный материал']
         ].forEach(function (r) { print('  ' + pad(r[0], 16) + r[1]); });
@@ -370,41 +369,56 @@
       },
       find: function (a) {
         var q = a.join(' ').toLowerCase().trim();
-        if (!q) { print('find: укажите запрос. Напр.: find бас-фактор', 'dim'); return; }
-        var hits = [];
-        sectionNames.forEach(function (s) { (sections[s] || []).forEach(function (it) { if ((it.t || '').toLowerCase().indexOf(q) !== -1 || (it.n || '').toLowerCase().indexOf(q) !== -1) hits.push([s, it]); }); });
-        linkNames.forEach(function (k) { if (k.indexOf(q) !== -1) hits.push([null, { n: k, u: links[k], t: k }]); });
-        if (!hits.length) { print('ничего не найдено по «' + q + '»', 'dim'); return; }
-        print('найдено ' + hits.length + ':', 'dim');
-        hits.forEach(function (h) { var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link(h[1].u, (h[0] ? h[0] + '/' : '') + h[1].n)); n.appendChild(el('span', 'dim', '  ' + (h[1].t || ''))); printNode(n); });
+        if (!q) { print('find: укажите запрос. Напр.: find карьера', 'dim'); return; }
+        var lh = [];
+        linkNames.forEach(function (k) { if (k.indexOf(q) !== -1) lh.push({ n: k, u: links[k] }); });
+        function render(hits) {
+          if (!hits.length && !lh.length) { print('ничего не найдено по «' + q + '»', 'dim'); return; }
+          if (hits.length) {
+            print('найдено ' + hits.length + ' (по релевантности):', 'dim');
+            hits.slice(0, 12).forEach(function (h) { var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(h.u, h.s + '/' + h.t)); printNode(n); });
+            if (hits.length > 12) print('… ещё ' + (hits.length - 12) + '.', 'dim');
+          }
+          if (lh.length) { print('страницы:', 'dim'); lh.forEach(function (l) { var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link(l.u, l.n)); printNode(n); }); }
+        }
+        var R = w.TeamleadsRetrieval;
+        if (R && R.fetchIndex && R.rank) {
+          var loading = print('find: ищу…', 'dim');
+          R.fetchIndex().then(function () { if (loading && loading.parentNode) loading.parentNode.removeChild(loading); render(R.rank(q)); }).catch(function () { if (loading && loading.parentNode) loading.parentNode.removeChild(loading); render([]); });
+        } else { render([]); }
       },
       grep: function (a) {
+        var exact = false;
+        a = a.filter(function (x) { if (x === '--exact' || x === '-e') { exact = true; return false; } return true; });
         var q = a.join(' ').toLowerCase().trim();
-        if (!q) { print('grep: укажите слово. Напр.: grep бас-фактор', 'dim'); return; }
-        if (!w.fetch) { print('grep: fetch недоступен — попробуйте find <слово>', 'err'); return; }
-        function search(items) {
-          var hits = [];
-          items.forEach(function (p) {
-            var b = (p.b || '').toLowerCase(), pos = b.indexOf(q), inTitle = (p.t || '').toLowerCase().indexOf(q) !== -1;
-            if (pos === -1 && !inTitle) return;
-            var snip = '';
-            if (pos !== -1) { var st = Math.max(0, pos - 32); snip = (st > 0 ? '…' : '') + p.b.substr(st, 90).replace(/\s+/g, ' ').trim() + '…'; }
-            hits.push({ u: p.u, t: p.t, s: p.s, snip: snip });
-          });
+        if (!q) { print('grep: укажите запрос. Напр.: grep бас-фактор · grep --exact <строка> — буквальная подстрока', 'dim'); return; }
+        var R = w.TeamleadsRetrieval;
+        if (!R || !R.fetchIndex || !R.rank) { print('grep: индекс недоступен — попробуйте find <запрос>', 'err'); return; }
+        function show(hits, label) {
           if (!hits.length) { print('grep: ничего не найдено по «' + q + '»', 'dim'); return; }
-          print('найдено ' + hits.length + ':', 'dim');
+          print('найдено ' + hits.length + label + ':', 'dim');
           hits.slice(0, 12).forEach(function (h) {
             var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(h.u, h.s + '/' + h.t)); printNode(n);
             if (h.snip) print('   ' + h.snip, 'dim');
           });
           if (hits.length > 12) print('… ещё ' + (hits.length - 12) + '. Уточните запрос.', 'dim');
         }
-        if (SEARCH_INDEX) { search(SEARCH_INDEX); return; }
-        var loading = print('grep: индексирую…', 'dim');
-        w.fetch('/shell-index.json').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
-          SEARCH_INDEX = j;
+        var loading = print('grep: ищу…', 'dim');
+        R.fetchIndex().then(function (items) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
-          search(j);
+          if (exact) {
+            var hits = [];
+            items.forEach(function (p) {
+              var b = (p.b || '').toLowerCase(), pos = b.indexOf(q), inTitle = (p.t || '').toLowerCase().indexOf(q) !== -1;
+              if (pos === -1 && !inTitle) return;
+              var snip = '';
+              if (pos !== -1) { var st = Math.max(0, pos - 32); snip = (st > 0 ? '…' : '') + p.b.substr(st, 90).replace(/\s+/g, ' ').trim() + '…'; }
+              hits.push({ u: p.u, t: p.t, s: p.s, snip: snip });
+            });
+            show(hits, ' (точное совпадение)');
+          } else {
+            show(R.rank(q), ' (по релевантности)');
+          }
         }).catch(function (e) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
           print('grep: индекс недоступен — ' + e.message, 'err');
@@ -551,8 +565,8 @@
           cat: 'cat <страница> — показать markdown-версию страницы с подсветкой (заголовки, цитаты, ссылки). cat <страница> --raw — без подсветки.',
           pwd: 'pwd — текущий путь.',
           tree: 'tree — всё дерево сайта со счётчиками.',
-          find: 'find <слово> — поиск по заголовкам и именам.',
-          grep: 'grep <слово> — полнотекстовый поиск по содержимому всех страниц.',
+          find: 'find <запрос> — ранжированный поиск по всем материалам (по релевантности).',
+          grep: 'grep <запрос> — полнотекстовый ранжированный поиск по всем страницам. grep --exact <строка> (или -e) — буквальная подстрока.',
           latest: 'latest — открыть последнюю встречу.',
           random: 'random — открыть случайный материал.',
           tools: 'tools — топ инструментов сообщества.',
