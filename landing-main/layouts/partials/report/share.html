@@ -1,0 +1,43 @@
+{{- /* Share control, rendered under the page title.
+       Supports two ways to share:
+        1. General — share/copy the canonical page URL (Web Share API + clipboard fallback).
+        2. Shell-mode — a deep-link into /shell/ that auto-runs `cat <section>/<base>`.
+           The terminal reads the command from the URL hash on load (see static/js/shell.js),
+           so the recipient lands straight in the terminal with this page already open.
+       Context: the page (.) */ -}}
+{{- $shellSections := slice "events" "articles" "insights" "showcase" -}}
+{{- $shellHref := "" -}}
+{{- if and .File (in $shellSections .Section) -}}
+  {{- $cmd := printf "cat %s/%s" .Section .File.ContentBaseName -}}
+  {{- $shellHref = printf "%s#%s" (absURL "/shell/") (replace $cmd " " "%20") -}}
+{{- end -}}
+<div class="report-share" data-share data-url="{{ .Permalink }}" data-title="{{ .Title }}"{{ with $shellHref }} data-shell="{{ . }}"{{ end }}>
+    <button type="button" class="share-trigger" data-share-trigger aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+        <span>Поделиться</span>
+    </button>
+    <div class="share-menu" data-share-menu role="menu" hidden>
+        <p class="share-menu-group">Ссылка на страницу</p>
+        <button type="button" class="share-item" role="menuitem" data-share-act="copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Скопировать ссылку
+        </button>
+        <button type="button" class="share-item" role="menuitem" data-share-act="native" data-share-native hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+            Поделиться…
+        </button>
+        {{- with $shellHref }}
+        <p class="share-menu-group">Shell-режим</p>
+        <a class="share-item" role="menuitem" href="{{ . }}" data-share-act="shell-open">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><polyline points="7 9 10 12 7 15"/><line x1="13" y1="15" x2="17" y2="15"/></svg>
+            Открыть в терминале
+        </a>
+        <button type="button" class="share-item" role="menuitem" data-share-act="shell-copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Скопировать shell-ссылку
+        </button>
+        {{- end }}
+    </div>
+    <span class="share-toast" data-share-toast role="status" aria-live="polite"></span>
+</div>
+<script src="{{ "js/share.js" | relURL }}" defer></script>

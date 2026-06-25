@@ -8,6 +8,7 @@
             Все инсайты
         </a>
         <h1 class="report-title">{{ .Title }}</h1>
+        {{ partial "report/share.html" . }}
         <div class="report-main-topic">
             <strong>Период:</strong> {{ .Params.period }} · {{ .Params.messagesCount }} сообщений · {{ .Params.topicsCount }} тем
         </div>

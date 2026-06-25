@@ -10,6 +10,7 @@
             Все встречи
         </a>
         <h1 class="report-title">{{ .Title }}</h1>
+        {{ partial "report/share.html" . }}
         <div class="article-meta">
             {{ partial "icons/calendar.html" }}
             <span class="article-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}</span>

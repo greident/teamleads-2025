@@ -273,7 +273,18 @@
     commands.ai = commands.claude; commands.ask = commands.claude;
     commands.gpt = commands.codex; commands.openai = commands.codex;
 
-    function run(raw) {
+    // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).
+    // Sends only the command NAME (first token) — never the free-text arguments — so no PII.
+    function track(str) {
+      try {
+        var name = (str.split(/\s+/)[0] || '').toLowerCase();
+        if (!name) return;
+        var known = commands.hasOwnProperty(name);
+        if (w.ym) w.ym(106055675, 'reachGoal', 'shell_command', { command: name, known: known ? 'yes' : 'no' });
+      } catch (e) {}
+    }
+
+    function run(raw, noTrack) {
       var str = raw.trim();
       var p = el('div', 'ln'); var pr = el('span', 'term-prompt'); pr.innerHTML = '<b>guest@teamleads</b>:' + pathStr() + '$ ';
       p.appendChild(pr); p.appendChild(d.createTextNode(str)); out.appendChild(p);
@@ -284,6 +295,7 @@
       }
       if (!str) { body.scrollTop = body.scrollHeight; return; }
       hist.push(str); hpos = hist.length;
+      if (!noTrack) track(str);
       var parts = str.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
       if (commands.hasOwnProperty(cmd)) { try { commands[cmd](args); } catch (e) { print('ошибка: ' + e.message, 'err'); } }
       else print(cmd + ': команда не найдена. help — список команд.', 'err');
@@ -344,7 +356,7 @@
       if (line) line.hidden = false; input.focus();
       var urlcmd = urlCommand();
       if (urlcmd) { setTimeout(function () { run(urlcmd); }, reduced ? 0 : 150); return; }
-      if (mode === 'full') setTimeout(function () { run('ls'); }, reduced ? 0 : 140);
+      if (mode === 'full') setTimeout(function () { run('ls', true); }, reduced ? 0 : 140);
     }
     var boot;
     if (mode === '404') {
