@@ -13,10 +13,10 @@
 {{- $links := dict "questions" "/questions/" "join" "/join/" "home" "/" -}}
 {{- $fs := dict "sections" $sections "links" $links -}}
 
-{{- /* Friendly services/communities — surfaced via the `friends` command. */ -}}
+{{- /* Friendly services/communities – surfaced via the `friends` command. */ -}}
 {{- $friends := slice
-  (dict "n" "claude-community" "t" "Claude Community KZ — сообщество по AI-разработке" "u" "https://claude-community.kz/")
-  (dict "n" "techinterview" "t" "techinterview.space — зарплаты и подготовка к собеседованиям" "u" "https://techinterview.space/")
+  (dict "n" "claude-community" "t" "Claude Community KZ – сообщество по AI-разработке" "u" "https://claude-community.kz/")
+  (dict "n" "techinterview" "t" "techinterview.space – зарплаты и подготовка к собеседованиям" "u" "https://techinterview.space/")
 -}}
 
 {{- /* verb → /s/<id>/ share-card map, so the shell rewrites the address bar to

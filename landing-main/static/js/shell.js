@@ -1,5 +1,5 @@
 /*!
- * Teamleads Shell — a tiny, dependency-free terminal that turns the site into a
+ * Teamleads Shell – a tiny, dependency-free terminal that turns the site into a
  * navigable filesystem. Config comes from data-* attributes on the mount node:
  *   data-mode  "full" | "404"
  *   data-tg    Telegram URL
@@ -83,7 +83,7 @@
       return node;
     }
     function mdLine(line) {
-      if (!line.trim()) return null;   // collapse blank lines — spacing is controlled by CSS margins
+      if (!line.trim()) return null;   // collapse blank lines – spacing is controlled by CSS margins
       var div = el('div', 'ln'), m;
       if ((m = /^(#{1,6})\s+(.*)$/.exec(line))) { div.className = 'ln md-h md-h' + m[1].length; return mdInline(div, m[2]); }
       if (/^\s*(---+|\*\*\*+|___+)\s*$/.test(line)) { div.className = 'ln md-hr'; div.textContent = '────────────────────────────'; return div; }
@@ -93,7 +93,7 @@
         div.appendChild(el('span', 'md-bullet', /\d/.test(m[2]) ? m[2] + ' ' : '• '));
         return mdInline(div, m[3]);
       }
-      if (line.trim()) div.className = 'ln md-p';   // paragraph — gets extra spacing
+      if (line.trim()) div.className = 'ln md-p';   // paragraph – gets extra spacing
       return mdInline(div, line);
     }
 
@@ -255,13 +255,13 @@
         print('НАВИГАЦИЯ', 'accent');
         [
           ['ls [раздел]', 'что вокруг / содержимое раздела'],
-          ['cd <раздел>', 'войти в раздел (cd .. — наверх)'],
+          ['cd <раздел>', 'войти в раздел (cd .. – наверх)'],
           ['open <стр>', 'открыть страницу в браузере'],
           ['cat <стр>', 'показать markdown страницы здесь'],
           ['pwd', 'где я сейчас'],
           ['tree', 'всё дерево сайта'],
           ['find <запрос>', 'поиск по материалам (ранжированный)'],
-          ['grep <запрос>', 'полнотекстовый поиск; --exact — подстрока'],
+          ['grep <запрос>', 'полнотекстовый поиск; --exact – подстрока'],
           ['latest', 'последняя встреча'],
           ['random', 'случайный материал']
         ].forEach(function (r) { print('  ' + pad(r[0], 16) + r[1]); });
@@ -293,7 +293,7 @@
             var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link('/' + s + '/', pad(s + '/', 13))); n.appendChild(el('span', 'dim', (sections[s] || []).length + ' материалов')); printNode(n);
           });
           if (linkNames.length) { print(''); print('-rw-r--r--  страницы:', 'dim'); linkNames.forEach(function (k) { var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(link(links[k], k)); printNode(n); }); }
-          print(''); print('cd <раздел> — войти, open <страница> — открыть, find <слово> — поиск.', 'dim');
+          print(''); print('cd <раздел> – войти, open <страница> – открыть, find <слово> – поиск.', 'dim');
           return;
         }
         if (sections[where]) {
@@ -318,7 +318,7 @@
       },
       open: function (a) {
         var arg = (a[0] || '').replace(/^\/|\/$/g, '');
-        if (!arg) { print('open: укажите страницу. Список — ls.', 'err'); return; }
+        if (!arg) { print('open: укажите страницу. Список – ls.', 'err'); return; }
         if (links[arg]) { go(links[arg]); return; }
         var sec = null, name = arg;
         if (arg.indexOf('/') !== -1) { var p = arg.split('/'); sec = p[0]; name = p[1]; }
@@ -334,8 +334,8 @@
         var raw = false;
         a = a.filter(function (x) { if (x === '--raw' || x === '-r') { raw = true; return false; } return true; });
         var arg = (a[0] || '').replace(/^\/|\/$/g, '');
-        if (!arg) { print('cat: укажите страницу. Список — ls.', 'err'); return; }
-        if (links[arg]) { print('cat: «' + arg + '» — служебная страница без markdown. Откройте: open ' + arg, 'dim'); return; }
+        if (!arg) { print('cat: укажите страницу. Список – ls.', 'err'); return; }
+        if (links[arg]) { print('cat: «' + arg + '» – служебная страница без markdown. Откройте: open ' + arg, 'dim'); return; }
         var sec = null, name = arg;
         if (arg.indexOf('/') !== -1) { var p = arg.split('/'); sec = p[0]; name = p[1]; }
         else if (cwd) { sec = cwd; }
@@ -343,19 +343,19 @@
         if (sec && sections[sec]) sections[sec].forEach(function (it) { if (it.n === name) hit = it; });
         if (!hit) pool.forEach(function (it) { if (it.n === name) hit = it; });
         if (!hit) { print('cat: не найдено: ' + arg, 'err'); return; }
-        if (!w.fetch) { print('cat: fetch недоступен в этом браузере — попробуйте open ' + arg, 'err'); return; }
+        if (!w.fetch) { print('cat: fetch недоступен в этом браузере – попробуйте open ' + arg, 'err'); return; }
         var url = hit.u + 'index.md';
-        print('— ' + url + ' —', 'dim');
+        print('– ' + url + ' –', 'dim');
         var loading = print('загрузка…', 'dim');
         w.fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (txt) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
           var lines = txt.replace(/\s+$/, '').split('\n'), CAP = 400;
           lines.slice(0, CAP).forEach(function (l) { if (raw) { print(l); return; } var node = mdLine(l); if (node) out.appendChild(node); });
           body.scrollTop = body.scrollHeight;
-          if (lines.length > CAP) print('… обрезано (' + (lines.length - CAP) + ' строк). open ' + arg + ' — полная версия.', 'dim');
+          if (lines.length > CAP) print('… обрезано (' + (lines.length - CAP) + ' строк). open ' + arg + ' – полная версия.', 'dim');
         }).catch(function (e) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
-          print('cat: не удалось загрузить — ' + e.message, 'err');
+          print('cat: не удалось загрузить – ' + e.message, 'err');
         });
       },
       pwd: function () { print(pathStr()); },
@@ -392,9 +392,9 @@
         var exact = false;
         a = a.filter(function (x) { if (x === '--exact' || x === '-e') { exact = true; return false; } return true; });
         var q = a.join(' ').toLowerCase().trim();
-        if (!q) { print('grep: укажите запрос. Напр.: grep бас-фактор · grep --exact <строка> — буквальная подстрока', 'dim'); return; }
+        if (!q) { print('grep: укажите запрос. Напр.: grep бас-фактор · grep --exact <строка> – буквальная подстрока', 'dim'); return; }
         var R = w.TeamleadsRetrieval;
-        if (!R || !R.fetchIndex || !R.rank) { print('grep: индекс недоступен — попробуйте find <запрос>', 'err'); return; }
+        if (!R || !R.fetchIndex || !R.rank) { print('grep: индекс недоступен – попробуйте find <запрос>', 'err'); return; }
         function show(hits, label) {
           if (!hits.length) { print('grep: ничего не найдено по «' + q + '»', 'dim'); return; }
           print('найдено ' + hits.length + label + ':', 'dim');
@@ -422,7 +422,7 @@
           }
         }).catch(function (e) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
-          print('grep: индекс недоступен — ' + e.message, 'err');
+          print('grep: индекс недоступен – ' + e.message, 'err');
         });
       },
       latest: function () { var ev = sections.events || []; if (ev.length) { print('последняя встреча: ' + ev[0].t, 'cy'); go(ev[0].u); } else print('latest: нет данных', 'err'); },
@@ -430,29 +430,29 @@
       toolkit: function () {
         var items = (sections.toolkit || []).slice().sort(function (a, b) { return (a.n || '').localeCompare(b.n || ''); });
         if (!items.length) { print('toolkit: шаблоны не загружены', 'err'); return; }
-        print('Операционка тимлида — рабочие шаблоны сообщества:', 'accent');
+        print('Операционка тимлида – рабочие шаблоны сообщества:', 'accent');
         items.forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(it.u, pad(it.n, 22))); n.appendChild(el('span', 'dim', it.t)); printNode(n); });
-        print(''); print('cat toolkit/<имя> — открыть здесь. /toolkit/ — на сайте.', 'dim');
+        print(''); print('cat toolkit/<имя> – открыть здесь. /toolkit/ – на сайте.', 'dim');
       },
       tools: function () {
         print('Топ инструментов, которые советует сообщество:', 'accent');
         [
           ['Claude Code (Opus)', 'AI-разработка и рефакторинг под контролем', 'https://claude.com/claude-code'],
           ['Hetzner', 'дешёвый и стабильный хостинг вместо локальных провайдеров', 'https://www.hetzner.com/'],
-          ['GitHub / Forgejo', 'код всегда в общем репозитории — лекарство от бас-фактора', 'https://forgejo.org/'],
+          ['GitHub / Forgejo', 'код всегда в общем репозитории – лекарство от бас-фактора', 'https://forgejo.org/'],
           ['SonarQube', 'статанализ и дисциплина декомпозиции', 'https://www.sonarsource.com/'],
           ['Swagger / OpenAPI', 'документация API, по которой конформятся новички', 'https://swagger.io/'],
           ['Sales Navigator', 'выход на западных заказчиков через прогрев', 'https://business.linkedin.com/sales-solutions/sales-navigator'],
           ['techinterview.space', 'зарплаты по рынку и подготовка к собеседованиям', 'https://techinterview.space/']
-        ].forEach(function (t) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(t[2], t[0], true)); n.appendChild(el('span', 'dim', ' — ' + t[1])); printNode(n); });
+        ].forEach(function (t) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(t[2], t[0], true)); n.appendChild(el('span', 'dim', ' – ' + t[1])); printNode(n); });
       },
       friends: function () {
         if (!FRIENDS.length) { print('friends: список пуст', 'dim'); return; }
         print('Дружественные сообщества и сервисы:', 'accent');
         FRIENDS.forEach(function (f) {
-          var dash = (f.t || '').split(' — '); var name = dash[0]; var desc = dash.slice(1).join(' — ');
+          var dash = (f.t || '').split(' – '); var name = dash[0]; var desc = dash.slice(1).join(' – ');
           var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(f.u, name, true));
-          if (desc) n.appendChild(el('span', 'dim', ' — ' + desc)); printNode(n);
+          if (desc) n.appendChild(el('span', 'dim', ' – ' + desc)); printNode(n);
         });
       },
       salary: function (a) {
@@ -466,14 +466,14 @@
           if (grades[t]) grade = t; else if (roles[t]) role = t;
         });
         if (!grade && !role) {
-          print('Зарплатные вилки сообщества — ' + (SAL.unit || ''), 'accent');
+          print('Зарплатные вилки сообщества – ' + (SAL.unit || ''), 'accent');
           print('Использование: salary <грейд> <роль>. Напр.: salary senior backend', 'hint');
           print('  грейды: ' + gradeNames.join(', '), 'dim');
           print('  роли:   ' + roleNames.join(', '), 'dim');
           return;
         }
-        if (!grade) { grade = 'senior'; print('грейд не указан — беру senior', 'dim'); }
-        if (!role) { role = 'backend'; print('роль не указана — беру backend', 'dim'); }
+        if (!grade) { grade = 'senior'; print('грейд не указан – беру senior', 'dim'); }
+        if (!role) { role = 'backend'; print('роль не указана – беру backend', 'dim'); }
         var base = grades[grade], k = roles[role];
         if (!base || k == null) { print('salary: нет данных для этой пары', 'err'); return; }
         var vals = base.map(function (v) { return Math.round(v * k / 10000) * 10000; });
@@ -497,8 +497,8 @@
           w.TeamleadsClaude.open(q);
           return;
         }
-        // Fallback if the Claude overlay isn't loaded — search content inline.
-        print('Claude-окно недоступно — ищу прямо здесь.', 'dim');
+        // Fallback if the Claude overlay isn't loaded – search content inline.
+        print('Claude-окно недоступно – ищу прямо здесь.', 'dim');
         var words = q.toLowerCase().split(/\s+/).filter(function (x) { return x.length > 2; });
         var hits = [];
         sectionNames.forEach(function (s) {
@@ -508,7 +508,7 @@
           });
         });
         if (hits.length) { hits.slice(0, 4).forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(it.u, it.t)); printNode(n); }); }
-        else { print('Ничего не нашёл — попробуйте find <слово> или раздел articles.', 'dim'); }
+        else { print('Ничего не нашёл – попробуйте find <слово> или раздел articles.', 'dim'); }
       },
       codex: function (a) {
         var q = a.join(' ').trim();
@@ -520,16 +520,16 @@
       telegram: function () { print('открываю Telegram…', 'ok'); printNode(link(TG, TG, true)); w.open(TG, '_blank', 'noopener'); },
       contribute: function () {
         var url = 'https://github.com/belyaevsa/teamleads-2025';
-        print('Сайт открытый — буду рад правкам и pull request:', 'cy');
+        print('Сайт открытый – буду рад правкам и pull request:', 'cy');
         printNode(link(url, url, true));
         w.open(url, '_blank', 'noopener');
       },
       whoami: function () {
-        print('«Тимлид не кодит» — сообщество тимлидов, EM и CTO Казахстана.', 'accent');
+        print('«Тимлид не кодит» – сообщество тимлидов, EM и CTO Казахстана.', 'accent');
         var facts = [
           ['состав', '400+ практик: Kaspi, Kolesa, DAR, Chocofamily, InDrive и другие'],
           ['формат', 'еженедельные встречи, разбор реальных кейсов, отчёты публикуем открыто'],
-          ['о чём', 'люди · архитектура · найм · процессы · карьера — без слайдов и хайпа'],
+          ['о чём', 'люди · архитектура · найм · процессы · карьера – без слайдов и хайпа'],
           ['с чего начать', 'sim · salary senior backend · principles · latest']
         ];
         facts.forEach(function (r) { var n = el('span'); n.appendChild(el('span', 'accent', pad(r[0], 15))); n.appendChild(d.createTextNode(r[1])); printNode(n); });
@@ -537,31 +537,31 @@
         print('whoami → guest. …но мы-то видим тимлида. Добро пожаловать.', 'dim');
       },
       principles: function () {
-        print('Доктрина «Тимлид не кодит» — выжимка из реальных кейсов сообщества.', 'accent');
+        print('Доктрина «Тимлид не кодит» – выжимка из реальных кейсов сообщества.', 'accent');
         print('');
         var p = [
-          ['Сеньора берут, не дают — лычка не равна уровню.', 'карьера'],
-          ['Тимлид — не «сеньор плюс подчинённые». Тимлид и техлид — разные работы.', 'роли'],
-          ['Бас-фактор — плата за экономию, отложенная во времени. Знание — живому дублёру, не в документ.', 'бас-фактор'],
+          ['Сеньора берут, не дают – лычка не равна уровню.', 'карьера'],
+          ['Тимлид – не «сеньор плюс подчинённые». Тимлид и техлид – разные работы.', 'роли'],
+          ['Бас-фактор – плата за экономию, отложенная во времени. Знание – живому дублёру, не в документ.', 'бас-фактор'],
           ['Метрики врут не потому что ложны, а потому что вы смотрите не туда.', 'метрики'],
           ['Сначала диагноз (не хочет / забывает / не видит ценности), потом лекарство.', 'процессы'],
-          ['Ответственность не передаётся лекцией — дайте обжечься под присмотром и научите откатывать.', 'рост'],
+          ['Ответственность не передаётся лекцией – дайте обжечься под присмотром и научите откатывать.', 'рост'],
           ['Дорогая оценка часто прячется за страх. Проверяйте её дешёвым совместным экспериментом.', 'оценки'],
-          ['Влияние — не подчинение и не саботаж, а аргументы и информированный выбор.', 'стейкхолдеры'],
+          ['Влияние – не подчинение и не саботаж, а аргументы и информированный выбор.', 'стейкхолдеры'],
           ['Нанимать стоит под конкретную перегруженную роль, а не чтобы «стало полегче».', 'найм'],
-          ['Самый зрелый способ внедрить ИИ — иногда внедрить его временно: разведать и уйти.', 'AI'],
+          ['Самый зрелый способ внедрить ИИ – иногда внедрить его временно: разведать и уйти.', 'AI'],
           ['Не ставьте на один сценарий. Ценна команда, сильная при любом будущем.', 'AI · команда'],
-          ['Сначала инженер, потом — продуктовый. Гемба вместо хайпа.', 'продукт']
+          ['Сначала инженер, потом – продуктовый. Гемба вместо хайпа.', 'продукт']
         ];
         p.forEach(function (r, i) {
           var n = el('div', 'ln');
           n.appendChild(el('span', 'accent', pad(String(i + 1), 3)));
           n.appendChild(d.createTextNode(r[0] + ' '));
-          n.appendChild(el('span', 'dim', '— ' + r[1]));
+          n.appendChild(el('span', 'dim', '– ' + r[1]));
           printNode(n);
         });
         print('');
-        print('Каждый принцип — развернутый разбор в статьях: find <тема> или cat articles/…', 'dim');
+        print('Каждый принцип – развернутый разбор в статьях: find <тема> или cat articles/…', 'dim');
       },
       date: function () { print(new Date().toString()); },
       echo: function (a) { print(a.join(' ')); },
@@ -569,30 +569,30 @@
       clear: function () { out.innerHTML = ''; },
       man: function (a) {
         var pages = {
-          ls: 'ls [раздел] — содержимое текущего или указанного раздела.',
-          cd: 'cd <раздел> — войти. cd .. — наверх. cd — в корень.',
-          open: 'open <страница> — открыть страницу в браузере.',
-          cat: 'cat <страница> — показать markdown-версию страницы с подсветкой (заголовки, цитаты, ссылки). cat <страница> --raw — без подсветки.',
-          pwd: 'pwd — текущий путь.',
-          tree: 'tree — всё дерево сайта со счётчиками.',
-          find: 'find <запрос> — ранжированный поиск по всем материалам (по релевантности).',
-          grep: 'grep <запрос> — полнотекстовый ранжированный поиск по всем страницам. grep --exact <строка> (или -e) — буквальная подстрока.',
-          latest: 'latest — открыть последнюю встречу.',
-          random: 'random — открыть случайный материал.',
-          tools: 'tools — топ инструментов сообщества.',
-          toolkit: 'toolkit — рабочие шаблоны (1-on-1, ретро, постмортем, найм, ADR). cat toolkit/<имя> — открыть шаблон здесь.',
-          salary: 'salary <грейд> <роль> — зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
-          sim: 'sim — тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
-          principles: 'principles — доктрина сообщества: принципы управления, выжатые из реальных кейсов и статей. Синонимы: doctrine, manifesto.',
-          friends: 'friends — дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
-          claude: 'claude <вопрос> — Claude-окно: офлайн-ответ по материалам сообщества. Ищет по полному тексту (как grep), показывает сниппеты и ссылки.',
-          codex: 'codex <вопрос> — Codex-окно: офлайн-ответ по материалам сообщества. Ищет по полному тексту (как grep), показывает сниппеты и ссылки.',
-          join: 'join — ссылка на еженедельную встречу.',
-          contribute: 'contribute — открыть репозиторий сайта на GitHub (правки, PR). Синонимы: github, gh, pr.',
-          fortune: 'fortune — случайная мудрость тимлида.',
-          vim: 'vim — открыть редактор. Выход: :q (если повезёт).',
-          sudo: 'sudo — для guest недоступно.',
-          help: 'help — список всех команд.'
+          ls: 'ls [раздел] – содержимое текущего или указанного раздела.',
+          cd: 'cd <раздел> – войти. cd .. – наверх. cd – в корень.',
+          open: 'open <страница> – открыть страницу в браузере.',
+          cat: 'cat <страница> – показать markdown-версию страницы с подсветкой (заголовки, цитаты, ссылки). cat <страница> --raw – без подсветки.',
+          pwd: 'pwd – текущий путь.',
+          tree: 'tree – всё дерево сайта со счётчиками.',
+          find: 'find <запрос> – ранжированный поиск по всем материалам (по релевантности).',
+          grep: 'grep <запрос> – полнотекстовый ранжированный поиск по всем страницам. grep --exact <строка> (или -e) – буквальная подстрока.',
+          latest: 'latest – открыть последнюю встречу.',
+          random: 'random – открыть случайный материал.',
+          tools: 'tools – топ инструментов сообщества.',
+          toolkit: 'toolkit – рабочие шаблоны (1-on-1, ретро, постмортем, найм, ADR). cat toolkit/<имя> – открыть шаблон здесь.',
+          salary: 'salary <грейд> <роль> – зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
+          sim: 'sim – тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
+          principles: 'principles – доктрина сообщества: принципы управления, выжатые из реальных кейсов и статей. Синонимы: doctrine, manifesto.',
+          friends: 'friends – дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
+          claude: 'claude <вопрос> – Claude-окно: офлайн-ответ по материалам сообщества. Ищет по полному тексту (как grep), показывает сниппеты и ссылки.',
+          codex: 'codex <вопрос> – Codex-окно: офлайн-ответ по материалам сообщества. Ищет по полному тексту (как grep), показывает сниппеты и ссылки.',
+          join: 'join – ссылка на еженедельную встречу.',
+          contribute: 'contribute – открыть репозиторий сайта на GitHub (правки, PR). Синонимы: github, gh, pr.',
+          fortune: 'fortune – случайная мудрость тимлида.',
+          vim: 'vim – открыть редактор. Выход: :q (если повезёт).',
+          sudo: 'sudo – для guest недоступно.',
+          help: 'help – список всех команд.'
         };
         var k = (a[0] || '').toLowerCase();
         if (!k) { print('Использование: man <команда>. Напр.: man tree', 'dim'); return; }
@@ -604,21 +604,21 @@
         info.forEach(function (r, i) { var n = el('span'); n.appendChild(el('span', 'cy', (art[i] || '          ') + '  ')); n.appendChild(el('span', 'accent', r[0] + ': ')); n.appendChild(d.createTextNode(String(r[1]))); printNode(n); });
       },
       fortune: function () {
-        var f = ['Сеньора не дают — сеньора берут.', 'Бас-фактор — это плата за экономию, отложенная во времени.', 'Документ говорит «что». Человек знает «почему».', 'Срочно — значит, некачественно. Автоматически.', 'За большим хайпом скрывается большой попил.', 'Тимлид и техлид — две разные работы с одним названием.', 'Стоять надо не там, где интересно, а у кормушки с деньгами.', 'Молчаливое большинство, которое читает, — здоровый показатель.'];
+        var f = ['Сеньора не дают – сеньора берут.', 'Бас-фактор – это плата за экономию, отложенная во времени.', 'Документ говорит «что». Человек знает «почему».', 'Срочно – значит, некачественно. Автоматически.', 'За большим хайпом скрывается большой попил.', 'Тимлид и техлид – две разные работы с одним названием.', 'Стоять надо не там, где интересно, а у кормушки с деньгами.', 'Молчаливое большинство, которое читает, – здоровый показатель.'];
         print('« ' + f[Math.floor(Math.random() * f.length)] + ' »', 'accent');
       },
       sim: function () { simStart(); },
-      vim: function () { vimMode = true; print('~', 'dim'); print('~  VIM — Vi IMproved', 'dim'); print('~', 'dim'); print('Вы в vim. Удачи с выходом: :q (или :q!).', 'hint'); },
+      vim: function () { vimMode = true; print('~', 'dim'); print('~  VIM – Vi IMproved', 'dim'); print('~', 'dim'); print('Вы в vim. Удачи с выходом: :q (или :q!).', 'hint'); },
       top: function () {
         print('PID   COMMAND           %CPU  STATE', 'dim');
         [['1', 'daily-standup', '38', 'running'], ['7', 'retro', '12', 'blocked'], ['42', 'coffee', '73', 'critical'], ['99', 'code-review', '21', 'waiting'], ['100', 'tg-notifications', '55', 'running']].forEach(function (p) { print('  ' + pad(p[0], 5) + pad(p[1], 18) + pad(p[2], 6) + p[3]); });
-        print('тимлид не кодит — тимлид анблокает.', 'dim');
+        print('тимлид не кодит – тимлид анблокает.', 'dim');
       },
       sudo: function () { print('guest отсутствует в файле sudoers. Инцидент запротоколирован. 🚨', 'err'); },
       git: function (a) {
-        if (a[0] === 'blame') print('fatal: винить некого — 404 это не баг, а фича вашего URL.', 'dim');
+        if (a[0] === 'blame') print('fatal: винить некого – 404 это не баг, а фича вашего URL.', 'dim');
         else if (a[0] === 'push') print('Everything up-to-date. А страница всё равно не та.', 'dim');
-        else print("git: '" + (a[0] || '') + "' — не команда здесь. Попробуйте git blame.", 'err');
+        else print("git: '" + (a[0] || '') + "' – не команда здесь. Попробуйте git blame.", 'err');
       },
       coffee: function () { print('☕  Тимлид не кодит. Тимлид пьёт кофе и анблокает команду.', 'accent'); },
       rm: function (a) {
@@ -626,7 +626,7 @@
         if (/ -[a-z]*[rf][a-z]* /.test(s) && / \/ /.test(s)) { print('rm: удаляю / …', 'err'); print('…', 'dim'); setTimeout(function () { print('обошлось. В этот раз. На проде так не надо.', 'ok'); }, reduced ? 0 : 550); return; }
         print('rm: давайте без rm здесь. Это не тот терминал.', 'dim');
       },
-      '42': function () { print('Ответ на главный вопрос жизни, вселенной и всего такого — 42.', 'accent'); print('Но запрошенной страницы среди ответов нет.', 'dim'); },
+      '42': function () { print('Ответ на главный вопрос жизни, вселенной и всего такого – 42.', 'accent'); print('Но запрошенной страницы среди ответов нет.', 'dim'); },
       home: function () { go('/'); },
       exit: function () { go('/'); }
     };
@@ -639,7 +639,7 @@
     commands.about = commands.whoami; commands.manifesto = commands.principles; commands.doctrine = commands.principles;
 
     // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).
-    // Sends only the command NAME (first token) — never the free-text arguments — so no PII.
+    // Sends only the command NAME (first token) – never the free-text arguments – so no PII.
     function track(str) {
       try {
         var name = (str.split(/\s+/)[0] || '').toLowerCase();
@@ -664,7 +664,7 @@
           url = w.location.origin + '/shell/#' + encodeURIComponent(cmd);
         }
         w.history.replaceState(null, '', url);
-        if (!hintedShare) { hintedShare = true; print('адрес в строке браузера обновился — это ссылка на эту команду с запросом, делитесь', 'dim'); }
+        if (!hintedShare) { hintedShare = true; print('адрес в строке браузера обновился – это ссылка на эту команду с запросом, делитесь', 'dim'); }
       } catch (e) {}
     }
 
@@ -682,7 +682,7 @@
       hpos = hist.length;
       var parts = str.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
       if (commands.hasOwnProperty(cmd)) { try { commands[cmd](args); } catch (e) { print('ошибка: ' + e.message, 'err'); } }
-      else print(cmd + ': команда не найдена. help — список команд.', 'err');
+      else print(cmd + ': команда не найдена. help – список команд.', 'err');
       body.scrollTop = body.scrollHeight;
     }
 
@@ -742,7 +742,7 @@
     });
     body.addEventListener('click', function (e) { if (e.target.tagName !== 'A') input.focus(); });
 
-    // Mobile helper bar — taps map to the same actions as the hardware keys.
+    // Mobile helper bar – taps map to the same actions as the hardware keys.
     var keysBar = root.querySelector('[data-term-keys]');
     if (keysBar) keysBar.addEventListener('click', function (e) {
       var k = e.target && e.target.getAttribute ? e.target.getAttribute('data-k') : null;
@@ -756,7 +756,7 @@
     });
 
     // A shareable deep-link can carry a command: /shell/#cat events/meetup-2026-06-24
-    // or /shell/?cmd=cat%20articles/... — it runs once the shell is ready.
+    // or /shell/?cmd=cat%20articles/... – it runs once the shell is ready.
     function urlCommand() {
       try {
         var h = (w.location.hash || '').replace(/^#/, '');
@@ -771,7 +771,7 @@
       var urlcmd = urlCommand();
       if (urlcmd) {
         // Assistant share links (claude/codex …) land in the terminal with the command
-        // ENTERED in the prompt, ready to run — don't auto-fire someone else's question.
+        // ENTERED in the prompt, ready to run – don't auto-fire someone else's question.
         // Other share links (cat, sim, salary …) still auto-run.
         var verb0 = (urlcmd.split(/\s+/)[0] || '').toLowerCase();
         if (/^(claude|codex|ai|ask|gpt|openai)$/.test(verb0)) {
@@ -787,9 +787,9 @@
     var boot;
     if (mode === '404') {
       var path = w.location.pathname || '/404';
-      boot = [['$ curl -i https://teamleads.kz' + path, 'cy'], ['HTTP/1.1 404 Not Found', 'dim'], ['content-type: text/html; charset=utf-8', 'dim'], ['', null], ['Ресурс не найден. Но раз вы здесь — поднимаем сессию.', null], ['Это Shell Mode: навигируйте по сайту прямо отсюда. help — команды.', 'hint'], ['', null]];
+      boot = [['$ curl -i https://teamleads.kz' + path, 'cy'], ['HTTP/1.1 404 Not Found', 'dim'], ['content-type: text/html; charset=utf-8', 'dim'], ['', null], ['Ресурс не найден. Но раз вы здесь – поднимаем сессию.', null], ['Это Shell Mode: навигируйте по сайту прямо отсюда. help – команды.', 'hint'], ['', null]];
     } else {
-      boot = [['Teamleads Shell — навигация по сайту из терминала.', 'cy'], ['help — команды · ls — осмотреться · open <стр> — открыть · find <слово> — поиск.', 'hint'], ['С чего начать: sim — симулятор развилок · salary senior backend · principles — доктрина.', 'hint'], ['', null]];
+      boot = [['Teamleads Shell – навигация по сайту из терминала.', 'cy'], ['help – команды · ls – осмотреться · open <стр> – открыть · find <слово> – поиск.', 'hint'], ['С чего начать: sim – симулятор развилок · salary senior backend · principles – доктрина.', 'hint'], ['', null]];
     }
     function bootSeq(i) { if (i >= boot.length) { ready(); return; } print(boot[i][0], boot[i][1]); setTimeout(function () { bootSeq(i + 1); }, reduced ? 0 : 200); }
     setPrompt(); bootSeq(0);

@@ -1,5 +1,5 @@
 /*!
- * Teamleads Codex — an offline, Codex/ChatGPT-styled chat overlay. NO network calls.
+ * Teamleads Codex – an offline, Codex/ChatGPT-styled chat overlay. NO network calls.
  * Same engine as the Claude tool, OpenAI dark theme. Answers from the site's own
  * content (the shell's filesystem). Exposed as window.TeamleadsCodex.
  */
@@ -32,7 +32,7 @@
     if (built) return; built = true;
     root = el('div', 'cx-overlay'); root.setAttribute('hidden', '');
     root.innerHTML =
-      '<div class="cx-panel" role="dialog" aria-label="Codex — офлайн-ассистент">' +
+      '<div class="cx-panel" role="dialog" aria-label="Codex – офлайн-ассистент">' +
         '<div class="cx-bar">' +
           '<span class="cx-brand"></span>' +
           '<div class="cx-titles"><strong>Codex</strong><span>офлайн-демо · отвечает по материалам сообщества</span></div>' +
@@ -98,9 +98,9 @@
   function answer(q) {
     var ql = q.toLowerCase().trim();
     if (/(^|\s)(привет|здравств|хай|hello|hi|добр)/.test(ql))
-      return Promise.resolve({ text: 'Привет! Я офлайн-версия Codex на сайте «Тимлид не кодит». Сетевых вызовов нет — отвечаю по материалам встреч и статей, ищу по полному тексту (как grep). Спросите про бас-фактор, карьеру, найм или продуктовых разработчиков.', links: [] });
+      return Promise.resolve({ text: 'Привет! Я офлайн-версия Codex на сайте «Тимлид не кодит». Сетевых вызовов нет – отвечаю по материалам встреч и статей, ищу по полному тексту (как grep). Спросите про бас-фактор, карьеру, найм или продуктовых разработчиков.', links: [] });
     if (/(кто ты|что ты|ты кто|кто это|про тебя)/.test(ql))
-      return Promise.resolve({ text: 'Я демонстрационный ассистент в стиле Codex (OpenAI) — без обращения к API. Отвечаю тем, что нахожу в материалах сообщества полнотекстовым поиском.', links: [{ title: 'openai.com/codex', url: 'https://openai.com/codex/' }] });
+      return Promise.resolve({ text: 'Я демонстрационный ассистент в стиле Codex (OpenAI) – без обращения к API. Отвечаю тем, что нахожу в материалах сообщества полнотекстовым поиском.', links: [{ title: 'openai.com/codex', url: 'https://openai.com/codex/' }] });
     if (/(спасибо|благодар|thanks|thx)/.test(ql))
       return Promise.resolve({ text: 'Пожалуйста! Спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] });
 
@@ -109,8 +109,8 @@
     return retr.then(function (hits) {
       if (hits && hits.length) {
         var lead = hits.length === 1
-          ? 'Прошёлся по полным текстам (grep) — ближе всего этот разбор:'
-          : 'Прошёлся по полным текстам (grep) — вот ' + hits.length + ' наиболее релевантных:';
+          ? 'Прошёлся по полным текстам (grep) – ближе всего этот разбор:'
+          : 'Прошёлся по полным текстам (grep) – вот ' + hits.length + ' наиболее релевантных:';
         return { text: lead, links: hits.map(function (h) { return { title: h.t, url: h.u, s: h.s, snip: h.snip }; }), cmd: R && R.suggest ? R.suggest(q, hits) : null, q: q };
       }
       var words = ql.split(/\s+/).filter(function (x) { return x.length > 2; });
@@ -122,13 +122,13 @@
         });
       });
       if (thits.length)
-        return { text: 'По заголовкам нашёл — загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }), cmd: R && R.suggest ? R.suggest(q, thits) : null, q: q };
+        return { text: 'По заголовкам нашёл – загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }), cmd: R && R.suggest ? R.suggest(q, thits) : null, q: q };
 
       var quips = [
-        'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени.',
-        'Прямого совпадения нет. Сообщество любит повторять: сеньора не дают — сеньора берут.',
-        'Не нашёл прямого ответа. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
-        'В архиве ничего точного. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
+        'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор – это плата за экономию, отложенная во времени.',
+        'Прямого совпадения нет. Сообщество любит повторять: сеньора не дают – сеньора берут.',
+        'Не нашёл прямого ответа. Общий принцип из встреч: срочно – значит, некачественно автоматически.',
+        'В архиве ничего точного. Зато есть наблюдение: тимлид и техлид – две разные работы с одним названием.'
       ];
       return { text: quips[Math.floor(Math.random() * quips.length)] + ' Уточните запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }], q: q };
     });
@@ -151,7 +151,7 @@
       var row = el('div', 'cx-cmd-row');
       var b = el('button', 'cx-cmd'); b.type = 'button';
       b.appendChild(el('span', 'cx-cmd-p', '$')); b.appendChild(d.createTextNode(' ' + a.cmd.cmd));
-      b.title = (a.cmd.label || '') + ' — выполнить в терминале';
+      b.title = (a.cmd.label || '') + ' – выполнить в терминале';
       b.addEventListener('click', function () { runInShell(a.cmd.cmd); });
       row.appendChild(b); bubbleEl.appendChild(row);
     }
@@ -187,7 +187,7 @@
   function open(initial) {
     build(); readFS();
     if (!msgs.childNodes.length)
-      typeInto(bubble('bot'), 'Здравствуйте! Я офлайн-ассистент в стиле Codex. Сетевых вызовов нет — отвечаю по материалам сообщества «Тимлид не кодит». О чём расскажете?', []);
+      typeInto(bubble('bot'), 'Здравствуйте! Я офлайн-ассистент в стиле Codex. Сетевых вызовов нет – отвечаю по материалам сообщества «Тимлид не кодит». О чём расскажете?', []);
     root.removeAttribute('hidden'); d.body.classList.add('cx-lock');
     setTimeout(function () { input.focus(); }, 50);
     if (initial && initial.trim()) { lastQ = initial.trim(); userBubble(lastQ); botReply(lastQ); }

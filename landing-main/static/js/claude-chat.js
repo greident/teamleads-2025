@@ -1,5 +1,5 @@
 /*!
- * Teamleads Claude — an offline, Claude-styled chat overlay. NO network calls.
+ * Teamleads Claude – an offline, Claude-styled chat overlay. NO network calls.
  * It answers from the site's own content (the same filesystem the shell uses):
  * matches your question against meetup/article titles and surfaces the pages,
  * with canned community wisdom as a fallback. Exposed as window.TeamleadsClaude.
@@ -33,7 +33,7 @@
     if (built) return; built = true;
     root = el('div', 'cl-overlay'); root.setAttribute('hidden', '');
     root.innerHTML =
-      '<div class="cl-panel" role="dialog" aria-label="Claude — офлайн-ассистент">' +
+      '<div class="cl-panel" role="dialog" aria-label="Claude – офлайн-ассистент">' +
         '<div class="cl-bar">' +
           '<span class="cl-brand"></span>' +
           '<div class="cl-titles"><strong>Claude</strong><span>офлайн-демо · отвечает по материалам сообщества</span></div>' +
@@ -102,19 +102,19 @@
   function answer(q) {
     var ql = q.toLowerCase().trim();
     if (/(^|\s)(привет|здравств|хай|hello|hi|добр)/.test(ql))
-      return Promise.resolve({ text: 'Привет! Я офлайн-версия Claude на сайте сообщества «Тимлид не кодит». Сетевых вызовов нет — отвечаю по материалам встреч и статей, ищу по полному тексту (как grep). Спросите про бас-фактор, карьерные треки, найм или продуктовых разработчиков.', links: [] });
+      return Promise.resolve({ text: 'Привет! Я офлайн-версия Claude на сайте сообщества «Тимлид не кодит». Сетевых вызовов нет – отвечаю по материалам встреч и статей, ищу по полному тексту (как grep). Спросите про бас-фактор, карьерные треки, найм или продуктовых разработчиков.', links: [] });
     if (/(кто ты|что ты|ты кто|кто это|про тебя)/.test(ql))
-      return Promise.resolve({ text: 'Я демонстрационный ассистент в стиле Claude — без обращения к API. Отвечаю тем, что нахожу в материалах сообщества полнотекстовым поиском. Настоящий Claude живёт в Claude Code.', links: [{ title: 'claude.com/claude-code', url: 'https://claude.com/claude-code' }] });
+      return Promise.resolve({ text: 'Я демонстрационный ассистент в стиле Claude – без обращения к API. Отвечаю тем, что нахожу в материалах сообщества полнотекстовым поиском. Настоящий Claude живёт в Claude Code.', links: [{ title: 'claude.com/claude-code', url: 'https://claude.com/claude-code' }] });
     if (/(спасибо|благодар|thanks|thx)/.test(ql))
-      return Promise.resolve({ text: 'Пожалуйста! Если хотите — спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] });
+      return Promise.resolve({ text: 'Пожалуйста! Если хотите – спросите ещё или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }] });
 
     var R = w.TeamleadsRetrieval;
     var retr = (R && R.retrieve) ? R.retrieve(q, 5) : Promise.resolve([]);
     return retr.then(function (hits) {
       if (hits && hits.length) {
         var lead = hits.length === 1
-          ? 'Прошёлся по полным текстам (grep) — ближе всего этот разбор:'
-          : 'Прошёлся по полным текстам (grep) — вот ' + hits.length + ' наиболее релевантных:';
+          ? 'Прошёлся по полным текстам (grep) – ближе всего этот разбор:'
+          : 'Прошёлся по полным текстам (grep) – вот ' + hits.length + ' наиболее релевантных:';
         return { text: lead, links: hits.map(function (h) { return { title: h.t, url: h.u, s: h.s, snip: h.snip }; }), cmd: R && R.suggest ? R.suggest(q, hits) : null, q: q };
       }
       // fallback: title-only search over the shell filesystem (find-style)
@@ -127,13 +127,13 @@
         });
       });
       if (thits.length)
-        return { text: 'По заголовкам нашёл — загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }), cmd: R && R.suggest ? R.suggest(q, thits) : null, q: q };
+        return { text: 'По заголовкам нашёл – загляните:', links: thits.slice(0, 5).map(function (it) { return { title: it.t, url: it.u }; }), cmd: R && R.suggest ? R.suggest(q, thits) : null, q: q };
 
       var quips = [
-        'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор — это плата за экономию, отложенная во времени. Передавайте «почему», а не только «что».',
-        'По этой теме в архиве ничего точного, но сообщество любит повторять: сеньора не дают — сеньора берут.',
-        'Не нашёл прямого совпадения. Общий принцип из встреч: срочно — значит, некачественно автоматически.',
-        'Прямого ответа в материалах нет. Зато есть наблюдение: тимлид и техлид — две разные работы с одним названием.'
+        'Точного материала не нашёл, но вот мысль из обсуждений: бас-фактор – это плата за экономию, отложенная во времени. Передавайте «почему», а не только «что».',
+        'По этой теме в архиве ничего точного, но сообщество любит повторять: сеньора не дают – сеньора берут.',
+        'Не нашёл прямого совпадения. Общий принцип из встреч: срочно – значит, некачественно автоматически.',
+        'Прямого ответа в материалах нет. Зато есть наблюдение: тимлид и техлид – две разные работы с одним названием.'
       ];
       return { text: quips[Math.floor(Math.random() * quips.length)] + ' Попробуйте уточнить запрос или загляните в раздел статей.', links: [{ title: 'Все статьи →', url: '/articles/' }], q: q };
     });
@@ -157,7 +157,7 @@
       var row = el('div', 'cl-cmd-row');
       var b = el('button', 'cl-cmd'); b.type = 'button';
       b.appendChild(el('span', 'cl-cmd-p', '$')); b.appendChild(d.createTextNode(' ' + a.cmd.cmd));
-      b.title = (a.cmd.label || '') + ' — выполнить в терминале';
+      b.title = (a.cmd.label || '') + ' – выполнить в терминале';
       b.addEventListener('click', function () { runInShell(a.cmd.cmd); });
       row.appendChild(b); bubbleEl.appendChild(row);
     }
@@ -195,7 +195,7 @@
   function open(initial) {
     build(); readFS();
     if (!msgs.childNodes.length) {
-      typeInto(bubble('bot'), 'Здравствуйте! Я офлайн-ассистент в стиле Claude. Сетевых вызовов нет — отвечаю по материалам сообщества «Тимлид не кодит». О чём расскажете?', []);
+      typeInto(bubble('bot'), 'Здравствуйте! Я офлайн-ассистент в стиле Claude. Сетевых вызовов нет – отвечаю по материалам сообщества «Тимлид не кодит». О чём расскажете?', []);
     }
     root.removeAttribute('hidden');
     d.body.classList.add('cl-lock');

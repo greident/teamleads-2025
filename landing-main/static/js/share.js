@@ -1,5 +1,5 @@
 /*!
- * Teamleads Share — a tiny, dependency-free copy control for report pages.
+ * Teamleads Share – a tiny, dependency-free copy control for report pages.
  * Reads config from data-* on the [data-share] root:
  *   data-url       canonical page URL → copied by [data-share-copy]
  *   data-cmd-url   /shell/?cmd=… deep-link → copied by [data-share-cmd-copy]

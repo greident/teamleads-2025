@@ -62,7 +62,7 @@
         statsObserver.observe(heroStats);
     }
 
-    // Parallax effect for gradient orbs (desktop pointers only — no-op on touch)
+    // Parallax effect for gradient orbs (desktop pointers only – no-op on touch)
     let ticking = false;
     if (window.matchMedia('(pointer: fine)').matches)
     document.addEventListener('mousemove', (e) => {
@@ -169,7 +169,7 @@
 
         function render() {
             const diff = inst.getTime() - Date.now();
-            if (diff <= 0) { out.textContent = 'Идёт прямо сейчас — заходите в Telegram'; out.hidden = false; return; }
+            if (diff <= 0) { out.textContent = 'Идёт прямо сейчас – заходите в Telegram'; out.hidden = false; return; }
             const d = Math.floor(diff / 86400000),
                   h = Math.floor((diff % 86400000) / 3600000),
                   m = Math.floor((diff % 3600000) / 60000);

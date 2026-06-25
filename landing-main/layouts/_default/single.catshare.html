@@ -11,20 +11,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>$ {{ $cmd }} — {{ .Site.Title }}</title>
+  <title>$ {{ $cmd }} – {{ .Site.Title }}</title>
   <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Title }}{{ end }}">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="{{ .Permalink }}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ .Site.Title }}">
-  <meta property="og:title" content="$ {{ $cmd }} — терминал «Тимлид не кодит»">
+  <meta property="og:title" content="$ {{ $cmd }} – терминал «Тимлид не кодит»">
   <meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Title }}{{ end }}">
   <meta property="og:url" content="{{ $url }}">
   <meta property="og:image" content="{{ $og.Permalink }}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="$ {{ $cmd }} — терминал «Тимлид не кодит»">
+  <meta name="twitter:title" content="$ {{ $cmd }} – терминал «Тимлид не кодит»">
   <meta name="twitter:image" content="{{ $og.Permalink }}">
   <script>
     // Humans (JS) land in the terminal with the page already open via `cat`.

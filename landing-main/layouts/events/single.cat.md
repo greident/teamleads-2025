@@ -4,7 +4,7 @@
 {{ end }}
 {{- with .Params.participants }}
 ## Участники
-{{ range . }}- **{{ .name }}**{{ with .role }} — {{ . }}{{ end }}
+{{ range . }}- **{{ .name }}**{{ with .role }} – {{ . }}{{ end }}
 {{ end }}{{ end }}
 {{- with .Params.topics }}
 ## Подтемы и их суть
@@ -27,5 +27,5 @@
 {{ end }}{{ end }}
 {{- with .Params.nextQuestions }}
 ## Что обсудим дальше
-{{ range . }}- {{ .question }}{{ with .answeredIn }} — обсудили в {{ . }}{{ end }}
+{{ range . }}- {{ .question }}{{ with .answeredIn }} – обсудили в {{ . }}{{ end }}
 {{ end }}{{ end }}

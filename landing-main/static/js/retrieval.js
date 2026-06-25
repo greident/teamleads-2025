@@ -1,5 +1,5 @@
 /*!
- * Teamleads Retrieval — shared full-text lookup used by the Claude/Codex
+ * Teamleads Retrieval – shared full-text lookup used by the Claude/Codex
  * offline assistants (and reusable anywhere). Fetches the Shell's grep index
  * (/shell-index.json) once, caches it, and ranks pages by query relevance:
  * phrase + title hits weighted above body hits, multi-word queries summed.
@@ -71,7 +71,7 @@
     return fetchIndex().then(function () { return rank(query).slice(0, limit || 5); }).catch(function () { return []; });
   }
 
-  // Suggest the next shell command for an answer — a topical tool when the query
+  // Suggest the next shell command for an answer – a topical tool when the query
   // calls for one, otherwise `cat` of the best hit so the reader can open it inline.
   function suggest(query, hits) {
     var q = (query || '').toLowerCase();

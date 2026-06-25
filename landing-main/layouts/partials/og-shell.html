@@ -6,11 +6,11 @@
 {{/* flatten the branded background into a uniform dark "terminal" field */}}
 {{- $bg = $bg | images.Filter (images.Colorize 220 16 8) -}}
 
-{{/* window chrome — three dots + title bar */}}
+{{/* window chrome – three dots + title bar */}}
 {{- $bg = $bg | images.Filter (images.Text "●" (dict "color" "#ff5f56" "size" 28 "font" $fontBold "x" 72 "y" 54)) -}}
 {{- $bg = $bg | images.Filter (images.Text "●" (dict "color" "#ffbd2e" "size" 28 "font" $fontBold "x" 110 "y" 54)) -}}
 {{- $bg = $bg | images.Filter (images.Text "●" (dict "color" "#27c93f" "size" 28 "font" $fontBold "x" 148 "y" 54)) -}}
-{{- $bg = $bg | images.Filter (images.Text "guest@teamleads: ~   —   teamleads.kz/shell" (dict "color" "#8b949e" "size" 25 "font" $fontReg "x" 200 "y" 56)) -}}
+{{- $bg = $bg | images.Filter (images.Text "guest@teamleads: ~   –   teamleads.kz/shell" (dict "color" "#8b949e" "size" 25 "font" $fontReg "x" 200 "y" 56)) -}}
 
 {{/* the command */}}
 {{- $bg = $bg | images.Filter (images.Text (printf "$ %s" (.Params.cmd | truncate 42)) (dict "color" "#39c5cf" "size" 54 "font" $fontBold "x" 78 "y" 172)) -}}

@@ -1,4 +1,4 @@
-{{/* Live community stats — computed from content so they never go stale.
+{{/* Live community stats – computed from content so they never go stale.
      participantsCount is the external Telegram member count (params, manual). */}}
 {{- $events := where .Site.RegularPages "Section" "events" -}}
 {{- $insights := sort (where .Site.RegularPages "Section" "insights") "Date" "desc" -}}

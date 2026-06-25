@@ -1,9 +1,9 @@
 /*!
- * TeamleadsSearch — site search as a deep-link into the Claude/Codex chat tool.
+ * TeamleadsSearch – site search as a deep-link into the Claude/Codex chat tool.
  * ONE function (open) powers MANY entry points: the nav magnifier, global
  * Ctrl/Cmd+K, the /search/?q= page, and the in-overlay Claude⇄Codex switcher.
  * The "results UI" is the existing chat overlay (full-text grep + citations),
- * so this file only wires triggers — no new results rendering. Falls back to
+ * so this file only wires triggers – no new results rendering. Falls back to
  * the shell's `grep` when the overlay isn't available.
  * Exposed as window.TeamleadsSearch = { open, switchTool }.
  */
@@ -18,7 +18,7 @@
   function openCodex(q) { var X = w.TeamleadsCodex; return !!(X && X.open && (X.open(q || ''), true)); }
 
   // Yandex.Metrika goal: who opened search, and from where (counter 106055675).
-  // Records the SOURCE and whether a query was present — never the query text.
+  // Records the SOURCE and whether a query was present – never the query text.
   function track(source, q, tool) {
     try {
       if (!w.ym) return;
