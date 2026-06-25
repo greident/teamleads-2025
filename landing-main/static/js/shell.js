@@ -64,6 +64,7 @@
         ].forEach(function (r) { print('  ' + pad(r[0], 16) + r[1]); });
         print(''); print('УТИЛИТЫ', 'accent');
         [
+          ['claude <вопрос>', 'спросить ассистента по материалам'],
           ['tools', 'топ инструментов сообщества'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
@@ -152,6 +153,26 @@
           ['Sales Navigator', 'выход на западных заказчиков через прогрев', 'https://business.linkedin.com/sales-solutions/sales-navigator']
         ].forEach(function (t) { var n = el('span'); n.appendChild(el('span', 'accent', '• ')); n.appendChild(link(t[2], t[0], true)); n.appendChild(el('span', 'dim', ' — ' + t[1])); printNode(n); });
       },
+      claude: function (a) {
+        var q = a.join(' ').trim();
+        if (w.TeamleadsClaude) {
+          print('открываю Claude' + (q ? ' с вашим вопросом' : '') + '…', 'cy');
+          w.TeamleadsClaude.open(q);
+          return;
+        }
+        // Fallback if the Claude overlay isn't loaded — search content inline.
+        print('Claude-окно недоступно — ищу прямо здесь.', 'dim');
+        var words = q.toLowerCase().split(/\s+/).filter(function (x) { return x.length > 2; });
+        var hits = [];
+        sectionNames.forEach(function (s) {
+          (sections[s] || []).forEach(function (it) {
+            var t = (it.t || '').toLowerCase();
+            if (words.some(function (x) { return t.indexOf(x) !== -1; })) hits.push(it);
+          });
+        });
+        if (hits.length) { hits.slice(0, 4).forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(it.u, it.t)); printNode(n); }); }
+        else { print('Ничего не нашёл — попробуйте find <слово> или раздел articles.', 'dim'); }
+      },
       join: function () { print('Еженедельная встреча, среда 17:00 (Астана).', 'cy'); go('/join/'); },
       telegram: function () { print('открываю Telegram…', 'ok'); printNode(link(TG, TG, true)); w.open(TG, '_blank', 'noopener'); },
       whoami: function () { print('guest', 'cy'); print('…но мы-то видим тимлида. Добро пожаловать.', 'dim'); },
@@ -170,6 +191,7 @@
           latest: 'latest — открыть последнюю встречу.',
           random: 'random — открыть случайный материал.',
           tools: 'tools — топ инструментов сообщества.',
+          claude: 'claude <вопрос> — поиск ответа по материалам сообщества (оффлайн-пасхалка).',
           join: 'join — ссылка на еженедельную встречу.',
           fortune: 'fortune — случайная мудрость тимлида.',
           vim: 'vim — открыть редактор. Выход: :q (если повезёт).',
@@ -213,6 +235,7 @@
     };
     commands.cat = commands.open; commands.go = commands.open; commands.search = commands.find;
     commands.answer = commands['42']; commands.vi = commands.vim;
+    commands.ai = commands.claude; commands.ask = commands.claude;
 
     function run(raw) {
       var str = raw.trim();
