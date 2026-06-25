@@ -3140,6 +3140,19 @@ body > .nav {
 .term-out a{color:#39c5cf;text-decoration:none;border-bottom:1px dotted #39c5cf}
 .term-out a:hover{color:#FEC50C;border-bottom-color:#FEC50C}
 .term .dim{color:#6e7681}.term .hint{color:#8b949e}.term .ok{color:#3fb950}.term .err{color:#f85149}.term .accent{color:#FEC50C}.term .cy{color:#39c5cf}
+/* `cat` markdown coloring */
+.term-out .md-h{font-weight:700;margin-top:8px}
+.term-out .md-h1{color:#FEC50C;font-size:1.15em}
+.term-out .md-h2{color:#39c5cf;font-size:1.06em}
+.term-out .md-h3{color:#7ee787}
+.term-out .md-h4,.term-out .md-h5,.term-out .md-h6{color:#8b949e}
+.term-out .md-quote{color:#8b949e;border-left:2px solid #30363d;padding-left:10px;font-style:italic}
+.term-out .md-hr{color:#30363d}
+.term-out .md-li{padding-left:6px}
+.term-out .md-li .md-bullet{color:#FEC50C;margin-right:4px}
+.term-out .md-strong{color:#e6edf3;font-weight:700}
+.term-out .md-em{color:#c9d1d9;font-style:italic}
+.term-out .md-code{background:#161b22;border:1px solid #21262d;border-radius:4px;padding:0 4px;color:#FEC50C}
 .term-line{display:flex;align-items:baseline;margin-top:2px}
 .term-prompt{color:#39c5cf;margin-right:8px;white-space:nowrap;user-select:none}
 .term-prompt b{color:#3fb950;font-weight:600}

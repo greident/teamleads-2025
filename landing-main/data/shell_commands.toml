@@ -162,3 +162,17 @@ cmd = "sim"
 run = "sim"
 desc = "Тимлид-симулятор: развилки управленческих ситуаций."
 out = ["сценарий 1/…  — что выберете?", "a) … b) … c) …"]
+
+[[commands]]
+id = "salary"
+cmd = "salary senior backend"
+run = "salary senior backend"
+desc = "Зарплатные вилки сообщества по грейдам и ролям (оценки рынка РК)."
+out = ["Backend · senior · нетто/мес, РК", "p25 1 300 000 ₸ · med 1 800 000 ₸ · p75 2 600 000 ₸"]
+
+[[commands]]
+id = "friends"
+cmd = "friends"
+run = "friends"
+desc = "Дружественные сообщества и сервисы."
+out = ["• Claude Community KZ — сообщество по AI-разработке", "• techinterview.space — зарплаты и собеседования"]

@@ -63,6 +63,36 @@
     }
     function go(href) { print(''); print('переход → ' + href, 'ok'); setTimeout(function () { w.location.href = href; }, reduced ? 0 : 360); }
 
+    // Markdown line renderer for `cat`: colorizes headings, quotes, lists, links,
+    // and inline **bold** / *em* / `code` so long pages read like a document, not a wall.
+    function mdInline(node, s) {
+      var re = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`|_([^_]+)_/g;
+      var last = 0, m;
+      while ((m = re.exec(s))) {
+        if (m.index > last) node.appendChild(d.createTextNode(s.slice(last, m.index)));
+        if (m[2] != null) node.appendChild(link(m[2], m[1], /^https?:/i.test(m[2])));
+        else if (m[3] != null) node.appendChild(el('span', 'md-strong', m[3]));
+        else if (m[4] != null) node.appendChild(el('span', 'md-em', m[4]));
+        else if (m[5] != null) node.appendChild(el('span', 'md-code', m[5]));
+        else if (m[6] != null) node.appendChild(el('span', 'md-em', m[6]));
+        last = re.lastIndex;
+      }
+      if (last < s.length) node.appendChild(d.createTextNode(s.slice(last)));
+      return node;
+    }
+    function mdLine(line) {
+      var div = el('div', 'ln'), m;
+      if ((m = /^(#{1,6})\s+(.*)$/.exec(line))) { div.className = 'ln md-h md-h' + m[1].length; return mdInline(div, m[2]); }
+      if (/^\s*(---+|\*\*\*+|___+)\s*$/.test(line)) { div.className = 'ln md-hr'; div.textContent = '────────────────────────────'; return div; }
+      if ((m = /^>\s?(.*)$/.exec(line))) { div.className = 'ln md-quote'; return mdInline(div, m[1]); }
+      if ((m = /^(\s*)([-*+]|\d+\.)\s+(.*)$/.exec(line))) {
+        div.className = 'ln md-li';
+        div.appendChild(el('span', 'md-bullet', /\d/.test(m[2]) ? m[2] + ' ' : '• '));
+        return mdInline(div, m[3]);
+      }
+      return mdInline(div, line);
+    }
+
     // ── Тимлид-симулятор: an interactive panel mode. Instead of streaming
     //    append-only lines, it takes over the terminal body with a card that
     //    re-renders in place on each step. Scenarios come from data-scenarios.
@@ -294,6 +324,8 @@
         print('open: не найдено: ' + arg, 'err');
       },
       cat: function (a) {
+        var raw = false;
+        a = a.filter(function (x) { if (x === '--raw' || x === '-r') { raw = true; return false; } return true; });
         var arg = (a[0] || '').replace(/^\/|\/$/g, '');
         if (!arg) { print('cat: укажите страницу. Список — ls.', 'err'); return; }
         if (links[arg]) { print('cat: «' + arg + '» — служебная страница без markdown. Откройте: open ' + arg, 'dim'); return; }
@@ -311,7 +343,8 @@
         w.fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (txt) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
           var lines = txt.replace(/\s+$/, '').split('\n'), CAP = 400;
-          lines.slice(0, CAP).forEach(function (l) { print(l); });
+          lines.slice(0, CAP).forEach(function (l) { if (raw) print(l); else out.appendChild(mdLine(l)); });
+          body.scrollTop = body.scrollHeight;
           if (lines.length > CAP) print('… обрезано (' + (lines.length - CAP) + ' строк). open ' + arg + ' — полная версия.', 'dim');
         }).catch(function (e) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
@@ -470,7 +503,7 @@
           ls: 'ls [раздел] — содержимое текущего или указанного раздела.',
           cd: 'cd <раздел> — войти. cd .. — наверх. cd — в корень.',
           open: 'open <страница> — открыть страницу в браузере.',
-          cat: 'cat <страница> — показать markdown-версию страницы прямо в терминале.',
+          cat: 'cat <страница> — показать markdown-версию страницы с подсветкой (заголовки, цитаты, ссылки). cat <страница> --raw — без подсветки.',
           pwd: 'pwd — текущий путь.',
           tree: 'tree — всё дерево сайта со счётчиками.',
           find: 'find <слово> — поиск по заголовкам и именам.',
