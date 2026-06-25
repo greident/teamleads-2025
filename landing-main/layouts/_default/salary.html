@@ -11,124 +11,149 @@
 
 <section class="report-hero">
   <div class="container">
-    <a href="/shell/?cmd=salary" class="report-back">
+    <a href="/" class="report-back">
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-      Интерактивно в shell
+      На главную
     </a>
     <h1 class="report-title">{{ .Title }}</h1>
-    <p class="sal-sub">Живые данные сообщества <a href="https://techinterview.space/salaries" target="_blank" rel="noopener">techinterview.space</a> · нетто/мес, Казахстан · обновляется при сборке сайта{{ with $d.salariesCount }} · выборка {{ . }} анкет{{ end }}</p>
+    <p class="sal-sub">Данные сообщества <a href="https://techinterview.space/salaries" target="_blank" rel="noopener">techinterview.space</a> · нетто/мес, Казахстан · обновлено {{ now.Format "02.01.2006 15:04" }}{{ with $d.salariesCount }} · выборка {{ . }} анкет{{ end }}</p>
+    <a class="sal-cmd" href="/shell/?cmd=salary" aria-label="Открыть команду salary в shell-терминале">
+      <span class="sal-cmd-dots"><i></i><i></i><i></i></span>
+      <code class="sal-cmd-body"><span class="sal-cmd-prompt">guest@teamleads:~$</span> salary</code>
+      <span class="sal-cmd-go">живые данные → shell</span>
+    </a>
+    <p class="sal-cmd-cap">Цифры на странице обновляются при сборке. Нужны прямо сейчас или свой срез по городу и стеку – откройте команду <code>salary</code> в shell-терминале и меняйте фильтры: <code>salary senior backend almaty</code>.</p>
   </div>
 </section>
 
 <section class="report-content">
-  <div class="container report-container sal-page" data-sal-api="{{ $api }}" data-sal-usd="{{ $usdRate }}">
-  {{- if $d.salariesCount -}}
+  <div class="container">
+    <div class="report-layout">
+    {{- if $d.salariesCount -}}
 
-    {{/* ── Headline ── */}}
-    <div class="sal-cards">
-      <div class="sal-card">
-        <span class="sal-card-label">Медиана рынка</span>
-        <span class="sal-card-value" data-sal="median">{{ partial "money-kzt.html" $d.medianSalary }}</span>
-        {{ if $usdRate }}<span class="sal-card-usd">~${{ printf "%.0f" (div $d.medianSalary $usdRate) }}/мес</span>{{ end }}
-      </div>
-      <div class="sal-card">
-        <span class="sal-card-label">Среднее</span>
-        <span class="sal-card-value" data-sal="average">{{ partial "money-kzt.html" $d.averageSalary }}</span>
-        {{ if $usdRate }}<span class="sal-card-usd">~${{ printf "%.0f" (div $d.averageSalary $usdRate) }}/мес</span>{{ end }}
-      </div>
-      <div class="sal-card sal-card-accent">
-        <span class="sal-card-label">Медиана на ремоуте</span>
-        <span class="sal-card-value" data-sal="remoteMedian">{{ partial "money-kzt.html" $d.medianRemoteSalary }}</span>
-        {{ if and $d.medianSalary $d.medianRemoteSalary }}<span class="sal-card-usd">+{{ printf "%.0f" (mul (sub (div $d.medianRemoteSalary $d.medianSalary) 1) 100) }}% к локальному</span>{{ end }}
-      </div>
-    </div>
+      <aside class="report-toc" aria-label="Содержание" data-report-toc>
+        <p class="report-toc-title">Содержание</p>
+        <ol>
+          <li><a href="#overview">Обзор рынка</a></li>
+          <li><a href="#ladder">Грейд-лестница</a></li>
+          <li><a href="#dist">Распределение зарплат</a></li>
+          <li><a href="#roles">По ролям</a></li>
+          <li><a href="#contribute">Своя вилка</a></li>
+        </ol>
+      </aside>
 
-    {{/* ── Grade ladder ── */}}
-    <div class="sal-block">
-      <h2 class="sal-h2">Грейд-лестница</h2>
-      <p class="sal-note">Медиана по грейду на локальном рынке РК.</p>
-      {{- $topG := 0.0 -}}
-      {{- range $d.localSalariesByGrade -}}{{- if gt .medianSalary $topG -}}{{- $topG = .medianSalary -}}{{- end -}}{{- end -}}
-      <div class="sal-bars">
-        {{- range $d.localSalariesByGrade -}}
-        {{- $lbl := index $gradeLabels (printf "%d" .grade) | default (printf "grade %d" .grade) -}}
-        <div class="sal-bar-row">
-          <span class="sal-bar-name">{{ $lbl }}</span>
-          <span class="sal-bar-track"><span class="sal-bar-fill" style="width:{{ if $topG }}{{ printf "%.0f" (mul (div .medianSalary $topG) 100) }}{{ else }}0{{ end }}%"></span></span>
-          <span class="sal-bar-val">{{ partial "money-kzt.html" .medianSalary }}</span>
-          <span class="sal-bar-n">{{ .count }} анкет</span>
+      <div class="report-container sal-page" data-sal-api="{{ $api }}" data-sal-usd="{{ $usdRate }}">
+
+        {{/* ── Headline ── */}}
+        <div class="sal-cards" id="overview">
+          <div class="sal-card">
+            <span class="sal-card-label">Медиана рынка</span>
+            <span class="sal-card-value" data-sal="median">{{ partial "money-kzt.html" $d.medianSalary }}</span>
+            {{ if $usdRate }}<span class="sal-card-usd">~${{ printf "%.0f" (div $d.medianSalary $usdRate) }}/мес</span>{{ end }}
+          </div>
+          <div class="sal-card">
+            <span class="sal-card-label">Среднее</span>
+            <span class="sal-card-value" data-sal="average">{{ partial "money-kzt.html" $d.averageSalary }}</span>
+            {{ if $usdRate }}<span class="sal-card-usd">~${{ printf "%.0f" (div $d.averageSalary $usdRate) }}/мес</span>{{ end }}
+          </div>
+          <div class="sal-card sal-card-accent">
+            <span class="sal-card-label">Медиана на ремоуте</span>
+            <span class="sal-card-value" data-sal="remoteMedian">{{ partial "money-kzt.html" $d.medianRemoteSalary }}</span>
+            {{ if and $d.medianSalary $d.medianRemoteSalary }}<span class="sal-card-usd">+{{ printf "%.0f" (mul (sub (div $d.medianRemoteSalary $d.medianSalary) 1) 100) }}% к локальному</span>{{ end }}
+          </div>
         </div>
-        {{- end -}}
-      </div>
-    </div>
 
-    {{/* ── Distribution histogram (labels are bucket UPPER bounds) ── */}}
-    {{- with $d.salariesByMoneyBarChart -}}
-    {{- $items := .items -}}{{- $labels := .labels -}}
-    <div class="sal-block">
-      <h2 class="sal-h2">Распределение зарплат</h2>
-      <p class="sal-note">Локальный рынок РК, нетто/мес. Высота столбца — сколько анкет в диапазоне. Самые высокие зарплаты (выше {{ partial "money-kzt.html" (float (index $labels (sub (len $labels) 1))) }}) в график не попадают.</p>
-      {{- $maxI := 0 -}}
-      {{- range $items -}}{{- if gt . $maxI -}}{{- $maxI = . -}}{{- end -}}{{- end -}}
-      <div class="sal-hist">
-        {{- range $i, $lab := $labels -}}
-        {{- $cnt := index $items $i -}}
-        {{- $rng := cond (eq $i 0) (printf "до %s" (partial "money-kzt.html" (float $lab))) (printf "%s–%s" (partial "money-kzt.html" (float (index $labels (sub $i 1)))) (partial "money-kzt.html" (float $lab))) -}}
-        <div class="sal-hist-col" title="{{ $rng }}: {{ $cnt }} анкет">
-          <span class="sal-hist-n">{{ $cnt }}</span>
-          <span class="sal-hist-bar" style="height:{{ if $maxI }}{{ printf "%.0f" (mul (div (float $cnt) (float $maxI)) 100) }}{{ else }}0{{ end }}%"></span>
-          <span class="sal-hist-lab">{{ $rng }}</span>
-        </div>
-        {{- end -}}
-      </div>
-    </div>
-    {{- end -}}
-
-    {{/* ── By role ── */}}
-    {{- $roles := slice
-      (dict "id" 34 "label" "Backend" "key" "backend") (dict "id" 33 "label" "Frontend" "key" "frontend")
-      (dict "id" 35 "label" "Fullstack" "key" "fullstack") (dict "id" 32 "label" "Mobile" "key" "mobile")
-      (dict "id" 7 "label" "DevOps / SRE" "key" "devops") (dict "id" 2 "label" "QA" "key" "qa")
-      (dict "id" 14 "label" "Data Engineer" "key" "data") (dict "id" 38 "label" "ML / AI" "key" "ml")
-      (dict "id" 18 "label" "Аналитик" "key" "analyst") (dict "id" 25 "label" "Product Manager" "key" "pm") -}}
-    <div class="sal-block">
-      <h2 class="sal-h2">По ролям</h2>
-      <p class="sal-note">Медиана нетто/мес по локальному рынку и на ремоуте.</p>
-      <table class="sal-table">
-        <thead><tr><th>Роль</th><th>Анкет</th><th>Медиана</th><th>Ремоут</th></tr></thead>
-        <tbody>
-        {{- range $roles -}}
-          {{- $u := printf "%s&profsInclude=%d" $api .id -}}
-          {{- $label := .label -}}{{- $key := .key -}}
-          {{- with try (resources.GetRemote $u) -}}{{- with .Value -}}
-            {{- $rd := .Content | transform.Unmarshal -}}
-            {{- if $rd.salariesCount -}}
-            <tr>
-              <td><a href="/shell/?cmd=salary+{{ $key }}">{{ $label }}</a></td>
-              <td>{{ $rd.salariesCount }}</td>
-              <td>{{ partial "money-kzt.html" $rd.medianSalary }}</td>
-              <td>{{ if $rd.medianRemoteSalary }}{{ partial "money-kzt.html" $rd.medianRemoteSalary }}{{ else }}–{{ end }}</td>
-            </tr>
+        {{/* ── Grade ladder ── */}}
+        <div class="sal-block" id="ladder">
+          <h2 class="sal-h2">Грейд-лестница</h2>
+          <p class="sal-note">Медиана по грейду на локальном рынке РК.</p>
+          {{- $topG := 0.0 -}}
+          {{- range $d.localSalariesByGrade -}}{{- if gt .medianSalary $topG -}}{{- $topG = .medianSalary -}}{{- end -}}{{- end -}}
+          <div class="sal-bars">
+            {{- range $d.localSalariesByGrade -}}
+            {{- $lbl := index $gradeLabels (printf "%d" (int .grade)) | default (printf "Grade %d" (int .grade)) -}}
+            <div class="sal-bar-row">
+              <span class="sal-bar-name">{{ $lbl }}</span>
+              <span class="sal-bar-track"><span class="sal-bar-fill" style="width:{{ if $topG }}{{ printf "%.0f" (mul (div .medianSalary $topG) 100) }}{{ else }}0{{ end }}%"></span></span>
+              <span class="sal-bar-val">{{ partial "money-kzt.html" .medianSalary }}</span>
+              <span class="sal-bar-n">{{ .count }} анкет</span>
+            </div>
             {{- end -}}
-          {{- end -}}{{- end -}}
+          </div>
+        </div>
+
+        {{/* ── Distribution histogram (labels are bucket UPPER bounds) ── */}}
+        {{- with $d.salariesByMoneyBarChart -}}
+        {{- $items := .items -}}{{- $labels := .labels -}}
+        <div class="sal-block" id="dist">
+          <h2 class="sal-h2">Распределение зарплат</h2>
+          <p class="sal-note">Локальный рынок РК, нетто/мес. Высота столбца – сколько анкет в диапазоне. Самые высокие зарплаты (выше {{ partial "money-kzt.html" (float (index $labels (sub (len $labels) 1))) }}) в график не попадают.</p>
+          {{- $maxI := 0 -}}
+          {{- range $items -}}{{- if gt . $maxI -}}{{- $maxI = . -}}{{- end -}}{{- end -}}
+          <div class="sal-hist">
+            {{- range $i, $lab := $labels -}}
+            {{- $cnt := index $items $i -}}
+            {{- $rng := cond (eq $i 0) (printf "до %s" (partial "money-kzt.html" (float $lab))) (printf "%s–%s" (partial "money-kzt.html" (float (index $labels (sub $i 1)))) (partial "money-kzt.html" (float $lab))) -}}
+            <div class="sal-hist-col" title="{{ $rng }}: {{ $cnt }} анкет">
+              <span class="sal-hist-n">{{ $cnt }}</span>
+              <span class="sal-hist-bar" style="height:{{ if $maxI }}{{ printf "%.0f" (mul (div (float $cnt) (float $maxI)) 100) }}{{ else }}0{{ end }}%"></span>
+              <span class="sal-hist-lab">{{ $rng }}</span>
+            </div>
+            {{- end -}}
+          </div>
+        </div>
         {{- end -}}
-        </tbody>
-      </table>
-    </div>
 
-    {{/* ── Contribute CTA ── */}}
-    <div class="sal-cta">
-      <h2 class="sal-h2">В выборке нет твоей вилки?</h2>
-      <p>Чем больше анкет — тем точнее цифры для всего сообщества. Добавь свою анонимно за пару минут — и сравни себя с рынком.</p>
-      <a class="sal-cta-btn" href="https://techinterview.space/salaries" target="_blank" rel="noopener">Добавить свою зарплату →</a>
-      <p class="sal-note">Данные © <a href="https://techinterview.space/salaries/overview" target="_blank" rel="noopener">techinterview.space</a>. Хотите срезы по городу и стеку — это умеет <a href="/shell/?cmd=salary">команда <code>salary</code></a> в shell-режиме: <code>salary senior backend almaty</code>.</p>
-    </div>
+        {{/* ── By role ── */}}
+        {{- $roles := slice
+          (dict "id" 34 "label" "Backend" "key" "backend") (dict "id" 33 "label" "Frontend" "key" "frontend")
+          (dict "id" 35 "label" "Fullstack" "key" "fullstack") (dict "id" 32 "label" "Mobile" "key" "mobile")
+          (dict "id" 7 "label" "DevOps / SRE" "key" "devops") (dict "id" 2 "label" "QA" "key" "qa")
+          (dict "id" 14 "label" "Data Engineer" "key" "data") (dict "id" 38 "label" "ML / AI" "key" "ml")
+          (dict "id" 18 "label" "Аналитик" "key" "analyst") (dict "id" 25 "label" "Product Manager" "key" "pm") -}}
+        <div class="sal-block" id="roles">
+          <h2 class="sal-h2">По ролям</h2>
+          <p class="sal-note">Медиана нетто/мес по локальному рынку и на ремоуте.</p>
+          <table class="sal-table">
+            <thead><tr><th>Роль</th><th>Анкет</th><th>Медиана</th><th>Ремоут</th></tr></thead>
+            <tbody>
+            {{- range $roles -}}
+              {{- $u := printf "%s&profsInclude=%d" $api .id -}}
+              {{- $label := .label -}}{{- $key := .key -}}
+              {{- with try (resources.GetRemote $u) -}}{{- with .Value -}}
+                {{- $rd := .Content | transform.Unmarshal -}}
+                {{- if $rd.salariesCount -}}
+                <tr>
+                  <td><a href="/shell/?cmd=salary+{{ $key }}">{{ $label }}</a></td>
+                  <td>{{ $rd.salariesCount }}</td>
+                  <td>{{ partial "money-kzt.html" $rd.medianSalary }}</td>
+                  <td>{{ if $rd.medianRemoteSalary }}{{ partial "money-kzt.html" $rd.medianRemoteSalary }}{{ else }}–{{ end }}</td>
+                </tr>
+                {{- end -}}
+              {{- end -}}{{- end -}}
+            {{- end -}}
+            </tbody>
+          </table>
+        </div>
 
-  {{- else -}}
-    <div class="sal-cta">
-      <p>Свежие данные сейчас недоступны. Откройте интерактивную версию: <a href="/shell/?cmd=salary">команда <code>salary</code></a> в shell-режиме, или загляните на <a href="https://techinterview.space/salaries" target="_blank" rel="noopener">techinterview.space</a>.</p>
+        {{/* ── Contribute CTA ── */}}
+        <div class="sal-cta" id="contribute">
+          <h2 class="sal-h2">В выборке нет твоей вилки?</h2>
+          <p>Чем больше анкет – тем точнее цифры для всего сообщества. Добавь свою анонимно за пару минут – и сравни себя с рынком.</p>
+          <a class="sal-cta-btn" href="https://techinterview.space/salaries" target="_blank" rel="noopener">Добавить свою зарплату →</a>
+          <p class="sal-note">Данные © <a href="https://techinterview.space/salaries/overview" target="_blank" rel="noopener">techinterview.space</a>. Хотите срезы по городу и стеку – это умеет <a href="/shell/?cmd=salary">команда <code>salary</code></a> в shell-режиме: <code>salary senior backend almaty</code>.</p>
+        </div>
+
+      </div>
+
+    {{- else -}}
+      <div class="report-container sal-page">
+        <div class="sal-cta">
+          <p>Свежие данные сейчас недоступны. Откройте интерактивную версию: <a href="/shell/?cmd=salary">команда <code>salary</code></a> в shell-режиме, или загляните на <a href="https://techinterview.space/salaries" target="_blank" rel="noopener">techinterview.space</a>.</p>
+        </div>
+      </div>
+    {{- end -}}
     </div>
-  {{- end -}}
   </div>
 </section>
 

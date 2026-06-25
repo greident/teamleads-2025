@@ -3714,3 +3714,37 @@ body.cx-lock{overflow:hidden}
   .sal-bar-n { display: none; }
   .sal-hist-lab { font-size: 0.6rem; }
 }
+
+/* ===========================================
+   DISPLAY FACE — all section-level H2s
+   (H3 and below stay Inter for hierarchy)
+   =========================================== */
+.report-content h2,
+.report-next h2,
+.questions-section h2,
+.showcase-instructions h2,
+.insight-toc h2,
+.article-body h2,
+.related-articles h2,
+.sal-h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+}
+
+/* Shell-command bar on /salary/ (terminal pill, matches the site shell brand) */
+.sal-cmd { display: inline-flex; align-items: center; gap: var(--space-sm); margin-top: var(--space-lg); padding: var(--space-sm) var(--space-md); background: #0b1220; border: 1px solid var(--gray-800); border-radius: var(--radius-md); font-family: var(--font-mono); text-decoration: none; transition: border-color var(--transition-fast), transform var(--transition-fast); }
+.sal-cmd:hover { border-color: var(--primary); transform: translateY(-1px); }
+.sal-cmd-dots { display: inline-flex; gap: 5px; margin-right: 2px; }
+.sal-cmd-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+.sal-cmd-dots i:nth-child(1) { background: #ff5f56; }
+.sal-cmd-dots i:nth-child(2) { background: #ffbd2e; }
+.sal-cmd-dots i:nth-child(3) { background: #27c93f; }
+.sal-cmd-body { color: #e5e7eb; font-size: 0.95rem; }
+.sal-cmd-prompt { color: var(--term-green); font-weight: 600; }
+.sal-cmd-go { color: var(--primary-light); font-family: var(--font-sans); font-size: 0.8rem; white-space: nowrap; padding-left: var(--space-sm); border-left: 1px solid var(--gray-700); }
+.sal-cmd-cap { color: var(--gray-500); font-size: 0.9rem; margin-top: var(--space-sm); max-width: 660px; }
+.sal-cmd-cap code { font-family: var(--font-mono); background: var(--gray-100); padding: 1px 5px; border-radius: var(--radius-sm); font-size: 0.85em; }
+@media (max-width: 640px) {
+  .sal-cmd { flex-wrap: wrap; }
+  .sal-cmd-go { border-left: none; padding-left: 0; }
+}
