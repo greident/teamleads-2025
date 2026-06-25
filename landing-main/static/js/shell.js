@@ -84,6 +84,7 @@
           ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
+          ['contribute', 'код сайта на GitHub'],
           ['man <cmd>', 'справка по команде'],
           ['neofetch / date', 'инфо / время'],
           ['clear', 'очистить (Ctrl+L)'],
@@ -297,6 +298,12 @@
       },
       join: function () { print('Еженедельная встреча, среда 17:00 (Астана).', 'cy'); go('/join/'); },
       telegram: function () { print('открываю Telegram…', 'ok'); printNode(link(TG, TG, true)); w.open(TG, '_blank', 'noopener'); },
+      contribute: function () {
+        var url = 'https://github.com/belyaevsa/teamleads-2025';
+        print('Сайт открытый — буду рад правкам и pull request:', 'cy');
+        printNode(link(url, url, true));
+        w.open(url, '_blank', 'noopener');
+      },
       whoami: function () { print('guest', 'cy'); print('…но мы-то видим тимлида. Добро пожаловать.', 'dim'); },
       date: function () { print(new Date().toString()); },
       echo: function (a) { print(a.join(' ')); },
@@ -320,6 +327,7 @@
           claude: 'claude <вопрос> — Claude-окно: офлайн-ответ по материалам сообщества.',
           codex: 'codex <вопрос> — Codex-окно: офлайн-ответ по материалам сообщества.',
           join: 'join — ссылка на еженедельную встречу.',
+          contribute: 'contribute — открыть репозиторий сайта на GitHub (правки, PR). Синонимы: github, gh, pr.',
           fortune: 'fortune — случайная мудрость тимлида.',
           vim: 'vim — открыть редактор. Выход: :q (если повезёт).',
           sudo: 'sudo — для guest недоступно.',
@@ -364,6 +372,7 @@
     commands.answer = commands['42']; commands.vi = commands.vim;
     commands.ai = commands.claude; commands.ask = commands.claude;
     commands.gpt = commands.codex; commands.openai = commands.codex;
+    commands.github = commands.contribute; commands.gh = commands.contribute; commands.pr = commands.contribute;
 
     // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).
     // Sends only the command NAME (first token) — never the free-text arguments — so no PII.
