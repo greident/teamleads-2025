@@ -48,19 +48,59 @@
     40: 'Security Engineer', 36: 'Game Developer', 37: 'Embedded', 4: 'Business Analyst', 9: 'Product Owner'
   };
 
-  function resolveGrade(name) {
+  // techinterview.space KazakhstanCity enum → label, plus RU/EN aliases → id.
+  var CITY_LABEL = {
+    1: 'Актау', 2: 'Актобе', 3: 'Алматы', 4: 'Атырау', 5: 'Астана', 10: 'Караганда',
+    12: 'Кызылорда', 14: 'Костанай', 17: 'Павлодар', 22: 'Семей', 25: 'Тараз',
+    27: 'Туркестан', 28: 'Уральск', 29: 'Усть-Каменогорск', 30: 'Шымкент', 33: 'Экибастуз'
+  };
+  var CITY_BY_KEY = {
+    almaty: 3, 'алматы': 3, alma: 3,
+    astana: 5, 'астана': 5, 'нур-султан': 5, nursultan: 5, 'нурсултан': 5,
+    shymkent: 30, 'шымкент': 30,
+    karaganda: 10, 'караганда': 10,
+    atyrau: 4, 'атырау': 4,
+    aktobe: 2, 'актобе': 2,
+    aktau: 1, 'актау': 1,
+    pavlodar: 17, 'павлодар': 17,
+    taraz: 25, 'тараз': 25,
+    semey: 22, 'семей': 22,
+    kostanay: 14, 'костанай': 14,
+    oral: 28, uralsk: 28, 'уральск': 28,
+    oskemen: 29, ustkamenogorsk: 29, 'усть-каменогорск': 29,
+    kyzylorda: 12, 'кызылорда': 12, turkestan: 27, 'туркестан': 27, ekibastuz: 33, 'экибастуз': 33
+  };
+
+  // Popular skill ids (techinterview.space skill enum) → label, plus aliases → id.
+  var SKILL_LABEL = {
+    1: '.NET', 2: 'Laravel', 3: 'Angular', 6: 'C/C++', 7: 'Flutter', 10: 'Golang', 11: 'Java',
+    12: 'React', 13: 'Vue', 14: 'TypeScript', 15: 'JavaScript', 16: 'Node.js', 17: 'PHP',
+    19: 'Ruby', 20: 'Rust', 21: 'Scala', 27: 'Python', 31: 'Kotlin', 32: 'Swift', 35: 'Spring', 36: 'Django'
+  };
+  var SKILL_BY_KEY = {
+    dotnet: 1, '.net': 1, net: 1, csharp: 1, 'c#': 1, laravel: 2, angular: 3,
+    'c++': 6, cpp: 6, c: 6, flutter: 7, golang: 10, go: 10, java: 11,
+    react: 12, vue: 13, vuejs: 13, typescript: 14, ts: 14, javascript: 15, js: 15,
+    node: 16, nodejs: 16, 'node.js': 16, php: 17, ruby: 19, rails: 19, rust: 20, scala: 21,
+    python: 27, py: 27, kotlin: 31, swift: 32, spring: 35, django: 36
+  };
+
+  function lookup(name, byKey, byLabel) {
     if (name == null || name === '') return null;
     var k = String(name).toLowerCase();
-    if (GRADE_BY_KEY[k] != null) return GRADE_BY_KEY[k];
-    if (GRADES[k]) return Number(k);          // already a numeric id
+    if (byKey[k] != null) return byKey[k];
+    if (byLabel[k]) return Number(k);   // already a numeric id
     return null;
   }
-  function resolveProfession(name) {
-    if (name == null || name === '') return null;
-    var k = String(name).toLowerCase();
-    if (PROF_BY_KEY[k] != null) return PROF_BY_KEY[k];
-    if (PROF_LABEL[k]) return Number(k);      // already a numeric id
-    return null;
+  function resolveGrade(name) { return lookup(name, GRADE_BY_KEY, GRADES); }
+  function resolveProfession(name) { return lookup(name, PROF_BY_KEY, PROF_LABEL); }
+  function resolveCity(name) { return lookup(name, CITY_BY_KEY, CITY_LABEL); }
+  function resolveSkill(name) { return lookup(name, SKILL_BY_KEY, SKILL_LABEL); }
+  function resolveMany(val, fn) {
+    var arr = Array.isArray(val) ? val : (val == null || val === '' ? [] : [val]);
+    var out = [];
+    arr.forEach(function (v) { var id = fn(v); if (id != null && out.indexOf(id) === -1) out.push(id); });
+    return out;
   }
 
   function cacheGet(key) {
@@ -126,10 +166,14 @@
   function chart(opts) {
     opts = opts || {};
     var gid = resolveGrade(opts.grade), pid = resolveProfession(opts.profession);
+    var cids = resolveMany(opts.cities != null ? opts.cities : opts.city, resolveCity);
+    var sids = resolveMany(opts.skills != null ? opts.skills : opts.skill, resolveSkill);
     var qs = '';
     if (gid != null) qs += '&grade=' + gid;
     if (pid != null) qs += '&profsInclude=' + pid;
-    var key = (gid || '') + ':' + (pid || '');
+    cids.forEach(function (c) { qs += '&cities=' + c; });
+    sids.forEach(function (s) { qs += '&skills=' + s; });
+    var key = (gid || '') + ':' + (pid || '') + ':' + cids.join(',') + ':' + sids.join(',');
     var cached = cacheGet(key);
     if (cached) { cached._cached = true; return Promise.resolve(cached); }
     if (!w.fetch) return Promise.reject(new Error('no fetch'));
@@ -137,7 +181,13 @@
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     }).then(function (d) {
-      var n = normalize(d, { grade: gid, profession: pid, gradeLabel: gid && GRADES[gid] ? GRADES[gid].label : '', professionLabel: pid ? PROF_LABEL[pid] : '' });
+      var n = normalize(d, {
+        grade: gid, profession: pid, cities: cids, skills: sids,
+        gradeLabel: gid && GRADES[gid] ? GRADES[gid].label : '',
+        professionLabel: pid ? PROF_LABEL[pid] : '',
+        cityLabels: cids.map(function (c) { return CITY_LABEL[c] || c; }),
+        skillLabels: sids.map(function (s) { return SKILL_LABEL[s] || s; })
+      });
       cacheSet(key, n);
       return n;
     });
@@ -148,10 +198,19 @@
     toUSD: toUSD,
     resolveGrade: resolveGrade,
     resolveProfession: resolveProfession,
+    resolveCity: resolveCity,
+    resolveSkill: resolveSkill,
     GRADES: GRADES,
     GRADE_BY_KEY: GRADE_BY_KEY,
     PROF_BY_KEY: PROF_BY_KEY,
     PROF_LABEL: PROF_LABEL,
+    CITY_BY_KEY: CITY_BY_KEY,
+    CITY_LABEL: CITY_LABEL,
+    SKILL_BY_KEY: SKILL_BY_KEY,
+    SKILL_LABEL: SKILL_LABEL,
+    // Curated latin keys for autocomplete / hints (no cyrillic dupes).
+    CITY_KEYS: ['almaty', 'astana', 'shymkent', 'karaganda', 'atyrau', 'aktobe', 'aktau', 'pavlodar', 'taraz', 'semey', 'kostanay', 'oral', 'oskemen', 'kyzylorda', 'turkestan'],
+    SKILL_KEYS: ['python', 'java', 'golang', 'csharp', 'php', 'javascript', 'typescript', 'react', 'vue', 'angular', 'node', 'kotlin', 'swift', 'flutter', 'ruby', 'rust', 'scala', 'django', 'spring', 'laravel'],
     CONTRIBUTE_URL: CONTRIBUTE_URL,
     SOURCE_URL: SOURCE_URL
   };

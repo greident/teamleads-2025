@@ -1,0 +1,9 @@
+{{- /* Compact KZT money label. Input: a number (float/int). Output: "1.36 млн ₸" / "840 тыс ₸". */ -}}
+{{- $v := . -}}
+{{- if ge $v 1000000.0 -}}
+{{- printf "%.2f млн ₸" (div $v 1000000.0) -}}
+{{- else if ge $v 1000.0 -}}
+{{- printf "%.0f тыс ₸" (div $v 1000.0) -}}
+{{- else -}}
+{{- printf "%.0f ₸" $v -}}
+{{- end -}}

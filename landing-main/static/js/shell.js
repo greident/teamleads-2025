@@ -282,17 +282,17 @@
       printNode(n);
       print('Чем больше анкет – тем точнее цифры для всего сообщества.', 'dim');
     }
-    function salaryLive(grade, role) {
+    function salaryLive(grade, role, cities, skills) {
       var S = w.TeamleadsSalary, titles = SAL.roleTitles || {};
       var loading = print('запрашиваю свежие данные с techinterview.space…', 'dim');
-      S.chart({ grade: grade, profession: role }).then(function (res) {
+      S.chart({ grade: grade, profession: role, cities: cities, skills: skills }).then(function (res) {
         if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
         if (!res || !res.count) { print('salary: по такому фильтру данных нет – показываю оценку сообщества.', 'dim'); salaryOffline(grade, role); return; }
-        var rate = res.usdRate;
+        var rate = res.usdRate, q = res.query || {};
         function usd(v) { return rate ? ' (~$' + String(S.toUSD(v, rate)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ')' : ''; }
         var roleLabel = role ? (titles[role] || S.PROF_LABEL[S.resolveProfession(role)] || role) : '';
-        var gradeLabel = grade ? ((res.query && res.query.gradeLabel) || grade) : '';
-        var head = [roleLabel, gradeLabel].filter(Boolean).join(' · ') || 'Весь рынок IT · РК';
+        var gradeLabel = grade ? (q.gradeLabel || grade) : '';
+        var head = [roleLabel, gradeLabel].concat(q.cityLabels || [], q.skillLabels || []).filter(Boolean).join(' · ') || 'Весь рынок IT · РК';
         print('💰 ' + head + ' · нетто/мес', 'accent');
         print('живые данные · ' + res.count + ' зарплат · обновлено ' + res.updated + (res._cached ? ' · из кеша' : ''), 'dim');
         print('────────────────────────────────────────', 'dim');
@@ -312,17 +312,19 @@
         }
         if (res.histogram && res.histogram.items && res.histogram.items.length) {
           print('────────────────────────────────────────', 'dim');
-          print('Распределение зарплат:', 'accent');
+          print('Распределение (локальный рынок · нетто/мес):', 'accent');
           var h = res.histogram, mx = Math.max.apply(null, h.items) || 1;
           h.labels.forEach(function (lab, i) {
             var c = h.items[i] || 0;
-            print('  ' + pad(salMoney(lab), 7) + salBar('▓', c, mx, 18) + ' ' + c, c ? null : 'dim');
+            var rng = i === 0 ? 'до ' + salMoney(lab) : salMoney(h.labels[i - 1]) + '–' + salMoney(lab);
+            print('  ' + pad(rng, 12) + salBar('▓', c, mx, 16) + ' ' + c + ' чел.', c ? null : 'dim');
           });
-          print('  бакет ' + salMoney(h.step) + ' ₸ · столбик = число анкет', 'dim');
+          print('  столбик = число анкет в диапазоне; самые высокие (>' + salMoney(h.labels[h.labels.length - 1]) + ') в график не попали', 'dim');
         }
         print('────────────────────────────────────────', 'dim');
         salaryNudge();
-        if (!grade || !role) print('Уточнить: salary <грейд> <роль>. Напр.: salary senior backend', 'hint');
+        print('Уточнить: salary <грейд> <роль> <город> <скилл> · Tab – подсказки. Напр.: salary senior backend almaty', 'hint');
+        print('Полная страница с графиками: open salary', 'dim');
       }).catch(function (e) {
         if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
         print('salary: сервис недоступен (' + e.message + ') – показываю оценку сообщества.', 'dim');
@@ -582,21 +584,30 @@
         var grades = SAL.grades || {}, roles = SAL.roles || {}, aliases = SAL.aliases || {};
         var gradeNames = Object.keys(grades), roleNames = Object.keys(roles);
         if (!gradeNames.length || !roleNames.length) { print('salary: данные о зарплатах не загружены', 'err'); return; }
+        var S = w.TeamleadsSalary;
         if (a[0] === 'help' || a[0] === '--help' || a[0] === '-h') {
           print('Зарплаты рынка РК – живые данные techinterview.space', 'accent');
-          print('Использование: salary [грейд] [роль]. Напр.: salary senior backend', 'hint');
+          print('Использование: salary [грейд] [роль] [город] [скилл]. Напр.: salary senior backend almaty', 'hint');
           print('  без аргументов – обзор всего рынка (медиана, грейд-лестница, распределение)', 'dim');
           print('  грейды: ' + gradeNames.join(', '), 'dim');
           print('  роли:   ' + roleNames.join(', '), 'dim');
+          if (S) {
+            print('  города: ' + Object.keys(S.CITY_LABEL).map(function (k) { return S.CITY_LABEL[k]; }).slice(0, 8).join(', ') + ' …', 'dim');
+            print('  скиллы: ' + Object.keys(S.SKILL_LABEL).map(function (k) { return S.SKILL_LABEL[k]; }).join(', '), 'dim');
+          }
+          print('Подробная страница: open salary · /salary/', 'dim');
           return;
         }
-        // Resolve every token to a grade or a role (via RU aliases); last one wins.
-        var grade = '', role = '';
+        // Resolve every token to a grade / role / city / skill (via RU aliases); last grade & role win, cities/skills accumulate.
+        var grade = '', role = '', cities = [], skills = [];
         a.forEach(function (raw) {
-          var t = (aliases[raw.toLowerCase()] || raw.toLowerCase());
-          if (grades[t]) grade = t; else if (roles[t]) role = t;
+          var lc = raw.toLowerCase(), t = (aliases[lc] || lc);
+          if (grades[t]) { grade = t; return; }
+          if (roles[t]) { role = t; return; }
+          if (S && S.resolveCity(lc) != null) { cities.push(lc); return; }
+          if (S && S.resolveSkill(lc) != null) { skills.push(lc); return; }
         });
-        if (w.TeamleadsSalary && w.fetch) salaryLive(grade, role);
+        if (S && w.fetch) salaryLive(grade, role, cities, skills);
         else salaryOffline(grade, role);
       },
       claude: function (a) {
@@ -808,8 +819,25 @@
         return;
       }
       var parts = v.split(/\s+/), frag = parts[parts.length - 1], pool;
+      var verb0 = (parts[0] || '').toLowerCase();
       if (parts.length <= 1) {
         pool = Object.keys(commands);
+      } else if (verb0 === 'salary' && frag.indexOf('/') === -1) {
+        // `salary <Tab>` → suggest grades, roles, cities, skills. On empty fragment
+        // show a grouped cheatsheet so it's clear what each argument means.
+        var S = w.TeamleadsSalary;
+        pool = Object.keys(SAL.grades || {}).concat(Object.keys(SAL.roles || {}));
+        if (S) pool = pool.concat(S.CITY_KEYS || [], S.SKILL_KEYS || []);
+        if (!frag) {
+          print('грейд: ' + Object.keys(SAL.grades || {}).join(' '), 'dim');
+          print('роль:  ' + Object.keys(SAL.roles || {}).join(' '), 'dim');
+          if (S) {
+            print('город: ' + (S.CITY_KEYS || []).slice(0, 10).join(' ') + ' …', 'dim');
+            print('скилл: ' + (S.SKILL_KEYS || []).slice(0, 12).join(' ') + ' …', 'dim');
+          }
+          print('пример: salary senior backend almaty python', 'hint');
+          comp.full = null; return;
+        }
       } else if (frag.indexOf('/') !== -1) {
         // "section/partial" → complete page names within that section
         var s = frag.split('/')[0];
