@@ -48,6 +48,8 @@
     try { QUESTIONS = JSON.parse(root.getAttribute('data-questions') || '[]') || []; } catch (e) { QUESTIONS = []; }
     var VOICES = [];     // curated chat quotes (data/voices.yaml) → `voices`
     try { VOICES = JSON.parse(root.getAttribute('data-voices') || '[]') || []; } catch (e) { VOICES = []; }
+    var COMPANIES = [];  // pre-fetched companies with reviews (data/companies.json) → `companies`
+    try { COMPANIES = JSON.parse(root.getAttribute('data-companies') || '[]') || []; } catch (e) { COMPANIES = []; }
     var hintedShare = false;
     var sections = FS.sections || {};
     var links = FS.links || {};
@@ -79,6 +81,43 @@
       var gap = width - String(name).length;
       f.appendChild(el('span', 'dim', gap > 0 ? new Array(gap + 1).join(' ') : ' '));
       return f;
+    }
+    // ── techinterview.space company reviews (data source attribution required) ──
+    var TIAPI = 'https://api.techinterview.space/api';
+    var TIWEB = 'https://techinterview.space';
+    function linkTI(path, text) { return link(TIWEB + path, text, true); }
+    var RU_MON = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+    function fmtDate(iso) { if (!iso) return ''; var t = new Date(iso); if (isNaN(t.getTime())) return ''; return t.getDate() + ' ' + RU_MON[t.getMonth()] + ' ' + t.getFullYear(); }
+    function rstar(n) { return '★ ' + ((n || n === 0) ? Number(n).toFixed(1) : '–'); }
+    // Generic pager: returns the requested slice + page metadata.
+    function paginate(items, page, per) {
+      per = per || 8; var total = items.length;
+      var pages = Math.max(1, Math.ceil(total / per));
+      page = Math.min(Math.max(1, page || 1), pages);
+      var from = (page - 1) * per;
+      return { slice: items.slice(from, from + per), page: page, pages: pages, total: total, from: total ? from + 1 : 0, to: Math.min(from + per, total) };
+    }
+    // Footer line + next/prev hints for a paginated command (base = command without page arg).
+    function pageNav(p, base) {
+      if (p.pages <= 1) { if (p.total) print('всего: ' + p.total, 'dim'); return; }
+      print('стр. ' + p.page + '/' + p.pages + '  ·  ' + p.from + '–' + p.to + ' из ' + p.total, 'dim');
+      var nav = [];
+      if (p.page < p.pages) nav.push(base + ' ' + (p.page + 1) + ' – дальше');
+      if (p.page > 1) nav.push(base + ' ' + (p.page - 1) + ' – назад');
+      if (nav.length) print(nav.join('  ·  '), 'hint');
+    }
+    // Split args into a trailing page number and the rest of the query.
+    function pageArg(a) {
+      var args = (a || []).slice(); var page = 1;
+      if (args.length && /^\d+$/.test(args[args.length - 1])) page = parseInt(args.pop(), 10);
+      return { q: args.join(' ').trim(), page: page };
+    }
+    // Resolve a free-text query to a baked company (exact slug, then name/slug contains).
+    function resolveCompany(q) {
+      q = (q || '').toLowerCase();
+      for (var i = 0; i < COMPANIES.length; i++) { if (COMPANIES[i].slug === q) return COMPANIES[i]; }
+      for (i = 0; i < COMPANIES.length; i++) { var c = COMPANIES[i]; if (c.name.toLowerCase().indexOf(q) !== -1 || c.slug.indexOf(q) !== -1) return c; }
+      return null;
     }
     function pathStr() { return '/' + cwd; }
     // PowerShell maps the section to a Windows path: C:\Users\guest[\section].
@@ -334,7 +373,7 @@
       n.appendChild(d.createTextNode('В выборке нет твоей вилки? Добавь анонимно за пару минут → '));
       n.appendChild(link(url, 'techinterview.space/salaries', true));
       printNode(n);
-      print('Чем больше анкет – тем точнее цифры для всего сообщества.', 'dim');
+      print('Чем больше анкет – тем точнее цифры для всего сообщества. Прямо здесь: submit salary', 'dim');
     }
     function salaryLive(grade, role, cities, skills) {
       var S = w.TeamleadsSalary, titles = SAL.roleTitles || {};
@@ -425,12 +464,17 @@
           ['claude <вопрос>', 'спросить Claude (офлайн-демо)'],
           ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
           ['salary', 'зарплаты рынка (живые данные): salary senior backend'],
+          ['submit salary', 'добавить свою вилку в выборку (нужна авторизация)'],
           ['sim', 'тимлид-симулятор: развилки и решения'],
           ['discuss', 'случайная тема из бэклога + разбор по ней'],
           ['principles', 'доктрина сообщества: принципы из реальных кейсов'],
           ['tools', 'топ инструментов сообщества'],
           ['toolkit', 'шаблоны операционки: 1-on-1, ретро, постмортем…'],
+          ['showcase submit', 'добавить свой проект в витрину (инструкция)'],
           ['voices', 'реальные реплики участников из чата'],
+          ['companies', 'отзывы о компаниях (techinterview.space)'],
+          ['company <имя>', 'читать отзывы о компании + ссылка'],
+          ['addreview <имя>', 'оставить свой отзыв о компании'],
           ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
@@ -443,8 +487,11 @@
         print(''); print('Пасхалки: fortune, vim, top, sudo, git blame, coffee, 42, rm -rf /.', 'dim');
       },
       ls: function (a) {
-        // accept and ignore flags (-l, -a, -la, -al …); first non-flag arg is the path
+        // accept and ignore flags (-l, -a, -la, -al …); first non-flag arg is the path,
+        // a trailing number is the page (ls articles 2)
         var args = (a || []).filter(function (x) { return x && x.charAt(0) !== '-'; });
+        var lsPage = 1;
+        for (var ai = args.length - 1; ai >= 0; ai--) { if (/^\d+$/.test(args[ai])) { lsPage = parseInt(args[ai], 10); args.splice(ai, 1); break; } }
         var where = (args[0] || '').replace(/^\/|\/$/g, '') || cwd;
         if (!where) {
           print('drwxr-xr-x  разделы:', 'dim');
@@ -458,10 +505,12 @@
         if (sections[where]) {
           var items = sections[where];
           if (!items.length) { print('пусто', 'dim'); return; }
-          items.forEach(function (it) {
+          var lp = paginate(items, lsPage, 8);
+          lp.slice.forEach(function (it) {
             var n = el('span'); n.appendChild(el('span', 'dim', '  ')); n.appendChild(linkpad(it.u, it.n, 26));
             if (it.d) n.appendChild(el('span', 'dim', it.d + '  ')); n.appendChild(d.createTextNode(it.t)); printNode(n);
           });
+          pageNav(lp, 'ls ' + where);
           return;
         }
         print('ls: нет такого раздела: ' + where, 'err');
@@ -633,6 +682,66 @@
         });
         print(''); print('Больше из чата: open insights', 'hint');
       },
+      companies: function (a) {
+        if (!COMPANIES.length) { print('companies: список не загружен', 'err'); return; }
+        var pa = pageArg(a);
+        var list = COMPANIES;
+        if (pa.q) list = COMPANIES.filter(function (c) { return c.name.toLowerCase().indexOf(pa.q.toLowerCase()) !== -1; });
+        if (!list.length) { print('companies: ничего не найдено по «' + pa.q + '»', 'dim'); return; }
+        print('Отзывы о компаниях' + (pa.q ? ' · поиск: ' + pa.q : '') + ' (данные techinterview.space):', 'accent');
+        var p = paginate(list, pa.page, 8);
+        p.slice.forEach(function (c) {
+          var n = el('span');
+          n.appendChild(el('span', 'accent', pad(rstar(c.rating), 7)));
+          n.appendChild(linkpad(TIWEB + '/companies/' + c.slug, c.name, 28, true));
+          n.appendChild(el('span', 'dim', c.reviewsCount + ' отз.'));
+          printNode(n);
+        });
+        pageNav(p, 'companies' + (pa.q ? ' ' + pa.q : ''));
+        print('Источник: techinterview.space · company <имя> – отзывы в терминале', 'dim');
+      },
+      company: function (a) {
+        var pa = pageArg(a);
+        if (!pa.q) { print('company: укажите компанию. Список: companies. Напр.: company kaspi', 'err'); return; }
+        var match = resolveCompany(pa.q);
+        if (!match) { print('company: «' + pa.q + '» не найдена среди компаний с отзывами. companies – список.', 'err'); return; }
+        if (!w.fetch) { print('company: fetch недоступен – откройте ' + TIWEB + '/companies/' + match.slug, 'err'); return; }
+        var loading = print('загрузка отзывов о «' + match.name + '»…', 'dim');
+        w.fetch(TIAPI + '/companies/' + match.slug).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (data) {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          var c = (data && data.company) || {};
+          var reviews = (c.reviews || []).slice().sort(function (x, y) { return (y.createdAt || '').localeCompare(x.createdAt || ''); });
+          print(c.name + '  ' + rstar(c.rating) + '  ·  ' + (c.reviewsCount || reviews.length) + ' отзывов', 'accent');
+          var hn = el('span'); hn.appendChild(el('span', 'dim', 'страница: ')); hn.appendChild(linkTI('/companies/' + c.slug, 'techinterview.space/companies/' + c.slug)); printNode(hn);
+          print('────────────────────────────', 'dim');
+          if (!reviews.length) { print('Пока нет одобренных отзывов. Будьте первым: addreview ' + match.slug, 'hint'); }
+          else {
+            var p = paginate(reviews, pa.page, 3);
+            p.slice.forEach(function (rv) {
+              print(rstar(rv.totalRating) + '  ' + (rv.iWorkHere ? 'работает сейчас' : 'бывш. сотрудник') + (rv.createdAt ? ' · ' + fmtDate(rv.createdAt) : ''), 'cy');
+              if (rv.pros) print('  + ' + rv.pros);
+              if (rv.cons) print('  – ' + rv.cons);
+              print('  👍 ' + (rv.likesCount || 0) + '   👎 ' + (rv.dislikesCount || 0), 'dim');
+              print('');
+            });
+            pageNav(p, 'company ' + match.slug);
+          }
+          print('Источник данных: techinterview.space/companies/' + c.slug, 'dim');
+          print('Оставить свой отзыв: addreview ' + match.slug, 'hint');
+        }).catch(function (e) {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          print('company: не удалось загрузить – ' + e.message + '. Откройте ' + TIWEB + '/companies/' + match.slug, 'err');
+        });
+      },
+      addreview: function (a) {
+        var q = (a || []).join(' ').trim();
+        if (!q) { print('addreview: укажите компанию. Напр.: addreview kaspi', 'err'); return; }
+        var match = resolveCompany(q);
+        if (!match) { print('addreview: «' + q + '» не найдена. companies – список.', 'err'); return; }
+        print('Оставить отзыв о «' + match.name + '» на techinterview.space:', 'accent');
+        var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(linkTI('/companies/' + match.id + '/add-review', 'Открыть форму отзыва')); printNode(n);
+        print('Форма откроется на techinterview.space – партнёрском сервисе сообщества.', 'dim');
+      },
       tools: function () {
         print('Топ инструментов, которые советует сообщество:', 'accent');
         [
@@ -670,8 +779,10 @@
             print('  скиллы: ' + Object.keys(S.SKILL_LABEL).map(function (k) { return S.SKILL_LABEL[k]; }).join(', '), 'dim');
           }
           print('Подробная страница: open salary · /salary/', 'dim');
+          print('Добавить свою вилку в выборку: salary submit', 'hint');
           return;
         }
+        if (/^(submit|add|добавить|поделиться)$/.test((a[0] || '').toLowerCase())) { return commands.submit(); }
         // Resolve every token to a grade / role / city / skill (via RU aliases); last grade & role win, cities/skills accumulate.
         var grade = '', role = '', cities = [], skills = [];
         a.forEach(function (raw) {
@@ -718,6 +829,30 @@
         print('Сайт открытый – буду рад правкам и pull request:', 'cy');
         printNode(link(url, url, true));
         w.open(url, '_blank', 'noopener');
+      },
+      submit: function () {
+        var url = 'https://techinterview.space/salaries/add-new';
+        try { if (w.ym) w.ym(106055675, 'reachGoal', 'salary_submit', { source: 'shell' }); } catch (e) {}
+        print('Поделиться своей зарплатой – анонимно, пара минут.', 'accent');
+        print('Откроется форма techinterview.space. Нужна авторизация (вход через GitHub/Google).', 'dim');
+        printNode(link(url, url, true));
+        print('Чем больше анкет – тем точнее цифры в salary для всего сообщества.', 'dim');
+        w.open(url, '_blank', 'noopener');
+      },
+      showcase: function (a) {
+        var sub = (a[0] || '').toLowerCase();
+        if (/^(submit|add|new|добавить)$/.test(sub)) {
+          var url = 'https://github.com/belyaevsa/teamleads-2025/blob/master/landing-main/SHOWCASE.md';
+          try { if (w.ym) w.ym(106055675, 'reachGoal', 'showcase_submit', { source: 'shell' }); } catch (e) {}
+          print('Добавить свой проект в витрину сообщества.', 'accent');
+          print('Инструкция (SHOWCASE.md): форк репозитория → шаблон в content/showcase/ → Pull Request.', 'dim');
+          printNode(link(url, url, true));
+          w.open(url, '_blank', 'noopener');
+          return;
+        }
+        // bare `showcase` (or anything else) → list the section in place
+        commands.ls(['showcase']);
+        print('Добавить свой проект: showcase submit', 'hint');
       },
       whoami: function () {
         print('«Тимлид не кодит» – сообщество тимлидов, EM и CTO Казахстана.', 'accent');
@@ -777,7 +912,9 @@
           discuss: 'discuss – случайная тема для обсуждения из бэклога /questions/ + что есть по ней в архиве. Синонимы: topic, тема, обсудить.',
           tools: 'tools – топ инструментов сообщества.',
           toolkit: 'toolkit – рабочие шаблоны (1-on-1, ретро, постмортем, найм, ADR). cat toolkit/<имя> – открыть шаблон здесь.',
-          salary: 'salary [грейд] [роль] – зарплаты рынка РК: живые данные techinterview.space (медиана, среднее, ремоут-премия, грейд-лестница, распределение). Без аргументов – обзор всего рынка. Напр.: salary senior backend. При офлайне – оценка сообщества.',
+          salary: 'salary [грейд] [роль] – зарплаты рынка РК: живые данные techinterview.space (медиана, среднее, ремоут-премия, грейд-лестница, распределение). Без аргументов – обзор всего рынка. Напр.: salary senior backend. При офлайне – оценка сообщества. salary submit – добавить свою вилку.',
+          submit: 'submit (salary) – открыть форму techinterview.space/salaries/add-new и добавить свою зарплату в общую выборку. Анонимно; нужна авторизация (GitHub/Google). Синонимы: salary submit, salary add.',
+          showcase: 'showcase – витрина проектов участников. showcase submit – открыть инструкцию SHOWCASE.md (форк → шаблон → Pull Request).',
           sim: 'sim – тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
           principles: 'principles – доктрина сообщества: принципы управления, выжатые из реальных кейсов и статей. Синонимы: doctrine, manifesto.',
           friends: 'friends – дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
@@ -834,7 +971,11 @@
     commands.simulator = commands.sim; commands.game = commands.sim; commands.play = commands.sim;
     commands.topic = commands.discuss; commands['обсудить'] = commands.discuss; commands['тема'] = commands.discuss;
     commands.chat = commands.voices; commands['голоса'] = commands.voices; commands.quotes = commands.voices;
+    commands.reviews = commands.company; commands.review = commands.company; commands.submit = commands.addreview;
+    commands['компании'] = commands.companies; commands['компания'] = commands.company;
     commands.about = commands.whoami; commands.manifesto = commands.principles; commands.doctrine = commands.principles;
+    commands.contribute_salary = commands.submit; commands['добавить-зарплату'] = commands.submit;
+    commands.projects = commands.showcase; commands['витрина'] = commands.showcase;
 
     // PowerShell dialect – so Windows visitors can drive the shell with the verbs
     // (and aliases) they already know. Cmdlet names arrive lowercased via run().
@@ -934,6 +1075,15 @@
           print('пример: salary senior backend almaty python', 'hint');
           comp.full = null; return;
         }
+      } else if (/^(company|reviews|review|addreview|submit)$/.test(verb0)) {
+        // `company <Tab>` → complete company slugs from the baked list
+        if (!frag) {
+          echoLine();
+          print('напр.: ' + COMPANIES.slice(0, 10).map(function (c) { return c.slug.replace(/-[0-9a-f]{6,}$/, ''); }).join(' · '), 'dim');
+          print('companies – полный список компаний с отзывами', 'hint');
+          comp.full = null; return;
+        }
+        pool = COMPANIES.map(function (c) { return c.slug; });
       } else if (frag.indexOf('/') !== -1) {
         // "section/partial" → complete page names within that section
         var s = frag.split('/')[0];
