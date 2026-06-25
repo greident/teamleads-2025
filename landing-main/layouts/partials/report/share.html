@@ -5,11 +5,11 @@
            The terminal reads the command from the URL hash on load (see static/js/shell.js),
            so the recipient lands straight in the terminal with this page already open.
        Context: the page (.) */ -}}
-{{- $shellSections := slice "events" "articles" "insights" "showcase" -}}
+{{- /* Shell-mode share points at the per-page catshare card (terminal OG image +
+       redirect into /shell/ running `cat <section>/<base>`). */ -}}
 {{- $shellHref := "" -}}
-{{- if and .File (in $shellSections .Section) -}}
-  {{- $cmd := printf "cat %s/%s" .Section .File.ContentBaseName -}}
-  {{- $shellHref = printf "%s#%s" (absURL "/shell/") (replace $cmd " " "%20") -}}
+{{- with .OutputFormats.Get "catshare" -}}
+  {{- $shellHref = .Permalink -}}
 {{- end -}}
 <div class="report-share" data-share data-url="{{ .Permalink }}" data-title="{{ .Title }}"{{ with $shellHref }} data-shell="{{ . }}"{{ end }}>
     <button type="button" class="share-trigger" data-share-trigger aria-haspopup="true" aria-expanded="false">

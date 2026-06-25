@@ -32,6 +32,9 @@
     try { FRIENDS = JSON.parse(root.getAttribute('data-friends') || '[]') || []; } catch (e) { FRIENDS = []; }
     var SCEN = {};
     try { SCEN = JSON.parse(root.getAttribute('data-scenarios') || '{}') || {}; } catch (e) { SCEN = {}; }
+    var SHARE = {};  // verb → /s/<id>/ card id (from data/shell_commands.toml)
+    try { SHARE = JSON.parse(root.getAttribute('data-share') || '{}') || {}; } catch (e) { SHARE = {}; }
+    var hintedShare = false;
     var sections = FS.sections || {};
     var links = FS.links || {};
     var sectionNames = Object.keys(sections);
@@ -81,6 +84,7 @@
       return node;
     }
     function mdLine(line) {
+      if (!line.trim()) return null;   // collapse blank lines — spacing is controlled by CSS margins
       var div = el('div', 'ln'), m;
       if ((m = /^(#{1,6})\s+(.*)$/.exec(line))) { div.className = 'ln md-h md-h' + m[1].length; return mdInline(div, m[2]); }
       if (/^\s*(---+|\*\*\*+|___+)\s*$/.test(line)) { div.className = 'ln md-hr'; div.textContent = '────────────────────────────'; return div; }
@@ -90,6 +94,7 @@
         div.appendChild(el('span', 'md-bullet', /\d/.test(m[2]) ? m[2] + ' ' : '• '));
         return mdInline(div, m[3]);
       }
+      if (line.trim()) div.className = 'ln md-p';   // paragraph — gets extra spacing
       return mdInline(div, line);
     }
 
@@ -343,7 +348,7 @@
         w.fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (txt) {
           if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
           var lines = txt.replace(/\s+$/, '').split('\n'), CAP = 400;
-          lines.slice(0, CAP).forEach(function (l) { if (raw) print(l); else out.appendChild(mdLine(l)); });
+          lines.slice(0, CAP).forEach(function (l) { if (raw) { print(l); return; } var node = mdLine(l); if (node) out.appendChild(node); });
           body.scrollTop = body.scrollHeight;
           if (lines.length > CAP) print('… обрезано (' + (lines.length - CAP) + ' строк). open ' + arg + ' — полная версия.', 'dim');
         }).catch(function (e) {
@@ -577,6 +582,19 @@
       } catch (e) {}
     }
 
+    // Make the address bar a shareable link for the command just run: a /s/<id>/
+    // OG-card page when one exists, else /shell/#<cmd>. Copying the URL = sharing.
+    function syncUrl(cmd) {
+      try {
+        if (!(w.history && w.history.replaceState)) return;
+        var verb = (cmd.split(/\s+/)[0] || '').toLowerCase();
+        var id = SHARE[verb];
+        var url = id ? (w.location.origin + '/s/' + id + '/') : (w.location.origin + '/shell/#' + encodeURIComponent(cmd));
+        w.history.replaceState(null, '', url);
+        if (!hintedShare) { hintedShare = true; print('адрес в строке браузера обновился — это ссылка на эту команду, делитесь', 'dim'); }
+      } catch (e) {}
+    }
+
     function run(raw, noTrack) {
       var str = raw.trim();
       var p = el('div', 'ln'); var pr = el('span', 'term-prompt'); pr.innerHTML = '<b>guest@teamleads</b>:' + pathStr() + '$ ';
@@ -587,7 +605,7 @@
         body.scrollTop = body.scrollHeight; return;
       }
       if (!str) { body.scrollTop = body.scrollHeight; return; }
-      if (!noTrack) { hist.push(str); track(str); saveHist(); }
+      if (!noTrack) { hist.push(str); track(str); saveHist(); syncUrl(str); }
       hpos = hist.length;
       var parts = str.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
       if (commands.hasOwnProperty(cmd)) { try { commands[cmd](args); } catch (e) { print('ошибка: ' + e.message, 'err'); } }

@@ -25,6 +25,15 @@ title = "Тимлид не кодит – Сообщество тимлидов 
   isPlainText = true
   notAlternative = true
 
+# Per-page "open in shell" share card: a real URL (/<section>/<base>/shell.html) with
+# a terminal-style OG image for `cat <section>/<base>` + a JS redirect into /shell/.
+# Enabled only on content sections via cascade in their _index.md.
+[outputFormats.catshare]
+  mediaType = "text/html"
+  baseName = "shell"
+  suffix = "html"
+  notAlternative = true
+
 [outputs]
   page = ["html", "cat"]
   home = ["html", "rss", "shellindex"]

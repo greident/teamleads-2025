@@ -19,7 +19,15 @@
   (dict "n" "techinterview" "t" "techinterview.space — зарплаты и подготовка к собеседованиям" "u" "https://techinterview.space/")
 -}}
 
-<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}' data-scenarios='{{ site.Data.scenarios | jsonify }}'>
+{{- /* verb → /s/<id>/ share-card map, so the shell rewrites the address bar to
+       the right OG-card page as commands run. Single source: shell_commands.toml. */ -}}
+{{- $share := dict -}}
+{{- range site.Data.shell_commands.commands -}}
+  {{- $verb := index (split .run " ") 0 -}}
+  {{- $share = merge $share (dict $verb .id) -}}
+{{- end -}}
+
+<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}' data-scenarios='{{ site.Data.scenarios | jsonify }}' data-share='{{ $share | jsonify }}'>
   <div class="term-bar">
     <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
     <span class="term-title" data-term-title>guest@teamleads: /</span>

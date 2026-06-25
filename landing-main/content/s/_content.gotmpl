@@ -1,4 +1,6 @@
 {{/* Generate one share page per Shell command from data/shell_commands.toml. */}}
+{{/* One share card per catalog command. (Per-page `cat` cards are produced by the
+     `catshare` output format on content pages — see layouts/_default/single.catshare.html.) */}}
 {{ range $c := site.Data.shell_commands.commands }}
   {{ $.AddPage (dict
     "kind" "page"

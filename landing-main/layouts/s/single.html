@@ -20,7 +20,7 @@
   // Humans (JS) get bounced straight into the shell with the command pre-run.
   // Crawlers (no JS) stay here and read this page's terminal-style OG image.
   (function () {
-    try { window.location.replace('/shell/?cmd=' + encodeURIComponent({{ $run | jsonify }})); } catch (e) {}
+    try { window.location.replace('/shell/?{{ querify "cmd" $run }}'); } catch (e) {}
   })();
 </script>
 {{ end }}

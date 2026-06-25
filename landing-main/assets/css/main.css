@@ -3141,14 +3141,16 @@ body > .nav {
 .term-out a:hover{color:#FEC50C;border-bottom-color:#FEC50C}
 .term .dim{color:#6e7681}.term .hint{color:#8b949e}.term .ok{color:#3fb950}.term .err{color:#f85149}.term .accent{color:#FEC50C}.term .cy{color:#39c5cf}
 /* `cat` markdown coloring */
-.term-out .md-h{font-weight:700;margin-top:8px}
-.term-out .md-h1{color:#FEC50C;font-size:1.15em}
+.term-out .md-h{font-weight:700;margin-top:1.3em;margin-bottom:.4em}
+.term-out .md-h1{color:#FEC50C;font-size:1.15em;margin-top:.2em}
 .term-out .md-h2{color:#39c5cf;font-size:1.06em}
 .term-out .md-h3{color:#7ee787}
 .term-out .md-h4,.term-out .md-h5,.term-out .md-h6{color:#8b949e}
-.term-out .md-quote{color:#8b949e;border-left:2px solid #30363d;padding-left:10px;font-style:italic}
-.term-out .md-hr{color:#30363d}
-.term-out .md-li{padding-left:6px}
+.term-out .md-quote{color:#8b949e;border-left:2px solid #30363d;padding-left:10px;font-style:italic;margin:.15em 0}
+.term-out .md-quote:first-of-type{margin-top:.5em}
+.term-out .md-hr{color:#30363d;margin:.6em 0}
+.term-out .md-p{margin-bottom:.85em}
+.term-out .md-li{padding-left:6px;margin-bottom:.15em}
 .term-out .md-li .md-bullet{color:#FEC50C;margin-right:4px}
 .term-out .md-strong{color:#e6edf3;font-weight:700}
 .term-out .md-em{color:#c9d1d9;font-style:italic}
@@ -3178,6 +3180,25 @@ body > .nav {
 .shell-head{text-align:center;margin-bottom:var(--space-lg)}
 .shell-head .section-desc{max-width:600px;margin:var(--space-sm) auto 0}
 .shell-wrap .term{height:80vh;min-height:420px;max-height:none}
+
+/* Desktop: the shell page fills exactly one viewport below the sticky nav, so the
+   terminal fits by height without scrolling the page. shell-wrap flexes; term grows. */
+@media (min-width:769px){
+  .shell-wrap{display:flex;flex-direction:column;min-height:calc(100vh - 90px)}
+  .shell-inner{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+  .shell-head{flex:0 0 auto}
+  .shell-wrap .term{flex:1 1 auto;height:auto;min-height:260px}
+}
+
+/* On phones the fixed bottom-nav (64px) overlays the page, so size the terminal
+   to fit between the page header and that bar — otherwise the input prompt hides. */
+@media (max-width:768px){
+  .shell-wrap{padding:10px 10px 0}
+  .shell-head{margin-bottom:10px}
+  .shell-head .section-title{font-size:1.25rem;margin-bottom:4px}
+  .shell-wrap .section-desc{display:none}
+  .shell-wrap .term{height:calc(100vh - 210px);height:calc(100svh - 210px);min-height:300px}
+}
 
 /* ── Тимлид-симулятор: interactive panel that replaces the terminal body ── */
 .term-sim{flex:1 1 auto;min-height:0;overflow-y:auto;padding:22px;color:#c9d1d9;font-size:14px;line-height:1.6;outline:none;scrollbar-width:thin;scrollbar-color:#30363d #0d1117}
