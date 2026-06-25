@@ -36,6 +36,7 @@
     var cwd = '';            // '' = root, otherwise a section name
     var vimMode = false;
     var hist = [], hpos = -1;
+    var comp = { base: '', list: [], idx: 0, full: null };  // Tab-completion cycling state
 
     function el(t, c, x) { var n = d.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; }
     function print(text, cls) { var n = el('div', 'ln' + (cls ? ' ' + cls : ''), text == null ? '' : text); out.appendChild(n); body.scrollTop = body.scrollHeight; return n; }
@@ -65,7 +66,8 @@
         ].forEach(function (r) { print('  ' + pad(r[0], 16) + r[1]); });
         print(''); print('УТИЛИТЫ', 'accent');
         [
-          ['claude <вопрос>', 'спросить ассистента по материалам'],
+          ['claude <вопрос>', 'спросить Claude (офлайн-демо)'],
+          ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
           ['tools', 'топ инструментов сообщества'],
           ['join', 'ссылка на встречу'],
           ['telegram', 'наш Telegram'],
@@ -199,6 +201,11 @@
         if (hits.length) { hits.slice(0, 4).forEach(function (it) { var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(it.u, it.t)); printNode(n); }); }
         else { print('Ничего не нашёл — попробуйте find <слово> или раздел articles.', 'dim'); }
       },
+      codex: function (a) {
+        var q = a.join(' ').trim();
+        if (w.TeamleadsCodex) { print('открываю Codex' + (q ? ' с вашим вопросом' : '') + '…', 'cy'); w.TeamleadsCodex.open(q); return; }
+        print('Codex-окно недоступно на этой странице.', 'dim');
+      },
       join: function () { print('Еженедельная встреча, среда 17:00 (Астана).', 'cy'); go('/join/'); },
       telegram: function () { print('открываю Telegram…', 'ok'); printNode(link(TG, TG, true)); w.open(TG, '_blank', 'noopener'); },
       whoami: function () { print('guest', 'cy'); print('…но мы-то видим тимлида. Добро пожаловать.', 'dim'); },
@@ -218,7 +225,8 @@
           latest: 'latest — открыть последнюю встречу.',
           random: 'random — открыть случайный материал.',
           tools: 'tools — топ инструментов сообщества.',
-          claude: 'claude <вопрос> — поиск ответа по материалам сообщества (оффлайн-пасхалка).',
+          claude: 'claude <вопрос> — Claude-окно: офлайн-ответ по материалам сообщества.',
+          codex: 'codex <вопрос> — Codex-окно: офлайн-ответ по материалам сообщества.',
           join: 'join — ссылка на еженедельную встречу.',
           fortune: 'fortune — случайная мудрость тимлида.',
           vim: 'vim — открыть редактор. Выход: :q (если повезёт).',
@@ -263,6 +271,7 @@
     commands.go = commands.open; commands.search = commands.find;
     commands.answer = commands['42']; commands.vi = commands.vim;
     commands.ai = commands.claude; commands.ask = commands.claude;
+    commands.gpt = commands.codex; commands.openai = commands.codex;
 
     function run(raw) {
       var str = raw.trim();
@@ -282,13 +291,33 @@
     }
 
     function complete() {
-      var parts = input.value.split(/\s+/), p2;
-      if (parts.length <= 1) p2 = Object.keys(commands);
-      else { p2 = sectionNames.concat(linkNames); if (cwd && sections[cwd]) p2 = p2.concat(sections[cwd].map(function (it) { return it.n; })); }
-      var frag = parts[parts.length - 1];
-      var hits = p2.filter(function (c) { return c.indexOf(frag) === 0; });
-      if (hits.length === 1) { parts[parts.length - 1] = hits[0]; input.value = parts.join(' '); }
-      else if (hits.length > 1) print(hits.slice(0, 40).join('   '), 'dim');
+      var v = input.value;
+      // Repeated Tab on an unchanged value → cycle to the next candidate
+      if (comp.full !== null && v === comp.full && comp.list.length > 1) {
+        comp.idx = (comp.idx + 1) % comp.list.length;
+        input.value = comp.base + comp.list[comp.idx];
+        comp.full = input.value;
+        return;
+      }
+      var parts = v.split(/\s+/), frag = parts[parts.length - 1], pool;
+      if (parts.length <= 1) {
+        pool = Object.keys(commands);
+      } else if (frag.indexOf('/') !== -1) {
+        // "section/partial" → complete page names within that section
+        var s = frag.split('/')[0];
+        pool = (sections[s] || []).map(function (it) { return s + '/' + it.n; });
+      } else {
+        pool = sectionNames.concat(linkNames);
+        if (cwd && sections[cwd]) pool = pool.concat(sections[cwd].map(function (it) { return it.n; }));
+      }
+      if (!frag) { if (pool.length) print(pool.slice(0, 40).join('   '), 'dim'); comp.full = null; return; }
+      var hits = pool.filter(function (c) { return c.indexOf(frag) === 0; });
+      if (!hits.length) { comp.full = null; return; }
+      comp.base = parts.slice(0, parts.length - 1).join(' '); if (comp.base) comp.base += ' ';
+      comp.list = hits; comp.idx = 0;
+      input.value = comp.base + hits[0];     // fill the first match…
+      comp.full = input.value;
+      if (hits.length > 1) print(hits.slice(0, 40).join('   '), 'dim');  // …and show the rest (Tab cycles them)
     }
 
     input.addEventListener('keydown', function (e) {
@@ -300,7 +329,23 @@
     });
     body.addEventListener('click', function (e) { if (e.target.tagName !== 'A') input.focus(); });
 
-    function ready() { if (line) line.hidden = false; input.focus(); if (mode === 'full') setTimeout(function () { run('ls'); }, reduced ? 0 : 140); }
+    // A shareable deep-link can carry a command: /shell/#cat events/meetup-2026-06-24
+    // or /shell/?cmd=cat%20articles/... — it runs once the shell is ready.
+    function urlCommand() {
+      try {
+        var h = (w.location.hash || '').replace(/^#/, '');
+        if (h) return decodeURIComponent(h).trim();
+        var m = (w.location.search || '').match(/[?&]cmd=([^&]*)/);
+        if (m) return decodeURIComponent(m[1].replace(/\+/g, ' ')).trim();
+      } catch (e) {}
+      return '';
+    }
+    function ready() {
+      if (line) line.hidden = false; input.focus();
+      var urlcmd = urlCommand();
+      if (urlcmd) { setTimeout(function () { run(urlcmd); }, reduced ? 0 : 150); return; }
+      if (mode === 'full') setTimeout(function () { run('ls'); }, reduced ? 0 : 140);
+    }
     var boot;
     if (mode === '404') {
       var path = w.location.pathname || '/404';
