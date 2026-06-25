@@ -271,6 +271,7 @@
           ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
           ['salary', 'зарплатные вилки: salary senior backend'],
           ['sim', 'тимлид-симулятор: развилки и решения'],
+          ['principles', 'доктрина сообщества: принципы из реальных кейсов'],
           ['tools', 'топ инструментов сообщества'],
           ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
@@ -498,7 +499,45 @@
         printNode(link(url, url, true));
         w.open(url, '_blank', 'noopener');
       },
-      whoami: function () { print('guest', 'cy'); print('…но мы-то видим тимлида. Добро пожаловать.', 'dim'); },
+      whoami: function () {
+        print('«Тимлид не кодит» — сообщество тимлидов, EM и CTO Казахстана.', 'accent');
+        var facts = [
+          ['состав', '400+ практик: Kaspi, Kolesa, DAR, Chocofamily, InDrive и другие'],
+          ['формат', 'еженедельные встречи, разбор реальных кейсов, отчёты публикуем открыто'],
+          ['о чём', 'люди · архитектура · найм · процессы · карьера — без слайдов и хайпа'],
+          ['с чего начать', 'sim · salary senior backend · principles · latest']
+        ];
+        facts.forEach(function (r) { var n = el('span'); n.appendChild(el('span', 'accent', pad(r[0], 15))); n.appendChild(d.createTextNode(r[1])); printNode(n); });
+        print('');
+        print('whoami → guest. …но мы-то видим тимлида. Добро пожаловать.', 'dim');
+      },
+      principles: function () {
+        print('Доктрина «Тимлид не кодит» — выжимка из реальных кейсов сообщества.', 'accent');
+        print('');
+        var p = [
+          ['Сеньора берут, не дают — лычка не равна уровню.', 'карьера'],
+          ['Тимлид — не «сеньор плюс подчинённые». Тимлид и техлид — разные работы.', 'роли'],
+          ['Бас-фактор — плата за экономию, отложенная во времени. Знание — живому дублёру, не в документ.', 'бас-фактор'],
+          ['Метрики врут не потому что ложны, а потому что вы смотрите не туда.', 'метрики'],
+          ['Сначала диагноз (не хочет / забывает / не видит ценности), потом лекарство.', 'процессы'],
+          ['Ответственность не передаётся лекцией — дайте обжечься под присмотром и научите откатывать.', 'рост'],
+          ['Дорогая оценка часто прячется за страх. Проверяйте её дешёвым совместным экспериментом.', 'оценки'],
+          ['Влияние — не подчинение и не саботаж, а аргументы и информированный выбор.', 'стейкхолдеры'],
+          ['Нанимать стоит под конкретную перегруженную роль, а не чтобы «стало полегче».', 'найм'],
+          ['Самый зрелый способ внедрить ИИ — иногда внедрить его временно: разведать и уйти.', 'AI'],
+          ['Не ставьте на один сценарий. Ценна команда, сильная при любом будущем.', 'AI · команда'],
+          ['Сначала инженер, потом — продуктовый. Гемба вместо хайпа.', 'продукт']
+        ];
+        p.forEach(function (r, i) {
+          var n = el('div', 'ln');
+          n.appendChild(el('span', 'accent', pad(String(i + 1), 3)));
+          n.appendChild(d.createTextNode(r[0] + ' '));
+          n.appendChild(el('span', 'dim', '— ' + r[1]));
+          printNode(n);
+        });
+        print('');
+        print('Каждый принцип — развернутый разбор в статьях: find <тема> или cat articles/…', 'dim');
+      },
       date: function () { print(new Date().toString()); },
       echo: function (a) { print(a.join(' ')); },
       history: function () { if (!hist.length) { print('история пуста', 'dim'); return; } hist.forEach(function (c, i) { print('  ' + pad(i + 1, 4) + c); }); },
@@ -518,6 +557,7 @@
           tools: 'tools — топ инструментов сообщества.',
           salary: 'salary <грейд> <роль> — зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
           sim: 'sim — тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
+          principles: 'principles — доктрина сообщества: принципы управления, выжатые из реальных кейсов и статей. Синонимы: doctrine, manifesto.',
           friends: 'friends — дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
           claude: 'claude <вопрос> — Claude-окно: офлайн-ответ по материалам сообщества.',
           codex: 'codex <вопрос> — Codex-окно: офлайн-ответ по материалам сообщества.',
@@ -570,6 +610,7 @@
     commands.gpt = commands.codex; commands.openai = commands.codex;
     commands.github = commands.contribute; commands.gh = commands.contribute; commands.pr = commands.contribute;
     commands.simulator = commands.sim; commands.game = commands.sim; commands.play = commands.sim;
+    commands.about = commands.whoami; commands.manifesto = commands.principles; commands.doctrine = commands.principles;
 
     // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).
     // Sends only the command NAME (first token) — never the free-text arguments — so no PII.
@@ -704,7 +745,7 @@
       var path = w.location.pathname || '/404';
       boot = [['$ curl -i https://teamleads.kz' + path, 'cy'], ['HTTP/1.1 404 Not Found', 'dim'], ['content-type: text/html; charset=utf-8', 'dim'], ['', null], ['Ресурс не найден. Но раз вы здесь — поднимаем сессию.', null], ['Это Shell Mode: навигируйте по сайту прямо отсюда. help — команды.', 'hint'], ['', null]];
     } else {
-      boot = [['Teamleads Shell — навигация по сайту из терминала.', 'cy'], ['help — команды · ls — осмотреться · open <стр> — открыть · find <слово> — поиск.', 'hint'], ['', null]];
+      boot = [['Teamleads Shell — навигация по сайту из терминала.', 'cy'], ['help — команды · ls — осмотреться · open <стр> — открыть · find <слово> — поиск.', 'hint'], ['С чего начать: sim — симулятор развилок · salary senior backend · principles — доктрина.', 'hint'], ['', null]];
     }
     function bootSeq(i) { if (i >= boot.length) { ready(); return; } print(boot[i][0], boot[i][1]); setTimeout(function () { bootSeq(i + 1); }, reduced ? 0 : 200); }
     setPrompt(); bootSeq(0);

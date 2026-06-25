@@ -164,6 +164,13 @@ desc = "Тимлид-симулятор: развилки управленчес
 out = ["сценарий 1/…  — что выберете?", "a) … b) … c) …"]
 
 [[commands]]
+id = "principles"
+cmd = "principles"
+run = "principles"
+desc = "Доктрина сообщества «Тимлид не кодит»: принципы управления из реальных кейсов."
+out = ["1. Сеньора берут, не дают.", "12 принципов — выжимка из статей сообщества"]
+
+[[commands]]
 id = "salary"
 cmd = "salary senior backend"
 run = "salary senior backend"
