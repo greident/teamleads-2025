@@ -29,6 +29,8 @@
     try { SAL = JSON.parse(root.getAttribute('data-salary') || '{}') || {}; } catch (e) { SAL = {}; }
     var FRIENDS = [];
     try { FRIENDS = JSON.parse(root.getAttribute('data-friends') || '[]') || []; } catch (e) { FRIENDS = []; }
+    var SCEN = {};
+    try { SCEN = JSON.parse(root.getAttribute('data-scenarios') || '{}') || {}; } catch (e) { SCEN = {}; }
     var sections = FS.sections || {};
     var links = FS.links || {};
     var sectionNames = Object.keys(sections);
@@ -60,6 +62,81 @@
     }
     function go(href) { print(''); print('переход → ' + href, 'ok'); setTimeout(function () { w.location.href = href; }, reduced ? 0 : 360); }
 
+    // ── Тимлид-симулятор: a stateful, branching decision mode (like vim, it
+    //    captures the input line until you quit). Scenarios come from data-scenarios.
+    var simSt = null;
+    var SIM_RULE = '──────────────────────────────────────────';
+    function copyText(t) {
+      if (w.navigator && w.navigator.clipboard && w.navigator.clipboard.writeText) return w.navigator.clipboard.writeText(t);
+      return new Promise(function (res, rej) {
+        try { var ta = d.createElement('textarea'); ta.value = t; ta.style.position = 'absolute'; ta.style.left = '-9999px'; d.body.appendChild(ta); ta.select(); var ok = d.execCommand('copy'); d.body.removeChild(ta); ok ? res() : rej(new Error('copy')); } catch (e) { rej(e); }
+      });
+    }
+    function simLink(ref) {
+      if (!ref) return null;
+      var p = ref.split('/'), sec = p[0], name = p[1], hit = null;
+      if (sec && sections[sec]) sections[sec].forEach(function (it) { if (it.n === name) hit = it; });
+      if (!hit) pool.forEach(function (it) { if (it.n === name) hit = it; });
+      return hit;
+    }
+    function simStart() {
+      var list = (SCEN.scenarios || []).slice();
+      if (!list.length) { print('sim: сценарии не загружены', 'err'); return; }
+      for (var i = list.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = list[i]; list[i] = list[j]; list[j] = t; }
+      simSt = { list: list, idx: 0, score: 0, await: 'choice' };
+      print(''); print(SCEN.title || 'Тимлид-симулятор', 'accent');
+      if (SCEN.intro) print(SCEN.intro, 'hint');
+      simShow();
+    }
+    function simShow() {
+      var s = simSt.list[simSt.idx];
+      print(''); print('сценарий ' + (simSt.idx + 1) + '/' + simSt.list.length + '            [q] выйти', 'cy');
+      print(SIM_RULE, 'dim');
+      String(s.prompt || '').split('\n').forEach(function (l) { if (l.trim()) print(l.trim()); });
+      print('');
+      s.options.forEach(function (o, i) { print('  ' + String.fromCharCode(97 + i) + ') ' + o.label); });
+      print('');
+      print('Ваш выбор: ' + s.options.map(function (o, i) { return String.fromCharCode(97 + i); }).join(' / '), 'hint');
+      simSt.await = 'choice';
+    }
+    function simChoose(letter) {
+      var s = simSt.list[simSt.idx], idx = 'abcdefgh'.indexOf(letter);
+      if (idx < 0 && /^[1-9]$/.test(letter)) idx = parseInt(letter, 10) - 1;
+      if (idx < 0 || idx >= s.options.length) { print('Выберите вариант: ' + s.options.map(function (o, i) { return String.fromCharCode(97 + i); }).join(' / '), 'err'); return; }
+      var o = s.options[idx];
+      if (o.good) simSt.score++;
+      print((o.good ? '✓ ' : '✗ ') + o.outcome, o.good ? 'ok' : 'err');
+      if (s.lesson) print('💡 ' + s.lesson, 'hint');
+      if (o.votes != null) print('📊 так выбрали ' + o.votes + '%', 'dim');
+      var hit = simLink(s.link);
+      if (hit) { var n = el('span'); n.appendChild(el('span', 'dim', 'разбор → ')); n.appendChild(link(hit.u, hit.t)); printNode(n); }
+      print(SIM_RULE, 'dim');
+      var last = simSt.idx >= simSt.list.length - 1;
+      print('[enter] ' + (last ? 'итог' : 'дальше') + ' · [s] поделиться · [q] выйти', 'hint');
+      simSt.await = 'next';
+    }
+    function simNext() { simSt.idx++; if (simSt.idx >= simSt.list.length) simFinish(); else simShow(); }
+    function simFinish() {
+      simSt.await = 'done';
+      var n = simSt.list.length, sc = simSt.score;
+      print(''); print('ИТОГ: ' + sc + '/' + n + ' разумных решений', 'accent');
+      print(sc === n ? 'Чистый прогон. Тимлид не кодит – тимлид анблокает.'
+        : sc >= Math.ceil(n / 2) ? 'Крепко. Но часть развилок стоит обсудить вживую.'
+          : 'Есть над чем подумать – как раз тема для встречи.');
+      print(SIM_RULE, 'dim');
+      print('Продолжить вживую: join (среда 17:00) · telegram', 'hint');
+      print('[s] поделиться · [enter] ещё раз · [q] выйти', 'hint');
+    }
+    function simShare() {
+      var url = SCEN.shareUrl || (w.location.origin + '/shell/#sim');
+      var played = simSt.await === 'done' || simSt.idx > 0;
+      var txt = played ? ('Тимлид-симулятор: ' + simSt.score + '/' + simSt.list.length + ' разумных решений. Пройди и ты: ' + url)
+        : ('Тимлид-симулятор в терминале сообщества: ' + url);
+      copyText(txt).then(function () { print('Результат скопирован, делись 👇', 'ok'); }, function () { print('Скопируй ссылку вручную 👇', 'dim'); });
+      var n = el('span'); n.appendChild(el('span', 'dim', '→ ')); n.appendChild(link(url, url)); printNode(n);
+    }
+    function simQuit() { simSt = null; print('вышли из симулятора. Возвращайтесь – развилок много.', 'ok'); }
+
     var commands = {
       help: function () {
         print('НАВИГАЦИЯ', 'accent');
@@ -80,6 +157,7 @@
           ['claude <вопрос>', 'спросить Claude (офлайн-демо)'],
           ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
           ['salary', 'зарплатные вилки: salary senior backend'],
+          ['sim', 'тимлид-симулятор: развилки и решения'],
           ['tools', 'топ инструментов сообщества'],
           ['friends', 'дружественные сообщества и сервисы'],
           ['join', 'ссылка на встречу'],
@@ -323,6 +401,7 @@
           random: 'random — открыть случайный материал.',
           tools: 'tools — топ инструментов сообщества.',
           salary: 'salary <грейд> <роль> — зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
+          sim: 'sim — тимлид-симулятор: развилки из реальных споров сообщества. Выбор a/b/c, [s] поделиться, [q] выйти. Синонимы: simulator, game, play.',
           friends: 'friends — дружественные сообщества и сервисы (Claude Community KZ, techinterview.space).',
           claude: 'claude <вопрос> — Claude-окно: офлайн-ответ по материалам сообщества.',
           codex: 'codex <вопрос> — Codex-окно: офлайн-ответ по материалам сообщества.',
@@ -346,6 +425,7 @@
         var f = ['Сеньора не дают — сеньора берут.', 'Бас-фактор — это плата за экономию, отложенная во времени.', 'Документ говорит «что». Человек знает «почему».', 'Срочно — значит, некачественно. Автоматически.', 'За большим хайпом скрывается большой попил.', 'Тимлид и техлид — две разные работы с одним названием.', 'Стоять надо не там, где интересно, а у кормушки с деньгами.', 'Молчаливое большинство, которое читает, — здоровый показатель.'];
         print('« ' + f[Math.floor(Math.random() * f.length)] + ' »', 'accent');
       },
+      sim: function () { simStart(); },
       vim: function () { vimMode = true; print('~', 'dim'); print('~  VIM — Vi IMproved', 'dim'); print('~', 'dim'); print('Вы в vim. Удачи с выходом: :q (или :q!).', 'hint'); },
       top: function () {
         print('PID   COMMAND           %CPU  STATE', 'dim');
@@ -373,6 +453,7 @@
     commands.ai = commands.claude; commands.ask = commands.claude;
     commands.gpt = commands.codex; commands.openai = commands.codex;
     commands.github = commands.contribute; commands.gh = commands.contribute; commands.pr = commands.contribute;
+    commands.simulator = commands.sim; commands.game = commands.sim; commands.play = commands.sim;
 
     // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).
     // Sends only the command NAME (first token) — never the free-text arguments — so no PII.
@@ -392,6 +473,19 @@
       if (vimMode) {
         if (/^:(q|q!|wq|wq!|x)$/.test(str)) { vimMode = false; print('вышли из vim. Невозможное возможно.', 'ok'); }
         else print('E37: незаписанные изменения. :q! чтобы выйти не сохраняя.', 'err');
+        body.scrollTop = body.scrollHeight; return;
+      }
+      if (simSt) {
+        var low = str.toLowerCase();
+        if (!str) {
+          if (simSt.await === 'next') simNext();
+          else if (simSt.await === 'done') simStart();
+          else print('Введите букву варианта.', 'dim');
+        } else if (low === 'q' || low === 'quit' || low === 'exit' || low === ':q') { simQuit(); }
+        else if (low === 's' || low === 'share' || low === 'поделиться') { simShare(); }
+        else if (simSt.await === 'choice') { simChoose(low); }
+        else if (simSt.await === 'next') { if (low === 'n' || low === 'next' || low === 'д') simNext(); else print('[enter] дальше · [s] поделиться · [q] выйти', 'dim'); }
+        else if (simSt.await === 'done') { simStart(); }
         body.scrollTop = body.scrollHeight; return;
       }
       if (!str) { body.scrollTop = body.scrollHeight; return; }
@@ -439,6 +533,7 @@
       else if (e.key === 'ArrowUp') { e.preventDefault(); histPrev(); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); histNext(); }
       else if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'L')) { e.preventDefault(); commands.clear(); }
+      else if (e.key === 'Escape' && simSt) { e.preventDefault(); input.value = ''; simQuit(); body.scrollTop = body.scrollHeight; }
     });
     body.addEventListener('click', function (e) { if (e.target.tagName !== 'A') input.focus(); });
 
