@@ -48,21 +48,7 @@
 
 {{ partial "next-meetup.html" . }}
 
-<!-- Year Review Banner -->
-<section class="year-review">
-    <div class="container">
-        <a href="https://2025.teamleads.kz" class="year-review-card" target="_blank" rel="noopener">
-            <div class="year-review-content">
-                <span class="year-review-badge">Итоги года</span>
-                <h3 class="year-review-title">Как прошёл 2025 год</h3>
-                <p class="year-review-desc">Аналитика сообщества: темы, люди, тренды и главные инсайты года</p>
-            </div>
-            <div class="year-review-arrow">→</div>
-        </a>
-    </div>
-</section>
-
-<!-- Events Section -->
+<!-- Events Section — recent only; full archive lives on /events/ -->
 <section class="events" id="events">
     <div class="container">
         <div class="section-header">
@@ -71,13 +57,12 @@
             <p class="section-desc">
                 Регулярные онлайн-встречи сообщества: разбираем реальные кейсы, спорим об архитектуре и делимся опытом.
             </p>
-            <a href="/questions/" class="btn btn-secondary" style="margin-top: var(--space-md);">Что обсудить дальше?</a>
         </div>
 
         {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+        {{- $events := where (where .Site.RegularPages "Section" "events") "Params.cardTitle" "!=" nil -}}
         <div class="events-grid">
-            {{- range where .Site.RegularPages "Section" "events" -}}
-            {{- if .Params.cardTitle -}}
+            {{- range first 4 (sort $events "Date" "desc") -}}
             <a href="{{ .RelPermalink }}" class="event-card">
                 <div class="event-date">
                     <span class="event-day">{{ .Date.Day }}</span>
@@ -96,8 +81,12 @@
                 </div>
                 <div class="event-arrow">→</div>
             </a>
-            {{- end -}}
             {{- end }}
+        </div>
+
+        <div class="section-cta-row">
+            <a href="/events/" class="btn btn-secondary">Все встречи →</a>
+            <a href="/questions/" class="btn btn-ghost">Что обсудить дальше?</a>
         </div>
     </div>
 </section>
@@ -149,38 +138,7 @@
     </div>
 </section>
 
-<!-- Voices Section -->
-{{- with .Site.Data.voices }}
-<section class="voices" id="voices">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">Голоса сообщества</span>
-            <h2 class="section-title">Что говорят участники</h2>
-            <p class="section-desc">
-                Реальные реплики из обсуждений в чате – без редактуры, как есть.
-            </p>
-        </div>
-
-        <div class="voices-grid">
-            {{- range . }}
-            <figure class="voice-card">
-                <blockquote class="voice-text">{{ .text }}</blockquote>
-                <figcaption class="voice-meta">
-                    <span class="voice-author">{{ .author }}</span>
-                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
-                </figcaption>
-            </figure>
-            {{- end }}
-        </div>
-
-        <div style="text-align: center; margin-top: var(--space-xl);">
-            <a href="/insights/" class="btn btn-secondary">Больше из чата →</a>
-        </div>
-    </div>
-</section>
-{{- end }}
-
-<!-- Topics Section -->
+<!-- Topics Section — compact pill cloud -->
 <section class="topics" id="topics">
     <div class="container">
         <div class="section-header">
@@ -188,31 +146,17 @@
             <h2 class="section-title">Темы, которые волнуют</h2>
         </div>
 
-        <div class="topics-grid">
-            <div class="topic-card topic-featured">
-                <h3 class="topic-title">AI & ML</h3>
-                <p class="topic-desc">Claude, ChatGPT, Cursor, автоматизация код-ревью, AI в продакшене, промпт-инжиниринг</p>
-            </div>
-            <div class="topic-card">
-                <h3 class="topic-title">Управление командой</h3>
-                <p class="topic-desc">Мотивация, делегирование, развитие сотрудников, сложные разговоры, обратная связь</p>
-            </div>
-            <div class="topic-card">
-                <h3 class="topic-title">Архитектура</h3>
-                <p class="topic-desc">Микросервисы vs монолит, технический долг, масштабирование, выбор стека</p>
-            </div>
-            <div class="topic-card">
-                <h3 class="topic-title">Найм</h3>
-                <p class="topic-desc">Собеседования, оценка кандидатов, онбординг, удержание талантов, рынок труда</p>
-            </div>
-            <div class="topic-card">
-                <h3 class="topic-title">Процессы</h3>
-                <p class="topic-desc">Agile, Scrum, code review, CI/CD, метрики производительности, планирование</p>
-            </div>
-            <div class="topic-card">
-                <h3 class="topic-title">Карьера и рост</h3>
-                <p class="topic-desc">Путь от разработчика к лиду, зарплаты, переговоры, выгорание, work-life balance</p>
-            </div>
+        <div class="topics-cloud">
+            <span class="topic-pill topic-pill-featured">AI &amp; ML</span>
+            <span class="topic-pill">Управление командой</span>
+            <span class="topic-pill">Архитектура</span>
+            <span class="topic-pill">Найм</span>
+            <span class="topic-pill">Процессы разработки</span>
+            <span class="topic-pill">Карьера и рост</span>
+            <span class="topic-pill">Технический долг</span>
+            <span class="topic-pill">Зарплаты и переговоры</span>
+            <span class="topic-pill">Выгорание</span>
+            <span class="topic-pill">Code review</span>
         </div>
 
         <div class="topics-insight">
@@ -226,155 +170,127 @@
     </div>
 </section>
 
-<!-- Showcase Highlight -->
-{{- $showcasePages := where (where .Site.RegularPages "Section" "showcase") "Params.draft" "ne" true -}}
-{{- if gt (len $showcasePages) 0 }}
-<section class="showcase-highlight" id="showcase">
+<!-- Voices Section — moving marquee of raw chat replies -->
+{{- with .Site.Data.voices }}
+<section class="voices" id="voices">
     <div class="container">
         <div class="section-header">
-            <span class="section-tag">Витрина проектов</span>
-            <h2 class="section-title">Что делают участники</h2>
+            <span class="section-tag">Голоса сообщества</span>
+            <h2 class="section-title">Что говорят участники</h2>
             <p class="section-desc">
-                Проекты, продукты и инструменты от участников сообщества.
+                Реальные реплики из обсуждений в чате – без редактуры, как есть.
             </p>
         </div>
+    </div>
 
-        <div class="showcase-grid">
-            {{- range first 6 (sort $showcasePages "Date" "desc") -}}
-            {{- partial "showcase-card.html" . -}}
+    <div class="voices-marquee" aria-label="Реплики участников чата">
+        <div class="voices-track">
+            {{- range . }}
+            <figure class="voice-card">
+                <blockquote class="voice-text">{{ .text }}</blockquote>
+                <figcaption class="voice-meta">
+                    <span class="voice-author">{{ .author }}</span>
+                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
+                </figcaption>
+            </figure>
+            {{- end }}
+            {{- /* duplicate track for a seamless loop */ -}}
+            {{- range . }}
+            <figure class="voice-card" aria-hidden="true">
+                <blockquote class="voice-text">{{ .text }}</blockquote>
+                <figcaption class="voice-meta">
+                    <span class="voice-author">{{ .author }}</span>
+                    {{- with .topic }}<span class="voice-topic">{{ . }}</span>{{ end }}
+                </figcaption>
+            </figure>
             {{- end }}
         </div>
+    </div>
 
-        <div style="text-align: center; margin-top: var(--space-xl);">
-            <a href="/showcase/" class="btn btn-secondary">Все проекты →</a>
+    <div class="container">
+        <div class="section-cta-row">
+            <a href="/insights/" class="btn btn-secondary">Больше из чата →</a>
         </div>
     </div>
 </section>
 {{- end }}
 
-<!-- Toolkit Highlight -->
+<!-- Knowledge Hub — Articles + Insights + Toolkit + Showcase, consolidated -->
+{{- $articlePages := where (where .Site.RegularPages "Section" "articles") "Params.draft" "ne" true -}}
+{{- $insightPages := where (where .Site.RegularPages "Section" "insights") "Params.draft" "ne" true -}}
 {{- $toolkitPages := where (where .Site.RegularPages "Section" "toolkit") "Params.draft" "ne" true -}}
-{{- if gt (len $toolkitPages) 0 }}
-<section class="toolkit-highlight" id="toolkit">
+{{- $showcasePages := where (where .Site.RegularPages "Section" "showcase") "Params.draft" "ne" true -}}
+{{- $recentArticles := first 2 (sort $articlePages "Date" "desc") -}}
+{{- $recentInsights := first 2 (sort $insightPages "Date" "desc") -}}
+{{- $recentToolkit := first 2 (sort $toolkitPages "Date" "desc") -}}
+{{- $feed := sort (union $recentArticles (union $recentInsights $recentToolkit)) "Date" "desc" -}}
+{{- if gt (len $feed) 0 }}
+{{- $typeLabels := dict "articles" "Статья" "insights" "Инсайт" "toolkit" "Шаблон" -}}
+{{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
+<section class="hub" id="materials">
     <div class="container">
         <div class="section-header">
-            <span class="section-tag">Операционка</span>
-            <h2 class="section-title">Шаблоны на каждый день</h2>
+            <span class="section-tag">База знаний</span>
+            <h2 class="section-title">Знания, которые не тонут</h2>
             <p class="section-desc">
-                Рабочие форматы, которые выручат в понедельник утром: 1-on-1, ретро, постмортем, найм, ADR.
+                Дискуссии превращаются в статьи, дайджесты и рабочие шаблоны.
                 Откройте на сайте или в терминале: <code>cat toolkit/one-on-one</code>.
             </p>
         </div>
-        <div class="articles-grid">
-            {{- range sort $toolkitPages "Date" "desc" }}
-            <a href="{{ .RelPermalink }}" class="article-card">
-                <div class="article-card-header">
-                    {{- with .Params.category }}<span class="event-tag">{{ . }}</span>{{ end }}
-                </div>
-                <h3 class="insight-card-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
-                <p class="insight-card-desc">{{ with .Params.cardDesc }}{{ . }}{{ else }}{{ .Description }}{{ end }}</p>
-                <div class="insight-card-meta">
-                    <span class="insight-stat">cat toolkit/{{ .File.ContentBaseName }}</span>
+
+        <div class="hub-layout">
+            <nav class="hub-rail" aria-label="Разделы базы знаний">
+                <a href="/articles/" class="hub-rail-link">
+                    <span class="hub-rail-name">Статьи</span>
+                    <span class="hub-rail-desc">Экспертные разборы</span>
+                    <span class="hub-rail-count">{{ len $articlePages }}</span>
+                </a>
+                <a href="/insights/" class="hub-rail-link">
+                    <span class="hub-rail-name">Инсайты</span>
+                    <span class="hub-rail-desc">Дайджесты из чата</span>
+                    <span class="hub-rail-count">{{ len $insightPages }}</span>
+                </a>
+                <a href="/toolkit/" class="hub-rail-link">
+                    <span class="hub-rail-name">Операционка</span>
+                    <span class="hub-rail-desc">Шаблоны на каждый день</span>
+                    <span class="hub-rail-count">{{ len $toolkitPages }}</span>
+                </a>
+                <a href="/showcase/" class="hub-rail-link">
+                    <span class="hub-rail-name">Проекты</span>
+                    <span class="hub-rail-desc">Что делают участники</span>
+                    <span class="hub-rail-count">{{ len $showcasePages }}</span>
+                </a>
+            </nav>
+
+            <div class="hub-feed">
+                <div class="hub-feed-label">Свежее</div>
+                {{- range first 6 $feed }}
+                <a href="{{ .RelPermalink }}" class="feed-row">
+                    <span class="feed-type feed-type-{{ .Section }}">{{ index $typeLabels .Section }}</span>
+                    <span class="feed-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</span>
+                    <span class="feed-date">{{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }}</span>
                     <span class="event-arrow">→</span>
-                </div>
-            </a>
-            {{- end }}
-        </div>
-        <div style="text-align: center; margin-top: var(--space-xl);">
-            <a href="/toolkit/" class="btn btn-secondary">Вся операционка →</a>
+                </a>
+                {{- end }}
+            </div>
         </div>
     </div>
 </section>
 {{- end }}
 
-<!-- Articles Highlight -->
-{{- $articlePages := where (where .Site.RegularPages "Section" "articles") "Params.draft" "ne" true -}}
-{{- if gt (len $articlePages) 0 }}
-<section class="articles-highlight" id="articles">
+<!-- Year Review strip -->
+<section class="year-review">
     <div class="container">
-        <div class="section-header">
-            <span class="section-tag">Статьи</span>
-            <h2 class="section-title">Глубже, чем обсуждение</h2>
-            <p class="section-desc">
-                Экспертные материалы на основе дискуссий сообщества – структурированные для поиска и глубокого чтения.
-            </p>
-        </div>
-
-        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
-        <div class="articles-grid">
-            {{- range first 3 (sort $articlePages "Date" "desc") }}
-            <a href="{{ .RelPermalink }}" class="article-card">
-                <div class="article-card-header">
-                    {{- with .Params.tags }}
-                    <div class="article-card-tags">
-                        {{- range first 2 . }}
-                        <span class="event-tag">{{ . }}</span>
-                        {{- end }}
-                    </div>
-                    {{- end }}
-                    <span class="insight-date">
-                        {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}
-                    </span>
-                </div>
-                <h3 class="insight-card-title">{{ with .Params.cardTitle }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
-                <p class="insight-card-desc">{{ with .Params.cardDesc }}{{ . }}{{ else }}{{ .Description }}{{ end }}</p>
-                <div class="insight-card-meta">
-                    {{- with .Params.readingTime }}
-                    <span class="insight-stat">{{ . }} мин чтения</span>
-                    {{- end }}
-                    <span class="event-arrow">→</span>
-                </div>
-            </a>
-            {{- end }}
-        </div>
-
-        <div style="text-align: center; margin-top: var(--space-xl);">
-            <a href="/articles/" class="btn btn-secondary">Все статьи →</a>
-        </div>
+        <a href="https://2025.teamleads.kz" class="year-review-card" target="_blank" rel="noopener">
+            <div class="year-review-content">
+                <span class="year-review-badge">Итоги года</span>
+                <h3 class="year-review-title">Как прошёл 2025 год</h3>
+                <p class="year-review-desc">Аналитика сообщества: темы, люди, тренды и главные инсайты года</p>
+            </div>
+            <div class="year-review-arrow">→</div>
+        </a>
     </div>
 </section>
-{{- end }}
-
-<!-- Insights Highlight -->
-{{- $insightPages := where (where .Site.RegularPages "Section" "insights") "Params.draft" "ne" true -}}
-{{- if gt (len $insightPages) 0 }}
-<section class="insights-highlight" id="insights">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">Инсайты из чата</span>
-            <h2 class="section-title">Знания, которые не тонут</h2>
-            <p class="section-desc">
-                Ключевые идеи из обсуждений в Telegram – структурировано и доступно для поиска.
-            </p>
-        </div>
-
-        {{- $months := dict "1" "января" "2" "февраля" "3" "марта" "4" "апреля" "5" "мая" "6" "июня" "7" "июля" "8" "августа" "9" "сентября" "10" "октября" "11" "ноября" "12" "декабря" -}}
-        <div class="insights-grid">
-            {{- range first 3 (sort $insightPages "Date" "desc") }}
-            <a href="{{ .RelPermalink }}" class="insight-card">
-                <div class="insight-card-header">
-                    <span class="insight-period">{{ .Params.period }}</span>
-                    <span class="insight-date">
-                        {{ .Date.Day }} {{ index $months (printf "%d" .Date.Month) }} {{ .Date.Year }}
-                    </span>
-                </div>
-                <h3 class="insight-card-title">{{ .Title }}</h3>
-                <p class="insight-card-desc">{{ .Description }}</p>
-                <div class="insight-card-meta">
-                    <span class="insight-stat">{{ .Params.messagesCount }} сообщений</span>
-                    <span class="insight-stat">{{ .Params.topicsCount }} тем</span>
-                    <span class="event-arrow">→</span>
-                </div>
-            </a>
-            {{- end }}
-        </div>
-
-        <div style="text-align: center; margin-top: var(--space-xl);">
-            <a href="/insights/" class="btn btn-secondary">Все инсайты →</a>
-        </div>
-    </div>
-</section>
-{{- end }}
 
 <!-- CTA Section -->
 <section class="cta" id="join">

@@ -34,6 +34,8 @@
     try { SCEN = JSON.parse(root.getAttribute('data-scenarios') || '{}') || {}; } catch (e) { SCEN = {}; }
     var SHARE = {};  // verb → /s/<id>/ card id (from data/shell_commands.toml)
     try { SHARE = JSON.parse(root.getAttribute('data-share') || '{}') || {}; } catch (e) { SHARE = {}; }
+    var QUESTIONS = [];  // open discussion backlog (events' nextQuestions) → `discuss`
+    try { QUESTIONS = JSON.parse(root.getAttribute('data-questions') || '[]') || []; } catch (e) { QUESTIONS = []; }
     var hintedShare = false;
     var sections = FS.sections || {};
     var links = FS.links || {};
@@ -64,6 +66,17 @@
       if (titleEl) titleEl.textContent = 'guest@teamleads: ' + pathStr();
     }
     function go(href) { print(''); print('переход → ' + href, 'ok'); setTimeout(function () { w.location.href = href; }, reduced ? 0 : 360); }
+
+    // Footer for `discuss`: a one-click deep-dive into the assistant + the live-meetup nudge.
+    function discussFooter(item) {
+      print('────────────────────────────', 'dim');
+      var row = el('span'); row.appendChild(el('span', 'dim', 'Разобрать глубже: '));
+      var qShort = item.q.length > 44 ? item.q.slice(0, 44) + '…' : item.q;
+      var a = el('a', null, 'claude «' + qShort + '»'); a.href = 'javascript:void(0)';
+      a.addEventListener('click', function (e) { e.preventDefault(); run('claude ' + item.q); });
+      row.appendChild(a); printNode(row);
+      print('Обсудить вживую: join — среда 17:00 (Астана) · ещё тема — discuss', 'hint');
+    }
 
     // Markdown line renderer for `cat`: colorizes headings, quotes, lists, links,
     // and inline **bold** / *em* / `code` so long pages read like a document, not a wall.
@@ -271,6 +284,7 @@
           ['codex <вопрос>', 'спросить Codex (офлайн-демо)'],
           ['salary', 'зарплатные вилки: salary senior backend'],
           ['sim', 'тимлид-симулятор: развилки и решения'],
+          ['discuss', 'случайная тема из бэклога + разбор по ней'],
           ['principles', 'доктрина сообщества: принципы из реальных кейсов'],
           ['tools', 'топ инструментов сообщества'],
           ['toolkit', 'шаблоны операционки: 1-on-1, ретро, постмортем…'],
@@ -427,6 +441,29 @@
       },
       latest: function () { var ev = sections.events || []; if (ev.length) { print('последняя встреча: ' + ev[0].t, 'cy'); go(ev[0].u); } else print('latest: нет данных', 'err'); },
       random: function () { if (!pool.length) { print('random: нет данных', 'err'); return; } var r = pool[Math.floor(Math.random() * pool.length)]; print('случайный выбор: ' + r.t, 'cy'); go(r.u); },
+      discuss: function () {
+        if (!QUESTIONS.length) { print('Бэклог тем пуст. Загляните на ', 'dim'); var nq = el('span'); nq.appendChild(link('/questions/', '/questions/')); printNode(nq); return; }
+        var item = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+        print(''); print('💬 Тема для обсуждения:', 'accent');
+        print(item.q);
+        if (item.u) { var src = el('span'); src.appendChild(el('span', 'dim', 'предложена на встрече ' + (item.d || '') + ' → ')); src.appendChild(link(item.u, item.ev || 'встреча')); printNode(src); }
+        print('────────────────────────────', 'dim');
+        var R = w.TeamleadsRetrieval;
+        if (R && R.retrieve) {
+          var loading = print('ищу разбор по теме в архиве…', 'dim');
+          R.retrieve(item.q, 2).then(function (hits) {
+            if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+            if (hits && hits.length) {
+              print('Что есть по теме в архиве:', 'cy');
+              hits.forEach(function (h) {
+                var n = el('span'); n.appendChild(el('span', 'accent', '→ ')); n.appendChild(link(h.u, h.t)); printNode(n);
+                if (h.snip) print('   ' + h.snip, 'dim');
+              });
+            } else { print('Прямого разбора в архиве нет — отличный повод обсудить первыми.', 'dim'); }
+            discussFooter(item);
+          }).catch(function () { discussFooter(item); });
+        } else { discussFooter(item); }
+      },
       toolkit: function () {
         var items = (sections.toolkit || []).slice().sort(function (a, b) { return (a.n || '').localeCompare(b.n || ''); });
         if (!items.length) { print('toolkit: шаблоны не загружены', 'err'); return; }
@@ -579,6 +616,7 @@
           grep: 'grep <запрос> – полнотекстовый ранжированный поиск по всем страницам. grep --exact <строка> (или -e) – буквальная подстрока.',
           latest: 'latest – открыть последнюю встречу.',
           random: 'random – открыть случайный материал.',
+          discuss: 'discuss – случайная тема для обсуждения из бэклога /questions/ + что есть по ней в архиве. Синонимы: topic, тема, обсудить.',
           tools: 'tools – топ инструментов сообщества.',
           toolkit: 'toolkit – рабочие шаблоны (1-on-1, ретро, постмортем, найм, ADR). cat toolkit/<имя> – открыть шаблон здесь.',
           salary: 'salary <грейд> <роль> – зарплатная вилка (p25/медиана/p75). Напр.: salary senior backend. Грубые оценки сообщества.',
@@ -636,6 +674,7 @@
     commands.gpt = commands.codex; commands.openai = commands.codex;
     commands.github = commands.contribute; commands.gh = commands.contribute; commands.pr = commands.contribute;
     commands.simulator = commands.sim; commands.game = commands.sim; commands.play = commands.sim;
+    commands.topic = commands.discuss; commands['обсудить'] = commands.discuss; commands['тема'] = commands.discuss;
     commands.about = commands.whoami; commands.manifesto = commands.principles; commands.doctrine = commands.principles;
 
     // Analytics: count each typed command as a Yandex.Metrika goal (counter 106055675).

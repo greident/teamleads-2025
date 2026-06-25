@@ -27,7 +27,18 @@
   {{- $share = merge $share (dict $verb .id) -}}
 {{- end -}}
 
-<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}' data-scenarios='{{ site.Data.scenarios | jsonify }}' data-share='{{ $share | jsonify }}'>
+{{- /* Open discussion backlog (events' unanswered nextQuestions) – fuels `discuss`. */ -}}
+{{- $questions := slice -}}
+{{- range (where site.RegularPages "Section" "events") -}}
+  {{- $ev := . -}}
+  {{- range (.Params.nextQuestions | default slice) -}}
+    {{- if not .answeredIn -}}
+      {{- $questions = $questions | append (dict "q" .question "ev" $ev.Title "d" ($ev.Date.Format "02.01.2006") "u" $ev.RelPermalink) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}' data-scenarios='{{ site.Data.scenarios | jsonify }}' data-share='{{ $share | jsonify }}' data-questions='{{ $questions | jsonify }}'>
   <div class="term-bar">
     <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
     <span class="term-title" data-term-title>guest@teamleads: /</span>
