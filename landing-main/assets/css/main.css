@@ -2977,3 +2977,45 @@ body > .nav {
 @media (prefers-reduced-motion: reduce) {
     .hero-freshness-dot, .next-meetup-pulse span, .gradient-orb { animation: none; }
 }
+
+/* ============================================================
+   Teamleads Shell — reusable terminal component (.term)
+   Used by the 404 page and the dedicated /shell/ page.
+   ============================================================ */
+.term{display:flex;flex-direction:column;height:80vh;max-height:900px;text-align:left;background:#0d1117;border:1px solid #232b36;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px -24px rgba(0,0,0,.55);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+.term-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#161b22;border-bottom:1px solid #232b36}
+.term-dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+.term-dot.red{background:#ff5f56}.term-dot.yellow{background:#ffbd2e}.term-dot.green{background:#27c93f}
+.term-title{margin-left:8px;color:#8b949e;font-size:13px}
+.term-body{flex:1 1 auto;min-height:0;padding:16px;overflow-y:auto;font-size:14px;line-height:1.6;color:#c9d1d9;cursor:text;scrollbar-width:thin;scrollbar-color:#30363d #0d1117}
+.term-body::-webkit-scrollbar{width:9px}.term-body::-webkit-scrollbar-thumb{background:#30363d;border-radius:5px}
+.term-out .ln{white-space:pre-wrap;word-break:break-word;margin:0}
+.term-out a{color:#39c5cf;text-decoration:none;border-bottom:1px dotted #39c5cf}
+.term-out a:hover{color:#FEC50C;border-bottom-color:#FEC50C}
+.term .dim{color:#6e7681}.term .hint{color:#8b949e}.term .ok{color:#3fb950}.term .err{color:#f85149}.term .accent{color:#FEC50C}.term .cy{color:#39c5cf}
+.term-line{display:flex;align-items:baseline;margin-top:2px}
+.term-prompt{color:#39c5cf;margin-right:8px;white-space:nowrap;user-select:none}
+.term-prompt b{color:#3fb950;font-weight:600}
+.term-input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#e6edf3;font:inherit;caret-color:#FEC50C;padding:0}
+
+/* 404 page wrapper */
+.nf-wrap{min-height:calc(100vh - 80px);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--gray-50);padding:var(--space-xl) var(--space-lg)}
+.nf-inner{width:min(1100px,90vw)}
+.nf-head{text-align:center;margin-bottom:var(--space-lg)}
+.nf-head .section-desc{max-width:560px;margin:var(--space-md) auto 0}
+.nf-head code{background:rgba(0,175,202,.12);color:var(--kz-sky,#008BA3);padding:.1em .45em;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em}
+.nf-fallback{margin-top:var(--space-xl);display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap}
+
+/* Dedicated Shell Mode page wrapper */
+.shell-wrap{background:var(--gray-50);padding:var(--space-xl) var(--space-lg)}
+.shell-inner{width:min(1180px,94vw);margin:0 auto}
+.shell-head{text-align:center;margin-bottom:var(--space-lg)}
+.shell-head .section-desc{max-width:600px;margin:var(--space-sm) auto 0}
+.shell-wrap .term{height:calc(100vh - 220px);min-height:420px;max-height:none}
+
+@media (max-width:480px){
+  .term{height:78vh}
+  .shell-wrap .term{height:calc(100vh - 180px)}
+  .term-input{font-size:16px}
+  .term-title{display:none}
+}

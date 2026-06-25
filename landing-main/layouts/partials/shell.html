@@ -1,0 +1,29 @@
+{{- /* Reusable terminal component. Call: {{ partial "shell.html" (dict "mode" "full") }} */ -}}
+{{- $mode := .mode | default "full" -}}
+{{- $sectionList := slice "events" "articles" "insights" "showcase" -}}
+{{- $sections := dict -}}
+{{- range $s := $sectionList -}}
+  {{- $pages := (where site.RegularPages "Section" $s).ByDate.Reverse -}}
+  {{- $items := slice -}}
+  {{- range $pages -}}
+    {{- $items = $items | append (dict "n" .File.ContentBaseName "u" .RelPermalink "t" .Title "d" (.Date.Format "02.01.2006")) -}}
+  {{- end -}}
+  {{- $sections = merge $sections (dict $s $items) -}}
+{{- end -}}
+{{- $links := dict "questions" "/questions/" "join" "/join/" "home" "/" -}}
+{{- $fs := dict "sections" $sections "links" $links -}}
+
+<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}'>
+  <div class="term-bar">
+    <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+    <span class="term-title" data-term-title>guest@teamleads: /</span>
+  </div>
+  <div class="term-body" data-term-body tabindex="0">
+    <div class="term-out" data-term-out aria-live="polite"></div>
+    <div class="term-line" data-term-prompt-line hidden>
+      <span class="term-prompt" data-term-prompt><b>guest@teamleads</b>:/$</span>
+      <input class="term-input" data-term-input autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Введите команду">
+    </div>
+  </div>
+</div>
+<script src="{{ "js/shell.js" | relURL }}" defer></script>

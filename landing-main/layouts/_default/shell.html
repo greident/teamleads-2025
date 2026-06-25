@@ -1,0 +1,29 @@
+{{ define "main" }}
+<section class="shell-wrap">
+  <div class="shell-inner">
+    <div class="shell-head">
+      <span class="section-tag" style="display:inline-block;margin-bottom:var(--space-sm)">SHELL MODE</span>
+      <h1 class="section-title">{{ .Title }}</h1>
+      <p class="section-desc">Весь сайт – как файловая система. <code>ls</code> – осмотреться, <code>cd events</code> – зайти в раздел, <code>open &lt;страница&gt;</code> – открыть, <code>find &lt;слово&gt;</code> – поиск. <code>help</code> – все команды.</p>
+    </div>
+
+    {{ partial "shell.html" (dict "mode" "full") }}
+
+  </div>
+</section>
+{{ end }}
+
+{{ define "structured-data" }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Teamleads Shell",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Any",
+    "description": "Навигация по сайту сообщества «Тимлид не кодит» из браузерного терминала.",
+    "url": "{{ .Permalink }}",
+    "isPartOf": { "@type": "WebSite", "name": "{{ .Site.Title }}", "url": "{{ .Site.BaseURL }}" }
+}
+</script>
+{{ end }}
