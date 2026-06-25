@@ -17,12 +17,12 @@
     </a>
     <h1 class="report-title">{{ .Title }}</h1>
     <p class="sal-sub">Данные сообщества <a href="https://techinterview.space/salaries" target="_blank" rel="noopener">techinterview.space</a> · нетто/мес, Казахстан · обновлено {{ now.Format "02.01.2006 15:04" }}{{ with $d.salariesCount }} · выборка {{ . }} анкет{{ end }}</p>
-    <a class="sal-cmd" href="/shell/?cmd=salary" aria-label="Открыть команду salary в shell-терминале">
+    <button type="button" class="sal-cmd" data-sal-copy="salary" aria-label="Скопировать команду salary">
       <span class="sal-cmd-dots"><i></i><i></i><i></i></span>
       <code class="sal-cmd-body"><span class="sal-cmd-prompt">guest@teamleads:~$</span> salary</code>
-      <span class="sal-cmd-go">живые данные → shell</span>
-    </a>
-    <p class="sal-cmd-cap">Цифры на странице обновляются при сборке. Нужны прямо сейчас или свой срез по городу и стеку – откройте команду <code>salary</code> в shell-терминале и меняйте фильтры: <code>salary senior backend almaty</code>.</p>
+      <span class="sal-cmd-go" data-sal-copy-label>копировать</span>
+    </button>
+    <p class="sal-cmd-cap">Цифры на странице обновляются при сборке. Нужны прямо сейчас или свой срез по городу и стеку – скопируйте команду, откройте <a href="/shell/">shell-терминал</a> и вставьте её, меняя фильтры: <code>salary senior backend almaty</code>.</p>
   </div>
 </section>
 
@@ -175,8 +175,22 @@
       });
     }).catch(function () {});
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hydrate);
-  else hydrate();
+  // Copy-to-clipboard for the shell-command pill (paste it into the shell yourself).
+  function wireCopy() {
+    var btn = document.querySelector('[data-sal-copy]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var txt = btn.getAttribute('data-sal-copy');
+      var label = btn.querySelector('[data-sal-copy-label]');
+      function done() { if (!label) return; var old = label.textContent; label.textContent = 'скопировано ✓'; setTimeout(function () { label.textContent = old; }, 1600); }
+      function fallback() { try { var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); } catch (e) {} }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback);
+      else fallback();
+    });
+  }
+  function init() { hydrate(); wireCopy(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 {{ end }}

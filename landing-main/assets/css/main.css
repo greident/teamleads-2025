@@ -3732,8 +3732,10 @@ body.cx-lock{overflow:hidden}
 }
 
 /* Shell-command bar on /salary/ (terminal pill, matches the site shell brand) */
-.sal-cmd { display: inline-flex; align-items: center; gap: var(--space-sm); margin-top: var(--space-lg); padding: var(--space-sm) var(--space-md); background: #0b1220; border: 1px solid var(--gray-800); border-radius: var(--radius-md); font-family: var(--font-mono); text-decoration: none; transition: border-color var(--transition-fast), transform var(--transition-fast); }
+.sal-cmd { display: inline-flex; align-items: center; gap: var(--space-sm); margin-top: var(--space-lg); padding: var(--space-sm) var(--space-md); background: #0b1220; border: 1px solid var(--gray-800); border-radius: var(--radius-md); font-family: var(--font-mono); text-decoration: none; cursor: pointer; appearance: none; -webkit-appearance: none; text-align: left; transition: border-color var(--transition-fast), transform var(--transition-fast); }
 .sal-cmd:hover { border-color: var(--primary); transform: translateY(-1px); }
+.sal-cmd:active { transform: translateY(0); }
+.sal-cmd-go::before { content: "⧉ "; }
 .sal-cmd-dots { display: inline-flex; gap: 5px; margin-right: 2px; }
 .sal-cmd-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
 .sal-cmd-dots i:nth-child(1) { background: #ff5f56; }

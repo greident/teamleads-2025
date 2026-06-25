@@ -48,6 +48,13 @@ title = "Тимлид не кодит – Сообщество тимлидов 
   participantsCount = "510"
   topicsCount = "50+"
 
+  # Salary data endpoint for the browser (shell `salary` + /salary/ page).
+  # Empty -> fetch techinterview.space directly (needs their API up + CORS).
+  # Once the nginx reverse-proxy is deployed, set this to the same-origin path
+  # to avoid CORS and ride out their 502s via cache:
+  #   salaryApi = "/api/salaries/chart?allowReadonly=true"
+  salaryApi = ""
+
   # GitHub edit links — used by "Edit on GitHub" button on event pages
   githubRepo = "belyaevsa/teamleads-2025"
   githubBranch = "master"

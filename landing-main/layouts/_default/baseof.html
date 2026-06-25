@@ -190,6 +190,7 @@
     {{ partial "bottom-nav.html" . }}
 
     {{ block "scripts" . }}{{ end }}
+    {{- with site.Params.salaryApi }}<script>window.TEAMLEADS_SALARY_API = "{{ . }}";</script>{{ end }}
     <script src="{{ "js/retrieval.js" | relURL }}" defer></script>
     <script src="{{ "js/salary.js" | relURL }}" defer></script>
     <script src="{{ "js/claude-chat.js" | relURL }}" defer></script>

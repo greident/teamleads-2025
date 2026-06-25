@@ -15,7 +15,10 @@
 (function (w) {
   'use strict';
 
-  var API = 'https://api.techinterview.space/api/salaries/chart?allowReadonly=true';
+  // Endpoint: defaults to techinterview.space directly. Set window.TEAMLEADS_SALARY_API
+  // to a same-origin reverse-proxy path (e.g. '/api/salaries/chart?allowReadonly=true')
+  // to avoid CORS and ride out upstream outages via nginx caching.
+  var API = (w.TEAMLEADS_SALARY_API) || 'https://api.techinterview.space/api/salaries/chart?allowReadonly=true';
   var CONTRIBUTE_URL = 'https://techinterview.space/salaries';
   var SOURCE_URL = 'https://techinterview.space/salaries/overview';
   var TTL = 6 * 60 * 60 * 1000;   // 6h – salary data moves slowly
