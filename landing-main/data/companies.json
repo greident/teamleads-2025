@@ -1,0 +1,541 @@
+[
+ {
+  "id": "01967d3a-d891-79f7-819a-aa49adc3798e",
+  "name": "Kaspi.kz",
+  "slug": "kaspi-kz-ed1cf120",
+  "rating": 3.3,
+  "reviewsCount": 13
+ },
+ {
+  "id": "0196ddb3-66a1-7463-8026-0853ddf9eda5",
+  "name": "Documentolog",
+  "slug": "documentolog-ec7cdf35",
+  "rating": 2.86,
+  "reviewsCount": 6
+ },
+ {
+  "id": "01969682-e6fe-7d43-b090-17d23cda21e3",
+  "name": "Globerce capital",
+  "slug": "globerce-capital-573c96e5",
+  "rating": 1.98,
+  "reviewsCount": 6
+ },
+ {
+  "id": "01967d44-decf-7269-94d3-f0e06dfef75c",
+  "name": "Kolesa group",
+  "slug": "kolesa-group-081c7566",
+  "rating": 4.72,
+  "reviewsCount": 4
+ },
+ {
+  "id": "01968520-b678-71bb-b462-bf43ef6ce389",
+  "name": "MDLBEAST",
+  "slug": "mdlbeast-959fc753",
+  "rating": 4.15,
+  "reviewsCount": 4
+ },
+ {
+  "id": "01967d46-813f-7c8f-ad6b-c5640fa60d2e",
+  "name": "Halyk bank",
+  "slug": "halyk-bank-0b0293e3",
+  "rating": 2.04,
+  "reviewsCount": 4
+ },
+ {
+  "id": "0196e807-40e4-7c48-b18b-8f880ab723d9",
+  "name": "InDrive",
+  "slug": "in-drive-c2b07de9",
+  "rating": 4.78,
+  "reviewsCount": 3
+ },
+ {
+  "id": "01967d47-cc51-732a-8ca1-23809dee4a79",
+  "name": "EPAM Kazakhstan",
+  "slug": "epam-kazakhstan-71637c08",
+  "rating": 4.11,
+  "reviewsCount": 3
+ },
+ {
+  "id": "019687e5-4dad-700b-987d-970ee652ffde",
+  "name": "ИП Гасанов",
+  "slug": "ip-gasanov-da5db8ec",
+  "rating": 3.89,
+  "reviewsCount": 3
+ },
+ {
+  "id": "01967d53-fbfe-7c0f-88fe-0de4d51ace14",
+  "name": "Snoonu",
+  "slug": "snoonu-2b4e380d",
+  "rating": 3.37,
+  "reviewsCount": 3
+ },
+ {
+  "id": "0196c346-18f9-70b2-bc62-a6f183def2ef",
+  "name": "PingOcean",
+  "slug": "ping-ocean-3d246225",
+  "rating": 3.09,
+  "reviewsCount": 3
+ },
+ {
+  "id": "0196c29d-4a86-7366-82c6-295d8b4bf7cc",
+  "name": "Crocos.kz",
+  "slug": "crocos-kz-d640fd3e",
+  "rating": 2.78,
+  "reviewsCount": 3
+ },
+ {
+  "id": "01968740-8a32-717d-8357-1845f5b00ac4",
+  "name": "Freedom Bank Kazakhstan",
+  "slug": "freedom-bank-kazakhstan-0710e081",
+  "rating": 2.22,
+  "reviewsCount": 3
+ },
+ {
+  "id": "019695d2-d412-78c5-b0f4-16efe6570dbf",
+  "name": "Dev.pro",
+  "slug": "dev-pro-08e8d599",
+  "rating": 4.67,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196d943-47b3-7202-9cdf-6c273bcd6648",
+  "name": "Astana Motors",
+  "slug": "astana-motors-07ff34a1",
+  "rating": 4.25,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01968520-0302-7f60-b52b-5693eb25673a",
+  "name": "Petrel.ai",
+  "slug": "petrel-ai-9a5c35ae",
+  "rating": 4.1,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01967d4d-732d-7cc9-88eb-6f5cca4723d9",
+  "name": "Bereke Bank",
+  "slug": "bereke-bank-36feab73",
+  "rating": 4.08,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01967d55-6bdb-72df-baba-9772b2a5635e",
+  "name": "DataArt",
+  "slug": "data-art-86b32597",
+  "rating": 3.92,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196c334-4bb1-7d9c-8378-19fd7e1b57b4",
+  "name": "Altel Digital",
+  "slug": "altel-digital-c5b1386a",
+  "rating": 3.83,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01967d45-ee26-7706-8bc8-8cd4d709d42d",
+  "name": "Jusan bank",
+  "slug": "jusan-bank-4b41097f",
+  "rating": 3.75,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196851d-d3a8-7247-95ef-d7f2a3623936",
+  "name": "MyCar.kz",
+  "slug": "my-car-kz-8a844e02",
+  "rating": 3.5,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196f189-6a0b-7e5d-9cde-a271c04dbfd3",
+  "name": "Eurasian bank (Евразийский)",
+  "slug": "eurasian-bank-540285f9",
+  "rating": 3.48,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01972f58-2893-7b31-b559-99a6e706b851",
+  "name": "Adata",
+  "slug": "adata-46c814e4",
+  "rating": 2.83,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196e72e-4556-78bc-ad8b-41d23e659b80",
+  "name": "Mechta.kz (Мечта Маркет)",
+  "slug": "mechta-kz-8e1a87d6",
+  "rating": 2.58,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196c345-b887-7d75-b895-32d600e80865",
+  "name": "RBK bank",
+  "slug": "rbk-bank-30606dd2",
+  "rating": 2.58,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01968f9d-19d8-738e-82da-63cfe5c66dfd",
+  "name": "Freedom Travel (Aviata.kz)",
+  "slug": "freedom-travel-caa59901",
+  "rating": 2.5,
+  "reviewsCount": 2
+ },
+ {
+  "id": "019687e5-c807-7df3-ba48-d012faecbf82",
+  "name": "Elefanto",
+  "slug": "elefanto-55fd88f4",
+  "rating": 2.25,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01973a36-81c6-71b6-b12d-69858dc1c730",
+  "name": "Technodom",
+  "slug": "technodom-bb5cdf3a",
+  "rating": 2,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196ed15-8730-71c3-ad04-b4976d42e0ea",
+  "name": "iLab",
+  "slug": "i-lab-9e6f3199",
+  "rating": 1.92,
+  "reviewsCount": 2
+ },
+ {
+  "id": "019ac4af-9558-7137-8a5e-64d1e4777d04",
+  "name": "Amanat страховая компания",
+  "slug": "amanat-insurance-5cbc328d",
+  "rating": 1.17,
+  "reviewsCount": 2
+ },
+ {
+  "id": "0196cec4-66b5-7019-9997-f60908fcaa08",
+  "name": "MP Solutions",
+  "slug": "mp-solutions-ccdc421b",
+  "rating": 1.08,
+  "reviewsCount": 2
+ },
+ {
+  "id": "01967d4c-93b3-71ca-8a59-966792c0ae40",
+  "name": "Яндекс Казахстан",
+  "slug": "yandex-kazakhstan-3d2c6095",
+  "rating": 5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196fc55-be52-7541-a47c-c3fd0e8f7805",
+  "name": "Tredo",
+  "slug": "tredo-5a939bbb",
+  "rating": 5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d40-b5b4-78d6-8346-b6fcfab3312f",
+  "name": "Korona tech",
+  "slug": "korona-tech-587fcd77",
+  "rating": 4.83,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d4e-85a8-7472-bcdc-df929f9eb315",
+  "name": "Beeline",
+  "slug": "beeline-c8da6478",
+  "rating": 4.8,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d53-5fff-7de8-8772-08b4cd953825",
+  "name": "Т-Банк Казахстан",
+  "slug": "t-bank-kazakhstan-58ccf8b6",
+  "rating": 4.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196cec5-073d-7a93-8bd8-8d5d4abf6f57",
+  "name": "Freedom Pay",
+  "slug": "freedom-pay-4dc97b80",
+  "rating": 4.6,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196d93b-e404-74c4-89bb-844c124cdb2f",
+  "name": "Vention",
+  "slug": "vention-cada4f5f",
+  "rating": 4.5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019937df-ba12-7e1b-a199-be9e1d234cb8",
+  "name": "Akvelon",
+  "slug": "akvelon-df835fc8",
+  "rating": 4.5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196e72f-9888-7f6e-b6e7-02c7ae89eeac",
+  "name": "BI Innovations",
+  "slug": "bi-innovations-1ef44cdd",
+  "rating": 4.33,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0197c9a1-749e-73ae-b118-7e57cdb0ebf1",
+  "name": "a1qa",
+  "slug": "a1qa-3d2237f7",
+  "rating": 4.2,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d50-bfd0-7b6b-9fce-18d379e3564e",
+  "name": "Ozon",
+  "slug": "ozon-35ea03dc",
+  "rating": 4.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196e3ac-09f2-7b3e-a7d2-b423eac23016",
+  "name": "ABR",
+  "slug": "abr-33144e4b",
+  "rating": 4.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019babbe-66b7-757c-a169-0fcce4d4e6a1",
+  "name": "Fundraise Up",
+  "slug": "fundraise-up-b4124f0e",
+  "rating": 4.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0197f3fb-db02-7fff-a63b-bf90d07827c2",
+  "name": "Freedom Mobile",
+  "slug": "freedom-mobile-202080c2",
+  "rating": 4,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019695cf-e6b4-71e6-a9af-60cf047a4b7e",
+  "name": "Kassa24.kz (ТОО Astana-Plat)",
+  "slug": "kassa24-kz-11f649ff",
+  "rating": 4,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196e128-d056-7902-a183-136bad8b78f2",
+  "name": "InnoForce Group",
+  "slug": "inno-force-group-aaef536d",
+  "rating": 4,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196f37f-841f-771e-948a-2add90c1c753",
+  "name": "Techinterview.space",
+  "slug": "techinterview-space-5c3c5d41",
+  "rating": 3.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196d93c-4676-783c-afa6-0a16af80acc9",
+  "name": "Wildberries",
+  "slug": "wildberries-d7b1d6a3",
+  "rating": 3.5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196bf7a-b4ed-76eb-ab74-d8111753abcf",
+  "name": "DAR Tech",
+  "slug": "dar-tech-67d3ee0f",
+  "rating": 3.33,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01976908-41fd-7ece-8a19-9fc55b1c0425",
+  "name": "Adamant Systems",
+  "slug": "adamant-systems-e7a2f1f9",
+  "rating": 3.33,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196873e-9c3a-7a93-a1be-d0f1f8b9b278",
+  "name": "Citix",
+  "slug": "citix-ca806d6e",
+  "rating": 3.2,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d58-693d-7faa-b293-b5837f3f8276",
+  "name": "Ticketon.kz (ТОО Ticketon Events)",
+  "slug": "ticketon-kz-69397a57",
+  "rating": 3.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196ed25-623a-7b76-927a-60d3fdab6926",
+  "name": "ТОО Юг-ЭлектроКомплект (ekt.kz)",
+  "slug": "ekt-kz-999ce499",
+  "rating": 3.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196bf79-8991-70f6-bb87-af9a90045dbf",
+  "name": "ONE technologies",
+  "slug": "one-technologies-a7840550",
+  "rating": 3,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01968741-e7e0-7ed8-b27b-4de46d57c409",
+  "name": "Forte bank",
+  "slug": "forte-bank-7938f00b",
+  "rating": 3,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019d43f6-e2b1-7df3-b7c2-73dcbe03df4c",
+  "name": "nFactorial School",
+  "slug": "n-factorial-school-c6cbbf74",
+  "rating": 3,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019ba249-47c9-79c4-901c-acec0ee07af3",
+  "name": "Qazaqstroy (Казахстрой)",
+  "slug": "qazaqstroy-2c86d3e2",
+  "rating": 2.83,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019a38eb-9c98-71ec-9cc2-92ef017fe96f",
+  "name": "OneVision",
+  "slug": "one-vision-b97e4d5e",
+  "rating": 2.83,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019bda6b-0cce-7335-a253-3e981d036593",
+  "name": "Банк KMF",
+  "slug": "kmf-090d2016",
+  "rating": 2.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019ac4b3-da9a-7cf4-a547-ad8806712ac6",
+  "name": "Nurbank (Нурбанк)",
+  "slug": "nurbank-c479dc38",
+  "rating": 2.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019a0a98-8acc-712e-ad28-5107ca68e087",
+  "name": "ТОО АПРО",
+  "slug": "too-apro-8e484b3f",
+  "rating": 2.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019a4a40-72ce-72da-96e1-69b357d68386",
+  "name": "teez.kz",
+  "slug": "teez-kz-76588c81",
+  "rating": 2.5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d56-bd31-7ad5-a64a-db39ad87c342",
+  "name": "Onay (Транспортный холдинг Алматы)",
+  "slug": "onay-2050db74",
+  "rating": 2.33,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196f18c-7e34-7199-bb26-6461d6cc72aa",
+  "name": "Холдинг Samgau",
+  "slug": "samgau-59aee119",
+  "rating": 2.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019da3f8-6bd3-7814-a30c-4508fbb05dd2",
+  "name": "Jet Finance",
+  "slug": "jet-finance",
+  "rating": 2.17,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019d7be4-0ba0-7f68-b935-3511574bbb69",
+  "name": "Networks Energy",
+  "slug": "networks-energy-fde23a18",
+  "rating": 1.83,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d51-4d23-7694-b1ca-597500955ce6",
+  "name": "Netcracker",
+  "slug": "netcracker-823c3615",
+  "rating": 1.8,
+  "reviewsCount": 1
+ },
+ {
+  "id": "01967d4e-de66-7456-9cec-595c2f2f7f36",
+  "name": "KCell",
+  "slug": "kcell-5ddbdf88",
+  "rating": 1.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019d521e-968a-75d9-9552-be210575e017",
+  "name": "Rival Auto",
+  "slug": "rival-auto-2a419f25",
+  "rating": 1.67,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196f18b-052c-7d42-bf72-d9dae22c4366",
+  "name": "Alser.kz (Gulser Computers)",
+  "slug": "alser-kz-1269fe03",
+  "rating": 1.5,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0198caeb-3ee4-757a-b450-341f49eebfcf",
+  "name": "АО \"Алма Телекоммуникейшнс Казахстан\" (almaPLUS)",
+  "slug": "alma-plus-a12796b9",
+  "rating": 1.33,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196b0de-df68-7b3c-b59f-bdb808dda697",
+  "name": "Solva",
+  "slug": "solva-336bc046",
+  "rating": 1,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0198330c-01be-7849-9c2e-19dec283ccf1",
+  "name": "Cleverest Technologies",
+  "slug": "cleverest-technologies-f0a1cf80",
+  "rating": 1,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0196f1c9-9e1e-76cd-85d0-1e0560a63203",
+  "name": "АО \"Центр электронных финансов\" (ЦЭФ)",
+  "slug": "cef-c6ce557b",
+  "rating": 1,
+  "reviewsCount": 1
+ },
+ {
+  "id": "0197400b-d674-76e2-9931-6e1d5919c9b5",
+  "name": "Autodata (SaleScout)",
+  "slug": "autodata-sale-scout-36c8a59d",
+  "rating": 1,
+  "reviewsCount": 1
+ },
+ {
+  "id": "019bc16c-89c0-7dbc-9be8-bd0b4bdc512d",
+  "name": "ANYATIS MANAGEMENT",
+  "slug": "anyatis-management-c5367f5d",
+  "rating": 1,
+  "reviewsCount": 1
+ }
+]

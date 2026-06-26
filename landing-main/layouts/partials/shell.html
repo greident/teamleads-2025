@@ -38,7 +38,31 @@
   {{- end -}}
 {{- end -}}
 
-<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}' data-scenarios='{{ site.Data.scenarios | jsonify }}' data-share='{{ $share | jsonify }}' data-questions='{{ $questions | jsonify }}' data-voices='{{ site.Data.voices | jsonify }}'>
+{{- /* Company reviews (techinterview.space). Refreshed at build time via GetRemote.
+       The committed data/companies.json snapshot is the fallback for ANY failure:
+       network down, non-2xx, malformed JSON, or an empty response. */ -}}
+{{- $companies := site.Data.companies -}}
+{{- $fetch := try (resources.GetRemote "https://api.techinterview.space/api/companies/all") -}}
+{{- with $fetch.Err -}}
+  {{- warnf "companies API fetch failed, using data/companies.json snapshot: %s" . -}}
+{{- else with $fetch.Value -}}
+  {{- $parsed := try (transform.Unmarshal .Content) -}}
+  {{- with $parsed.Err -}}
+    {{- warnf "companies API returned unparseable data, using snapshot: %s" . -}}
+  {{- else with $parsed.Value -}}
+    {{- $list := slice -}}
+    {{- range (where . "reviewsCount" "gt" 0) -}}
+      {{- $list = $list | append (dict "id" .id "name" .name "slug" .slug "rating" .rating "reviewsCount" .reviewsCount) -}}
+    {{- end -}}
+    {{- if gt (len $list) 0 -}}
+      {{- $companies = sort $list "reviewsCount" "desc" -}}
+    {{- else -}}
+      {{- warnf "companies API returned no companies with reviews, using snapshot" -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<div class="term" data-term data-mode="{{ $mode }}" data-tg="{{ site.Params.telegram }}" data-fs='{{ $fs | jsonify }}' data-salary='{{ site.Data.salaries | jsonify }}' data-friends='{{ $friends | jsonify }}' data-scenarios='{{ site.Data.scenarios | jsonify }}' data-share='{{ $share | jsonify }}' data-questions='{{ $questions | jsonify }}' data-voices='{{ site.Data.voices | jsonify }}' data-companies='{{ $companies | jsonify }}'>
   <div class="term-bar">
     <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
     <span class="term-title" data-term-title>guest@teamleads: /</span>
