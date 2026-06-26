@@ -6,8 +6,8 @@
 title: "NetCoreKalkan"
 description: "Библиотека для работы с криптопровайдером АО \"НУЦ\" NetCoreKalkan" Ну или нейрослоп
 projectUrl: "https://github.com/greident/NetCoreKalkan"
-author: "Андрій Курдюмов"
-date: 2026-05-24
+author: "Рамазанов Адильбек"
+date: 2026-06-25
 
 # Теги (1–3 штуки). Примеры: SaaS, Open Source, Блог, Инструмент, Курс, Телеграм-канал, Библиотека
 tags:
